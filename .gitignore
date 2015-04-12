@@ -1,0 +1,6 @@
+*.pyc
+*.dat
+*.txt
+mm.cfg
+msg/
+deleteallmsgdata
