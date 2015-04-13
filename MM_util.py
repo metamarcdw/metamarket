@@ -359,11 +359,13 @@ def createfinalmsgstr(btc_addr, rechash, vendorid, buyerid, finaltxid):
     return MM_dumps(btc_addr, FINAL, final)
     
 # Creates a new Feedback Msg and returns its string representation.
-def createfeedbackmsgstr( btc_addr, markethash, fromid, toid, finaltxid, price, upvote, message ):
+def createfeedbackmsgstr( btc_addr, markethash, finalhash, fromid, toid, finaltxid, price, upvote, message ):
     feedback = { 'markethash': markethash,
                     'finalhash': finalhash,
                     'fromid': fromid,
                     'toid': toid,
+                    'finaltxid': finaltxid,
+                    'price': price,
                     'upvote': upvote,
                     'message': message }
     return MM_dumps(btc_addr, FEEDBACK, feedback)

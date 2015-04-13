@@ -14,7 +14,7 @@ import MM_util
 import pycoin.key.Key
 import bitcoin, bitcoin.rpc, bitcoin.core
 import xmlrpclib, base64, hashlib, decimal, time
-import simplecrypt
+import scrypt, simplecrypt
 
 CHAIN = "testnet"
 NETCODE = "XTN"
@@ -28,14 +28,18 @@ MM_util.btcd = bitcoin.rpc.RawProxy()
 MM_util.btcd.walletpassphrase('test', 300)
 bm = xmlrpclib.ServerProxy(BMURL)
 
-def btcaddr( pswd ):
+def pkstr( username, pswd ):
     hash = hashlib.sha256(pswd).hexdigest()
-    se = long(hash, 16)
+    pkbytes = scrypt.hash(hash, username, N=2**18, buflen=32)
+    return bitcoin.core.b2x(pkbytes)
+
+def btcaddr( pkstr ):
+    se = long(pkstr, 16)
     key = pycoin.key.Key(secret_exponent=se, netcode=NETCODE)
     return key.address()
     
-def bmaddr( pswd ):
-    return bm.getDeterministicAddress(base64.b64encode(pswd), 4,1)
+def bmaddr( pkstr ):
+    return bm.getDeterministicAddress(base64.b64encode(pkstr), 4,1)
 
 def savemsg( btc, name, msgstr ):
     ver = MM_util.MM_loads(btc, msgstr)
@@ -43,16 +47,16 @@ def savemsg( btc, name, msgstr ):
     MM_util.appendindex(name, ver.hash)
     return ver
 
-mod_pswd = """sr#hrAoe0S4]GCb8~J3>9"Hl$"""
-vendor_pswd = """[OQ2zu%A|TFef5`!h|]BL"""
-buyer_pswd = """W3}xa`XrHkoyZ9vHZ/'U{"""
+mod_pkstr = pkstr("MM mod", """sr#hrAoe0S4]GCb8~J3>9"Hl$""")
+vendor_pkstr = pkstr("MM vendor", """[OQ2zu%A|TFef5`!h|]BL""")
+buyer_pkstr = pkstr("MM buyer", """W3}xa`XrHkoyZ9vHZ/'U{""")
 
-mod_btc = btcaddr(mod_pswd)
-mod_bm = bmaddr(mod_pswd)
-vendor_btc = btcaddr(vendor_pswd)
-vendor_bm = bmaddr(vendor_pswd)
-buyer_btc = btcaddr(buyer_pswd)
-buyer_bm = bmaddr(buyer_pswd)
+mod_btc = btcaddr(mod_pkstr)
+mod_bm = bmaddr(mod_pkstr)
+vendor_btc = btcaddr(vendor_pkstr)
+vendor_bm = bmaddr(vendor_pkstr)
+buyer_btc = btcaddr(buyer_pkstr)
+buyer_bm = bmaddr(buyer_pkstr)
 
 # IDENT
 msgstr = MM_util.createidentmsgstr( mod_btc, mod_bm, "MM mod" )
@@ -126,7 +130,7 @@ multisig = {
         "redeemScript": "5221023e5024192f82300470568fbd1d3fdd8ccf82f6b71a67afbe641eff7661e749a12102be3c8de123fbbba538b1fda2514a021342d30d1936670dc1d1094497018c2b7252ae"
     }
 fundingtx = "01000000014762c15b1aa1e331020a9abc889e774d28a0037973a5b3a997e88a802a03c499000000006a47304402203c5fada60a8c6abda133e500e6db7dccab7c26783ed6731186e4e68742926194022071b0cc78931d7f18d55f4d2faea8b39399458220cb0aedb60e31e0dd7902a07e0121023e5024192f82300470568fbd1d3fdd8ccf82f6b71a67afbe641eff7661e749a1ffffffff0240420f000000000017a91450d96f356e7d5492164893af88f216d618330bc087b0a86a00000000001976a91406245119eb453eae3aba4ce557d458f70333fc6088ac00000000"
-crypt_fundingtx = base64.b64encode( simplecrypt.encrypt(buyer_pswd, fundingtx) )
+crypt_fundingtx = base64.b64encode( simplecrypt.encrypt(buyer_pkstr, fundingtx) )
 funding_txid = "cc107206fade04670c3fbd989c8404efe7e38329bad55f8b0ae8fc6a3cec8857"
 vout = 0
 spk = "a91450d96f356e7d5492164893af88f216d618330bc087"
@@ -180,15 +184,17 @@ msgstr = MM_util.createfinalmsgstr( buyer_btc, rec.hash, vendor.hash, buyer.hash
 final = savemsg(buyer_btc, 'final', msgstr)
 
 # FEEDBACK
-msgstr = MM_util.createfeedbackmsgstr( vendor_btc, market.hash, vendor.hash, buyer.hash, \
+msgstr = MM_util.createfeedbackmsgstr( vendor_btc, market.hash, final.hash, vendor.hash, buyer.hash, \
                 "1b18001c62dadaa7e1047cf336640a56c9b88a68eb6195add2d90d48379b11b3", \
+                "0.03", \
                 True, \
                 "Trade escrowed and finalized promptly." )
 vfeedback = savemsg(vendor_btc, 'feedback', msgstr)
 print vfeedback
 
-msgstr = MM_util.createfeedbackmsgstr( buyer_btc, market.hash, buyer.hash, vendor.hash, \
+msgstr = MM_util.createfeedbackmsgstr( buyer_btc, market.hash, final.hash, buyer.hash, vendor.hash, \
                 "1b18001c62dadaa7e1047cf336640a56c9b88a68eb6195add2d90d48379b11b3", \
+                "0.03", \
                 True, \
                 "Sale executed flawlessly, Many thanks." )
 bfeedback = savemsg(buyer_btc, 'feedback', msgstr)
