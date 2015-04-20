@@ -9,6 +9,7 @@ Install Bitcoin Core - http://bitcoin.org
 sudo apt-add-repository ppa:bitcoin/bitcoin
 sudo apt-get update
 sudo apt-get install bitcoin-qt
+bitcoin-qt
 
 Install Bitmessage - http://bitmessage.org
 sudo apt-get install python openssl git python-qt4
@@ -16,17 +17,16 @@ git clone https://github.com/Bitmessage/PyBitmessage $HOME/PyBitmessage
 ~/PyBitmessage/src/bitmessagemain.py 
 
 Edit ~/.config/PyBitmessage/keys.dat
-Or   %APPDATA%\PyBitmessage\keys.dat
+Or   %APPDATA%\PyBitmessage\keys.dat on Windows
 Add:
-[bitmessagesettings]
 apienabled = True
 apiport = 8442
 apiinterface = 127.0.0.1
 apiusername = username
 apipassword = password
 
-Edit ~/.config/Bitcoin/bitcoin.conf
-Or   %APPDATA%\Bitcoin\bitcoin.conf
+Edit ~/.bitcoin/bitcoin.conf
+Or   %APPDATA%\Bitcoin\bitcoin.conf on Windows
 Add:
 server=1
 testnet=1
