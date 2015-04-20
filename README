@@ -6,13 +6,28 @@ http://metamarket.biz
 
 INSTALL ON UBUNTU GNU/LINUX:
 
-sudo apt-get install git python-dev libssl-dev
-pip install simplejson, scrypt, pycrypto, simple-crypt, pycoin, python-bitcoinlib
+sudo apt-get install git python-dev libssl-dev python-pip
+sudo pip install simplejson
+sudo pip install scrypt
+sudo pip install pycrypto
+sudo pip install simple-crypt
+sudo pip install pycoin
+sudo pip install python-bitcoinlib
 cd ~
 git clone https://github.com/metamarcdw/metamarket.git
 cd metamarket
 sudo chmod u+x *.py
 ./mmcli.py --help
+
+
+INSTALL ON WINDOWS:
+
+Download ZIP from https://github.com/metamarcdw/metamarket/archive/master.zip
+Unzip metamarket-master
+Open Command Prompt
+cd C:\metamarket-master\dist
+mmcli --help
+
 
 * * *
 
