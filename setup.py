@@ -23,6 +23,6 @@ setup(
         'py2exe': {
             'packages': ['bitcoin', 'pycoin'],
             'includes': ['simplejson', 'simplecrypt', '_scrypt'],
-        }
+        } # Changed scrypt.py to import C module from current directory.
     }
 )
