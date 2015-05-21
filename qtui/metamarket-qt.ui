@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabwidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="chan_tab">
        <attribute name="title">
@@ -82,7 +82,7 @@
            <item row="0" column="0">
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
-              <widget class="QListView" name="orders_listview"/>
+              <widget class="QTreeView" name="orders_treeview"/>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -120,6 +120,49 @@
        <attribute name="title">
         <string>Markets</string>
        </attribute>
+       <layout class="QGridLayout" name="gridLayout_7">
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="market_groupbox">
+          <property name="title">
+           <string>Available Markets:</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_6">
+           <item row="0" column="0">
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <item>
+              <widget class="QTreeView" name="market_treeview"/>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <item>
+                <widget class="QPushButton" name="market_register_button">
+                 <property name="text">
+                  <string>Register Market</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="market_view_button">
+                 <property name="text">
+                  <string>View Market</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="market_delete_button">
+                 <property name="text">
+                  <string>Delete Market</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="ident_tab">
        <attribute name="title">
