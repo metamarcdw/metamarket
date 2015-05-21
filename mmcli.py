@@ -39,7 +39,8 @@ def login( wp=None ):
     print "BTC Address: %s\nBM Address: %s" % ( btcaddr, bmaddr )
     
     MM_util.unlockwallet(wp)
-    if not MM_util.btcd.validateaddress(btcaddr)['ismine']:
+    if not MM_util.btcd.validateaddress(btcaddr)['ismine'] or \
+        MM_util.bm.createDeterministicAddresses(base64.b64encode(pkstr)) != []:
         importkeys()
     
     identlist = MM_util.loadlist('ident')
@@ -60,13 +61,13 @@ def login( wp=None ):
         bannedtags = MM_util.loadindex('bannedtags')
         
 def importkeys( ):
-    print "Bitcoin private key not found in wallet."
-    print "Would you like to import it and create your BM ID?"
+    print "Bitcoin private key not found in wallet"
+    print "or Bitmessage identity does not exist."
+    print "Import your BTC private key and create your BM ID?"
     if MM_util.yorn():
         pass2 = getpass.getpass("Please re-enter your passphrase: ")
         if pass2 == passphrase:
             MM_util.btcd.importprivkey(wif, username, False)
-            MM_util.bm.createDeterministicAddresses(base64.b64encode(pkstr))
             
             print "REMEMBER TO SECURELY BACKUP YOUR"
             print "wallet.dat AND keys.dat files!"
@@ -74,6 +75,7 @@ def importkeys( ):
         else:
             raise Exception("Passwords did not match.")
     else:
+        MM_util.bm.deleteAddress(bmaddr)
         sys.exit()
     
 def register( idstr ):
