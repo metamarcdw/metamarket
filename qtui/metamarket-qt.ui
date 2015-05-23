@@ -15,7 +15,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
+    <item row="1" column="0">
      <widget class="QTabWidget" name="tabwidget">
       <property name="currentIndex">
        <number>0</number>
@@ -68,54 +68,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="order_tab">
-       <attribute name="title">
-        <string>Orders</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_5">
-        <item row="0" column="0">
-         <widget class="QGroupBox" name="order_groupbox">
-          <property name="title">
-           <string>Orders:</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_4">
-           <item row="0" column="0">
-            <layout class="QVBoxLayout" name="verticalLayout_2">
-             <item>
-              <widget class="QTableWidget" name="orders_table"/>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_2">
-               <item>
-                <widget class="QPushButton" name="order_process_button">
-                 <property name="text">
-                  <string>Process</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="order_cancel_button">
-                 <property name="text">
-                  <string>Cancel Order</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="order_backup_button">
-                 <property name="text">
-                  <string>Backup Order</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="market_tab">
        <attribute name="title">
         <string>Markets</string>
@@ -152,6 +104,54 @@
                 <widget class="QPushButton" name="market_delete_button">
                  <property name="text">
                   <string>Delete Market</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="order_tab">
+       <attribute name="title">
+        <string>Orders</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="order_groupbox">
+          <property name="title">
+           <string>My Orders:</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_4">
+           <item row="0" column="0">
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+             <item>
+              <widget class="QTableWidget" name="orders_table"/>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <item>
+                <widget class="QPushButton" name="order_process_button">
+                 <property name="text">
+                  <string>Process</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="order_cancel_button">
+                 <property name="text">
+                  <string>Cancel Order</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="order_backup_button">
+                 <property name="text">
+                  <string>Backup Order</string>
                  </property>
                 </widget>
                </item>
@@ -261,6 +261,57 @@
            </widget>
           </item>
          </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="offer_tab">
+       <attribute name="title">
+        <string>Offers</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_12">
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="offer_groupbox">
+          <property name="title">
+           <string>Available Offers: Market Name</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_11">
+           <item row="0" column="0">
+            <layout class="QVBoxLayout" name="verticalLayout_7">
+             <item>
+              <widget class="QComboBox" name="offer_mkt_combobox"/>
+             </item>
+             <item>
+              <widget class="QTableWidget" name="offer_tablewidget"/>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <item>
+                <widget class="QPushButton" name="offer_order_button">
+                 <property name="text">
+                  <string>Order</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="offer_view_button">
+                 <property name="text">
+                  <string>View Offer</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="offer_delete_button">
+                 <property name="text">
+                  <string>Delete Offer</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
         </item>
        </layout>
       </widget>
