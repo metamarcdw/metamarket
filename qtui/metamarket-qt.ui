@@ -34,7 +34,7 @@
            <item row="0" column="0">
             <layout class="QVBoxLayout" name="verticalLayout">
              <item>
-              <widget class="QListView" name="chan_listview"/>
+              <widget class="QListWidget" name="chan_list"/>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout">
@@ -82,7 +82,7 @@
            <item row="0" column="0">
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
-              <widget class="QTreeView" name="orders_treeview"/>
+              <widget class="QTableWidget" name="orders_table"/>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -130,7 +130,7 @@
            <item row="0" column="0">
             <layout class="QVBoxLayout" name="verticalLayout_3">
              <item>
-              <widget class="QTreeView" name="market_treeview"/>
+              <widget class="QTableWidget" name="market_table"/>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -228,7 +228,7 @@
                 </layout>
                </item>
                <item>
-                <widget class="QTreeView" name="ident_treeview"/>
+                <widget class="QTableWidget" name="ident_table"/>
                </item>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -263,9 +263,6 @@
          </layout>
         </item>
        </layout>
-       <zorder>ident_groupbox</zorder>
-       <zorder>ident_treeview</zorder>
-       <zorder>ident_myid_groupbox</zorder>
       </widget>
      </widget>
     </item>
