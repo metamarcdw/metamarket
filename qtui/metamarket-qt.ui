@@ -101,9 +101,9 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="order_delete_button">
+                <widget class="QPushButton" name="order_backup_button">
                  <property name="text">
-                  <string>Delete Order</string>
+                  <string>Backup Order</string>
                  </property>
                 </widget>
                </item>
