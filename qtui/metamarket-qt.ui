@@ -135,9 +135,9 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_3">
                <item>
-                <widget class="QPushButton" name="market_register_button">
+                <widget class="QPushButton" name="market_import_button">
                  <property name="text">
-                  <string>Register Market</string>
+                  <string>Import Market</string>
                  </property>
                 </widget>
                </item>
@@ -168,6 +168,104 @@
        <attribute name="title">
         <string>Identities</string>
        </attribute>
+       <layout class="QGridLayout" name="gridLayout_10">
+        <item row="0" column="0">
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QGroupBox" name="ident_myid_groupbox">
+            <property name="title">
+             <string>My Identity:</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_9">
+             <item row="0" column="0">
+              <layout class="QVBoxLayout" name="verticalLayout_5">
+               <item>
+                <widget class="QLabel" name="ident_myid_label">
+                 <property name="text">
+                  <string>ID Hash: </string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="ident_btcaddr_label">
+                 <property name="text">
+                  <string>BTC Address: </string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="ident_bmaddr_label">
+                 <property name="text">
+                  <string>BM Address: </string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="ident_groupbox">
+            <property name="title">
+             <string>Known Identities:</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_8">
+             <item row="0" column="0">
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_5">
+                 <item>
+                  <widget class="QComboBox" name="ident_market_combobox"/>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="ident_search_lineedit">
+                   <property name="text">
+                    <string>Search</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <widget class="QTreeView" name="ident_treeview"/>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                 <item>
+                  <widget class="QPushButton" name="ident_reg_button">
+                   <property name="text">
+                    <string>Register My Identity</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="ident_view_button">
+                   <property name="text">
+                    <string>View Identity</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="ident_burn_button">
+                   <property name="text">
+                    <string>BURN BTC</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+       <zorder>ident_groupbox</zorder>
+       <zorder>ident_treeview</zorder>
+       <zorder>ident_myid_groupbox</zorder>
       </widget>
      </widget>
     </item>
