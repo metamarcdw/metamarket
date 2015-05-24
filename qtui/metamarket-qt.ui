@@ -266,16 +266,16 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="order_cancel_button">
+                <widget class="QPushButton" name="order_view_button">
                  <property name="text">
-                  <string>Cancel Order</string>
+                  <string>View Order</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="order_backup_button">
+                <widget class="QPushButton" name="order_cancel_button">
                  <property name="text">
-                  <string>Backup Order</string>
+                  <string>Cancel Order</string>
                  </property>
                 </widget>
                </item>
