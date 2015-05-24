@@ -82,7 +82,21 @@
            <item row="0" column="0">
             <layout class="QVBoxLayout" name="verticalLayout_3">
              <item>
-              <widget class="QTableWidget" name="market_table"/>
+              <widget class="QTableWidget" name="market_table">
+               <attribute name="horizontalHeaderStretchLastSection">
+                <bool>true</bool>
+               </attribute>
+               <column>
+                <property name="text">
+                 <string>Name</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Description</string>
+                </property>
+               </column>
+              </widget>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -133,7 +147,31 @@
               <widget class="QComboBox" name="offer_mkt_combobox"/>
              </item>
              <item>
-              <widget class="QTableWidget" name="offer_tablewidget"/>
+              <widget class="QTableWidget" name="offer_tablewidget">
+               <attribute name="horizontalHeaderStretchLastSection">
+                <bool>true</bool>
+               </attribute>
+               <column>
+                <property name="text">
+                 <string>Name</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Locale</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Amount</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Price</string>
+                </property>
+               </column>
+              </widget>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -181,7 +219,31 @@
            <item row="0" column="0">
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
-              <widget class="QTableWidget" name="orders_table"/>
+              <widget class="QTableWidget" name="orders_table">
+               <attribute name="horizontalHeaderStretchLastSection">
+                <bool>true</bool>
+               </attribute>
+               <column>
+                <property name="text">
+                 <string>New Column</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Name</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Locale</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Price</string>
+                </property>
+               </column>
+              </widget>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -279,7 +341,21 @@
                 </layout>
                </item>
                <item>
-                <widget class="QTableWidget" name="ident_table"/>
+                <widget class="QTableWidget" name="ident_table">
+                 <attribute name="horizontalHeaderStretchLastSection">
+                  <bool>true</bool>
+                 </attribute>
+                 <column>
+                  <property name="text">
+                   <string>Name</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>ID</string>
+                  </property>
+                 </column>
+                </widget>
                </item>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_4">
