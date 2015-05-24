@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket-qt.ui'
 #
-# Created: Sun May 24 00:32:35 2015
+# Created: Sun May 24 00:36:07 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -301,11 +301,11 @@ class Ui_MainWindow(object):
         self.tabwidget.setTabText(self.tabwidget.indexOf(self.offer_tab), _translate("MainWindow", "Offers", None))
         self.order_groupbox.setTitle(_translate("MainWindow", "My Orders:", None))
         item = self.orders_table.horizontalHeaderItem(0)
-        item.setText(_translate("MainWindow", "New Column", None))
-        item = self.orders_table.horizontalHeaderItem(1)
         item.setText(_translate("MainWindow", "Name", None))
-        item = self.orders_table.horizontalHeaderItem(2)
+        item = self.orders_table.horizontalHeaderItem(1)
         item.setText(_translate("MainWindow", "Locale", None))
+        item = self.orders_table.horizontalHeaderItem(2)
+        item.setText(_translate("MainWindow", "Amount", None))
         item = self.orders_table.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "Price", None))
         self.order_process_button.setText(_translate("MainWindow", "Process", None))
