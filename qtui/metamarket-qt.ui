@@ -144,7 +144,18 @@
            <item row="0" column="0">
             <layout class="QVBoxLayout" name="verticalLayout_7">
              <item>
-              <widget class="QComboBox" name="offer_mkt_combobox"/>
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <item>
+                <widget class="QComboBox" name="offer_mkt_combobox"/>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="offer_search_lineedit">
+                 <property name="text">
+                  <string>Search</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
              <item>
               <widget class="QTableWidget" name="offer_tablewidget">
@@ -174,7 +185,7 @@
               </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
                <item>
                 <widget class="QPushButton" name="offer_order_button">
                  <property name="text">
