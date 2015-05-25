@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket-qt.ui'
 #
-# Created: Sun May 24 00:36:07 2015
+# Created: Sun May 24 23:52:40 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -174,12 +174,12 @@ class Ui_MainWindow(object):
         self.order_process_button = QtGui.QPushButton(self.order_groupbox)
         self.order_process_button.setObjectName(_fromUtf8("order_process_button"))
         self.horizontalLayout_2.addWidget(self.order_process_button)
+        self.order_view_button = QtGui.QPushButton(self.order_groupbox)
+        self.order_view_button.setObjectName(_fromUtf8("order_view_button"))
+        self.horizontalLayout_2.addWidget(self.order_view_button)
         self.order_cancel_button = QtGui.QPushButton(self.order_groupbox)
         self.order_cancel_button.setObjectName(_fromUtf8("order_cancel_button"))
         self.horizontalLayout_2.addWidget(self.order_cancel_button)
-        self.order_backup_button = QtGui.QPushButton(self.order_groupbox)
-        self.order_backup_button.setObjectName(_fromUtf8("order_backup_button"))
-        self.horizontalLayout_2.addWidget(self.order_backup_button)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
         self.gridLayout_4.addLayout(self.verticalLayout_2, 0, 0, 1, 1)
         self.gridLayout_5.addWidget(self.order_groupbox, 0, 0, 1, 1)
@@ -309,8 +309,8 @@ class Ui_MainWindow(object):
         item = self.orders_table.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "Price", None))
         self.order_process_button.setText(_translate("MainWindow", "Process", None))
+        self.order_view_button.setText(_translate("MainWindow", "View Order", None))
         self.order_cancel_button.setText(_translate("MainWindow", "Cancel Order", None))
-        self.order_backup_button.setText(_translate("MainWindow", "Backup Order", None))
         self.tabwidget.setTabText(self.tabwidget.indexOf(self.order_tab), _translate("MainWindow", "Orders", None))
         self.ident_myid_groupbox.setTitle(_translate("MainWindow", "My Identity:", None))
         self.ident_myid_label.setText(_translate("MainWindow", "ID Hash: ", None))
