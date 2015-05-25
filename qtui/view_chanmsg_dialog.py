@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'view_chanmsg_dialog.ui'
 #
-# Created: Mon May 25 15:52:31 2015
+# Created: Mon May 25 16:42:27 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -24,15 +24,15 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_Dialog(object):
-    def setupUi(self, Dialog):
-        Dialog.setObjectName(_fromUtf8("Dialog"))
-        Dialog.resize(400, 300)
-        self.gridLayout = QtGui.QGridLayout(Dialog)
+class Ui_view_chanmsg_dialog(object):
+    def setupUi(self, view_chanmsg_dialog):
+        view_chanmsg_dialog.setObjectName(_fromUtf8("view_chanmsg_dialog"))
+        view_chanmsg_dialog.resize(400, 300)
+        self.gridLayout = QtGui.QGridLayout(view_chanmsg_dialog)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.verticalLayout = QtGui.QVBoxLayout()
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.groupBox = QtGui.QGroupBox(Dialog)
+        self.groupBox = QtGui.QGroupBox(view_chanmsg_dialog)
         self.groupBox.setObjectName(_fromUtf8("groupBox"))
         self.gridLayout_2 = QtGui.QGridLayout(self.groupBox)
         self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
@@ -44,20 +44,20 @@ class Ui_Dialog(object):
         self.verticalLayout.addWidget(self.groupBox)
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
 
-        self.retranslateUi(Dialog)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+        self.retranslateUi(view_chanmsg_dialog)
+        QtCore.QMetaObject.connectSlotsByName(view_chanmsg_dialog)
 
-    def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(_translate("Dialog", "View Channel Message", None))
-        self.groupBox.setTitle(_translate("Dialog", "Message:", None))
+    def retranslateUi(self, view_chanmsg_dialog):
+        view_chanmsg_dialog.setWindowTitle(_translate("view_chanmsg_dialog", "View Channel Message", None))
+        self.groupBox.setTitle(_translate("view_chanmsg_dialog", "Message:", None))
 
 
 if __name__ == "__main__":
     import sys
     app = QtGui.QApplication(sys.argv)
-    Dialog = QtGui.QDialog()
-    ui = Ui_Dialog()
-    ui.setupUi(Dialog)
-    Dialog.show()
+    view_chanmsg_dialog = QtGui.QDialog()
+    ui = Ui_view_chanmsg_dialog()
+    ui.setupUi(view_chanmsg_dialog)
+    view_chanmsg_dialog.show()
     sys.exit(app.exec_())
 
