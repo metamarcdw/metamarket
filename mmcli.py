@@ -690,6 +690,7 @@ def createfeedback():
     finallist = MM_util.loadlist('final')
     final = MM_util.searchlistbyhash(finallist, finalhash)
     offer = MM_util.offerfromordermsg(final)
+    order = MM_util.offerfromordermsg(final, getorder=True)
     
     if entity == 'buyer':
         fromid = final.obj['buyerid']
@@ -698,8 +699,8 @@ def createfeedback():
         fromid = final.obj['vendorid']
         toid = final.obj['buyerid']
         
-    msgstr = MM_util.createfeedbackmsgstr(btcaddr, offer.obj['markethash'], finalhash, \
-                                            fromid, toid, upvote, message)
+    msgstr = MM_util.createfeedbackmsgstr(btcaddr, offer.obj['markethash'], finalhash, fromid, toid, \
+                                            final.obj['finaltxid'], order.obj['multisig']['redeemscript'], upvote, message)
     ver = MM_util.MM_loads(btcaddr, msgstr)
     MM_util.MM_writefile(msgstr)
     MM_util.appendindex('feedback', ver.hash)
@@ -895,40 +896,24 @@ def processfeedback(msg, ver):
     
     fromuser = MM_util.searchlistbyhash(identlist, ver.obj['fromid'])
     touser = MM_util.searchlistbyhash(identlist, ver.obj['toid'])
-    buyer = MM_util.searchlistbyhash(identlist, final.obj['buyerid'])
-    vendor = MM_util.searchlistbyhash(identlist, final.obj['vendorid'])
     
-    final = MM_util.searchlistbyhash(finallist, ver.obj['finalhash'])
-    offer = MM_util.offerfromordermsg(final)
-
-    price = decimal.Decimal(offer.obj['price'])
-    ratio = decimal.Decimal(offer.obj['ratio'])
-    
-    txid = final.obj['finaltxid']
     finaltx = gettx(txid)
-    finaltx_hex = MM_util.btcd.getrawtransaction(txid, 0)
-    fee = MM_util.calc_fee(finaltx_hex)
+    prevtxid = finaltx['vin'][0]['txid']
+    prevtx = gettx(prevtxid)
+    msaddr = prevtx['vout'][0]['addresses'][0]
     
-    # verify finaltx makes sense!
-    # if upvote, fintx is final
-    if ver.obj['upvote']:
-        searchtxops(finaltx, vendor.obj['btcaddr'], price - fee)
-    # if not upvote, fintx is refund
-    else:
-        b_portion, v_portion = MM_util.getamounts(price, ratio)
-        if fromuser.hash == buyer.hash:
-            searchtxops(finaltx, buyer.obj['btcaddr'], b_portion - fee/2)
-        elif fromuser.hash == vendor.hash:
-            searchtxops(finaltx, vendor.obj['btcaddr'], v_portion - fee/2)
+    redeemscript = MM_util.btcd.decodescript(ver.obj['redeemscript'])
     
-    if fromuser and touser and \
-       ver.obj['markethash'] == mymarket.hash:
+    if redeemscript['p2sh'] == msaddr and \
+       fromuser.obj['btcaddr'] in redeemscript['addresses'] and \
+       touser.obj['btcaddr'] in redeemscript['addresses']:
+    
         MM_util.MM_writefile(msg)
         MM_util.appendindex('feedback', ver.hash)
         print "FEEDBACK Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("FEEDBACK Msg rejected.")
-        
+
 def processsync(msg, ver):
     identlist = MM_util.loadlist("ident")
     user = MM_util.searchlistbyhash(identlist, ver.obj['userid'])

@@ -84,7 +84,7 @@ def btcfrommsg(entity, msgstr):
     return searchlistbyhash( ids, idhash ).obj['btcaddr']
 
 # Takes a verified "OrderMsg" and returns the associated Offer.
-def offerfromordermsg( msg ):
+def offerfromordermsg( msg, getorder=False ):
     offerlist = loadlist('offer')
     orderlist = loadlist('order')
     conflist = loadlist('conf')
@@ -110,6 +110,8 @@ def offerfromordermsg( msg ):
         pay = searchlistbyhash(paylist, rec.obj['payhash'])
         conf = searchlistbyhash(conflist, pay.obj['confhash'])
         order = searchlistbyhash(orderlist, conf.obj['orderhash'])
+        if getorder:
+            return order
         return searchlistbyhash(offerlist, order.obj['offerhash'])
 
 # Takes an unverified msg string of any type,
@@ -359,13 +361,13 @@ def createfinalmsgstr(btc_addr, rechash, vendorid, buyerid, finaltxid):
     return MM_dumps(btc_addr, FINAL, final)
     
 # Creates a new Feedback Msg and returns its string representation.
-def createfeedbackmsgstr( btc_addr, markethash, finalhash, fromid, toid, finaltxid, price, upvote, message ):
+def createfeedbackmsgstr( btc_addr, markethash, finalhash, fromid, toid, finaltxid, redeemscript, upvote, message ):
     feedback = { 'markethash': markethash,
                     'finalhash': finalhash,
                     'fromid': fromid,
                     'toid': toid,
                     'finaltxid': finaltxid,
-                    'price': price,
+                    'redeemscript': redeemscript,
                     'upvote': upvote,
                     'message': message }
     return MM_dumps(btc_addr, FEEDBACK, feedback)

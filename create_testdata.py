@@ -186,7 +186,7 @@ final = savemsg(buyer_btc, 'final', msgstr)
 # FEEDBACK
 msgstr = MM_util.createfeedbackmsgstr( vendor_btc, market.hash, final.hash, vendor.hash, buyer.hash, \
                 "1b18001c62dadaa7e1047cf336640a56c9b88a68eb6195add2d90d48379b11b3", \
-                "0.03", \
+                "5221023e5024192f82300470568fbd1d3fdd8ccf82f6b71a67afbe641eff7661e749a12102be3c8de123fbbba538b1fda2514a021342d30d1936670dc1d1094497018c2b7252ae", \
                 True, \
                 "Trade escrowed and finalized promptly." )
 vfeedback = savemsg(vendor_btc, 'feedback', msgstr)
