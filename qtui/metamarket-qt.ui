@@ -273,7 +273,7 @@
                <item>
                 <widget class="QPushButton" name="order_view_button">
                  <property name="text">
-                  <string>View Order</string>
+                  <string>View Offer</string>
                  </property>
                 </widget>
                </item>
