@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket-qt.ui'
 #
-# Created: Wed May 27 21:58:39 2015
+# Created: Fri May 29 23:32:58 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -257,14 +257,20 @@ class Ui_MainWindow(object):
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName(_fromUtf8("menuFile"))
+        self.menuHelp = QtGui.QMenu(self.menubar)
+        self.menuHelp.setObjectName(_fromUtf8("menuHelp"))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
         MainWindow.setStatusBar(self.statusbar)
         self.actionClose = QtGui.QAction(MainWindow)
         self.actionClose.setObjectName(_fromUtf8("actionClose"))
+        self.actionAbout = QtGui.QAction(MainWindow)
+        self.actionAbout.setObjectName(_fromUtf8("actionAbout"))
         self.menuFile.addAction(self.actionClose)
+        self.menuHelp.addAction(self.actionAbout)
         self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
         self.tabwidget.setCurrentIndex(0)
@@ -331,7 +337,9 @@ class Ui_MainWindow(object):
         self.ident_burn_button.setText(_translate("MainWindow", "BURN BTC", None))
         self.tabwidget.setTabText(self.tabwidget.indexOf(self.ident_tab), _translate("MainWindow", "Identities", None))
         self.menuFile.setTitle(_translate("MainWindow", "File", None))
+        self.menuHelp.setTitle(_translate("MainWindow", "Help", None))
         self.actionClose.setText(_translate("MainWindow", "Close", None))
+        self.actionAbout.setText(_translate("MainWindow", "About", None))
 
 
 if __name__ == "__main__":
