@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'view_ident_dialog.ui'
 #
-# Created: Wed May 27 22:08:10 2015
+# Created: Fri May 29 22:44:31 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -24,13 +24,13 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_Dialog(object):
-    def setupUi(self, Dialog):
-        Dialog.setObjectName(_fromUtf8("Dialog"))
-        Dialog.resize(400, 114)
-        self.gridLayout_2 = QtGui.QGridLayout(Dialog)
+class Ui_view_ident_dialog(object):
+    def setupUi(self, view_ident_dialog):
+        view_ident_dialog.setObjectName(_fromUtf8("view_ident_dialog"))
+        view_ident_dialog.resize(400, 114)
+        self.gridLayout_2 = QtGui.QGridLayout(view_ident_dialog)
         self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
-        self.view_ident_groupbox = QtGui.QGroupBox(Dialog)
+        self.view_ident_groupbox = QtGui.QGroupBox(view_ident_dialog)
         self.view_ident_groupbox.setObjectName(_fromUtf8("view_ident_groupbox"))
         self.gridLayout = QtGui.QGridLayout(self.view_ident_groupbox)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
@@ -48,23 +48,23 @@ class Ui_Dialog(object):
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
         self.gridLayout_2.addWidget(self.view_ident_groupbox, 0, 0, 1, 1)
 
-        self.retranslateUi(Dialog)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+        self.retranslateUi(view_ident_dialog)
+        QtCore.QMetaObject.connectSlotsByName(view_ident_dialog)
 
-    def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog", None))
-        self.view_ident_groupbox.setTitle(_translate("Dialog", "View Identity: Identname", None))
-        self.hash_label.setText(_translate("Dialog", "ID hash: ", None))
-        self.btcaddr_label.setText(_translate("Dialog", "BTC address: ", None))
-        self.bmaddr_label.setText(_translate("Dialog", "BM address: ", None))
+    def retranslateUi(self, view_ident_dialog):
+        view_ident_dialog.setWindowTitle(_translate("view_ident_dialog", "Dialog", None))
+        self.view_ident_groupbox.setTitle(_translate("view_ident_dialog", "View Identity: Identname", None))
+        self.hash_label.setText(_translate("view_ident_dialog", "ID hash: ", None))
+        self.btcaddr_label.setText(_translate("view_ident_dialog", "BTC address: ", None))
+        self.bmaddr_label.setText(_translate("view_ident_dialog", "BM address: ", None))
 
 
 if __name__ == "__main__":
     import sys
     app = QtGui.QApplication(sys.argv)
-    Dialog = QtGui.QDialog()
-    ui = Ui_Dialog()
-    ui.setupUi(Dialog)
-    Dialog.show()
+    view_ident_dialog = QtGui.QDialog()
+    ui = Ui_view_ident_dialog()
+    ui.setupUi(view_ident_dialog)
+    view_ident_dialog.show()
     sys.exit(app.exec_())
 
