@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket-qt.ui'
 #
-# Created: Fri May 29 23:32:58 2015
+# Created: Sun May 31 20:53:55 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -274,7 +274,6 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.tabwidget.setCurrentIndex(0)
-        QtCore.QObject.connect(self.actionClose, QtCore.SIGNAL(_fromUtf8("activated()")), MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
