@@ -904,7 +904,8 @@ def processfeedback(msg, ver):
     
     redeemscript = MM_util.btcd.decodescript(ver.obj['redeemscript'])
     
-    if redeemscript['p2sh'] == msaddr and \
+    if fromuser and touser and \
+       redeemscript['p2sh'] == msaddr and \
        fromuser.obj['btcaddr'] in redeemscript['addresses'] and \
        touser.obj['btcaddr'] in redeemscript['addresses']:
     
