@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'metamarket-qt.ui'
+# Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Sun May 31 20:53:55 2015
+# Created: Sun Jun 14 13:42:59 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -267,6 +267,9 @@ class Ui_MainWindow(object):
         self.actionClose.setObjectName(_fromUtf8("actionClose"))
         self.actionAbout = QtGui.QAction(MainWindow)
         self.actionAbout.setObjectName(_fromUtf8("actionAbout"))
+        self.actionLogin = QtGui.QAction(MainWindow)
+        self.actionLogin.setObjectName(_fromUtf8("actionLogin"))
+        self.menuFile.addAction(self.actionLogin)
         self.menuFile.addAction(self.actionClose)
         self.menuHelp.addAction(self.actionAbout)
         self.menubar.addAction(self.menuFile.menuAction())
@@ -339,6 +342,7 @@ class Ui_MainWindow(object):
         self.menuHelp.setTitle(_translate("MainWindow", "Help", None))
         self.actionClose.setText(_translate("MainWindow", "Close", None))
         self.actionAbout.setText(_translate("MainWindow", "About", None))
+        self.actionLogin.setText(_translate("MainWindow", "Login", None))
 
 
 if __name__ == "__main__":

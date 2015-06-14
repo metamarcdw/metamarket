@@ -424,6 +424,7 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionLogin"/>
     <addaction name="actionClose"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -444,6 +445,11 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionLogin">
+   <property name="text">
+    <string>Login</string>
    </property>
   </action>
  </widget>
