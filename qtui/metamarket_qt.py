@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Sun Jun 14 13:42:59 2015
+# Created: Mon Jun 22 22:10:24 2015
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -226,12 +226,14 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.addLayout(self.horizontalLayout_5)
         self.ident_table = QtGui.QTableWidget(self.ident_groupbox)
         self.ident_table.setObjectName(_fromUtf8("ident_table"))
-        self.ident_table.setColumnCount(2)
+        self.ident_table.setColumnCount(3)
         self.ident_table.setRowCount(0)
         item = QtGui.QTableWidgetItem()
         self.ident_table.setHorizontalHeaderItem(0, item)
         item = QtGui.QTableWidgetItem()
         self.ident_table.setHorizontalHeaderItem(1, item)
+        item = QtGui.QTableWidgetItem()
+        self.ident_table.setHorizontalHeaderItem(2, item)
         self.ident_table.horizontalHeader().setStretchLastSection(True)
         self.verticalLayout_4.addWidget(self.ident_table)
         self.horizontalLayout_4 = QtGui.QHBoxLayout()
@@ -333,6 +335,8 @@ class Ui_MainWindow(object):
         item = self.ident_table.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Name", None))
         item = self.ident_table.horizontalHeaderItem(1)
+        item.setText(_translate("MainWindow", "Rep Score", None))
+        item = self.ident_table.horizontalHeaderItem(2)
         item.setText(_translate("MainWindow", "ID", None))
         self.ident_reg_button.setText(_translate("MainWindow", "Register My Identity", None))
         self.ident_view_button.setText(_translate("MainWindow", "View Identity", None))
