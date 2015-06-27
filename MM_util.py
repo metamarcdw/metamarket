@@ -268,6 +268,15 @@ def modbanuser(userid, identlist, offerlist):
             if offer.obj['vendorid'] == user.hash:
                 MM_backupfile('offer', offer.hash)
                     
+def modbantag(taghash, offerlist, bannedtags):
+    appendindex('bannedtags', taghash)
+    MM_backupfile('tags', taghash)
+    
+    for offer in offerlist:
+        for tag in offer.obj['tags']:
+            if tag in bannedtags:
+                MM_backupfile('offer', offer.hash)
+                
 
 # Creates a new Ident Msg and returns its string representation.
 def createidentmsgstr( btc_addr, bm_addr, user_name ):

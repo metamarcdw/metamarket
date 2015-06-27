@@ -117,22 +117,16 @@ def do_modbanuser( ):
     
     modbanuser(userid, identlist, offerlist)
     
-def modbantag( ):
+def do_modbantag( ):
     taghash = raw_input("Enter a Tag ID: ")
     print "Are you sure?:"
     if not yorn():
         return
         
-    bannedtags.append(taghash)
-    appendindex('bannedtags', taghash)
-    MM_backupfile('tags', taghash)
-    
     offerlist = loadlist('offer')
-    for offer in offerlist:
-        for tag in offer.obj['tags']:
-            if tag in bannedtags:
-                MM_backupfile('offer', offer.hash)
-                
+    bannedtags.append(taghash)
+    modbantag(taghash, offerlist, bannedtags)
+
 def modremoveoffer( ):
     offerhash = raw_input("Enter an Offer ID: ")
     print "Are you sure?:"
@@ -1296,9 +1290,9 @@ def main():
         processinbox()
         btcd.walletlock()
     elif args.mode == "modbanuser":
-        modbanuser()
+        do_modbanuser()
     elif args.mode == "modbantag":
-        modbantag()
+        do_modbantag()
     elif args.mode == "modremoveoffer":
         modremoveoffer()
     elif args.mode == "showchan":
