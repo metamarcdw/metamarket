@@ -106,7 +106,7 @@ def modbroadcast( ):
 def modsync( bm_addr ):
     sendmsgviabm(bm_addr, bmaddr, synccast(), False)
 
-def modbanuser( ):
+def do_modbanuser( ):
     userid = raw_input("Enter a User ID: ")
     print "Are you sure?:"
     if not yorn():
@@ -115,15 +115,8 @@ def modbanuser( ):
     identlist = loadlist('ident')
     offerlist = loadlist('offer')
     
-    user = searchlistbyhash(identlist, userid)
-    if user:
-        bm.addAddressToBlackWhiteList( user.obj['bmaddr'], "Banned: %s" % user.obj['name'] )
-        MM_backupfile('ident', userid)
-        
-        for offer in offerlist:
-            if offer.obj['vendorid'] == user.hash:
-                MM_backupfile('offer', offer.hash)
-                    
+    modbanuser(userid, identlist, offerlist)
+    
 def modbantag( ):
     taghash = raw_input("Enter a Tag ID: ")
     print "Are you sure?:"

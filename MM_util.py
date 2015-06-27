@@ -258,6 +258,17 @@ def deletefromindex( name, hash ):
     writeindex( index, name )
 
 
+def modbanuser(userid, identlist, offerlist):
+    user = searchlistbyhash(identlist, userid)
+    if user:
+        bm.addAddressToBlackWhiteList( user.obj['bmaddr'], "Banned: %s" % user.obj['name'] )
+        MM_backupfile('ident', userid)
+        
+        for offer in offerlist:
+            if offer.obj['vendorid'] == user.hash:
+                MM_backupfile('offer', offer.hash)
+                    
+
 # Creates a new Ident Msg and returns its string representation.
 def createidentmsgstr( btc_addr, bm_addr, user_name ):
     ident = { 'name': user_name,
