@@ -127,13 +127,13 @@ def do_modbantag( ):
     bannedtags.append(taghash)
     modbantag(taghash, offerlist, bannedtags)
 
-def modremoveoffer( ):
+def do_modremoveoffer( ):
     offerhash = raw_input("Enter an Offer ID: ")
     print "Are you sure?:"
     if not yorn():
         return
-    MM_backupfile('offer', offerhash)
-    
+    modremoveoffer(offerhash):        
+        
     
 def getrep( identhash, burn_mult ):
     numrep = 0
@@ -1294,7 +1294,7 @@ def main():
     elif args.mode == "modbantag":
         do_modbantag()
     elif args.mode == "modremoveoffer":
-        modremoveoffer()
+        do_modremoveoffer()
     elif args.mode == "showchan":
         showchan(args.channame)
     elif args.mode == "showchanmsg":

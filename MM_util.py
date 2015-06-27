@@ -277,6 +277,9 @@ def modbantag(taghash, offerlist, bannedtags):
             if tag in bannedtags:
                 MM_backupfile('offer', offer.hash)
                 
+def modremoveoffer(offerhash):        
+    MM_backupfile('offer', offerhash)
+    
 
 # Creates a new Ident Msg and returns its string representation.
 def createidentmsgstr( btc_addr, bm_addr, user_name ):
