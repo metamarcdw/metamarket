@@ -11,6 +11,7 @@
 # LICENSE file.
 
 from MM_util import *
+import MM_util
 import bitcoin, bitcoin.rpc, bitcoin.core, pycoin.key.Key
 import scrypt, simplecrypt
 import simplejson as json
@@ -34,13 +35,13 @@ def login( wp=None ):
     
     wif = pk.wif()
     btcaddr = pk.address()
-    bmaddr = bm.getDeterministicAddress( base64.b64encode(pkstr), 4, 1 )
+    bmaddr = MM_util.bm.getDeterministicAddress( base64.b64encode(pkstr), 4, 1 )
     
     print "BTC Address: %s\nBM Address: %s" % ( btcaddr, bmaddr )
     
     unlockwallet(wp)
-    if not btcd.validateaddress(btcaddr)['ismine'] or \
-        bm.createDeterministicAddresses(base64.b64encode(pkstr)) != []:
+    if not MM_util.btcd.validateaddress(btcaddr)['ismine'] or \
+        MM_util.bm.createDeterministicAddresses(base64.b64encode(pkstr)) != []:
         importkeys()
     
     identlist = loadlist('ident')
@@ -67,7 +68,7 @@ def importkeys( ):
     if yorn():
         pass2 = getpass.getpass("Please re-enter your passphrase: ")
         if pass2 == passphrase:
-            btcd.importprivkey(wif, username, False)
+            MM_util.btcd.importprivkey(wif, username, False)
             
             print "REMEMBER TO SECURELY BACKUP YOUR"
             print "wallet.dat AND keys.dat files!"
@@ -75,7 +76,7 @@ def importkeys( ):
         else:
             raise Exception("Passwords did not match.")
     else:
-        bm.deleteAddress(bmaddr)
+        MM_util.bm.deleteAddress(bmaddr)
         sys.exit()
     
 def register( idstr ):
@@ -100,7 +101,7 @@ def synccast( ):
     
 # creates a "CAST Msg" from current lists and broadcasts over BM
 def modbroadcast( ):
-    bm.sendBroadcast(bmaddr, base64.b64encode('Msg'), base64.b64encode(synccast()))
+    MM_util.bm.sendBroadcast(bmaddr, base64.b64encode('Msg'), base64.b64encode(synccast()))
 
 # creates a "CAST Msg" from current lists and sends to new user
 def modsync( bm_addr ):
@@ -172,7 +173,7 @@ def showanylist( list, mktid=None, marketlist=None ):
 def do_backupordermsgs(finalhash):
     backupordermsgs( finalhash, loadlist('final'), loadlist('rec'), loadlist('pay'), loadlist('conf') )
     
-
+########################### LEFT OFF REFACTORING HERE ##############################
 
 def createreg():
     markethash = raw_input("Enter a Market ID: ")
@@ -188,11 +189,11 @@ def createreg():
     if not yorn():
         sys.exit()
         
-    change_addr = btcd.getrawchangeaddress()
+    change_addr = MM_util.btcd.getrawchangeaddress()
     
     def create_regtx(fee):
         regtx_hex = mktx(amount, modbtc, change_addr, default_fee, minconf)
-        return btcd.signrawtransaction(regtx_hex)['hex']
+        return MM_util.btcd.signrawtransaction(regtx_hex)['hex']
         
     regtx_hex_signed = create_regtx(default_fee)
     regtx_fee = calc_fee(regtx_hex_signed)
@@ -215,12 +216,12 @@ def createburn():
     if not yorn():
         sys.exit()
         
-    change_addr = btcd.getrawchangeaddress()
+    change_addr = MM_util.btcd.getrawchangeaddress()
     
     # Aggregate to main address. Includes 2 fees.
     def create_ag(fee):
         raw_agtx_hex = mktx(amount+default_fee, btcaddr, change_addr, fee, minconf)
-        return btcd.signrawtransaction(raw_agtx_hex)['hex']
+        return MM_util.btcd.signrawtransaction(raw_agtx_hex)['hex']
         
     sig_agtx_hex = create_ag(default_fee)
     ag_fee = calc_fee(sig_agtx_hex)
@@ -232,15 +233,15 @@ def createburn():
     waitforconf(ag_txid)
 
     # Create raw burn TX.
-    sig_agtx = btcd.decoderawtransaction(sig_agtx_hex)
+    sig_agtx = MM_util.btcd.decoderawtransaction(sig_agtx_hex)
     vout = searchtxops(sig_agtx, btcaddr, amount+default_fee)
     
     txs = [{    "txid": ag_txid,
                 "vout": vout }]
     addrs = {   pob_address: amount }
     
-    burntx_hex = btcd.createrawtransaction(txs, addrs)
-    burntx_hex_signed = btcd.signrawtransaction(burntx_hex)['hex']
+    burntx_hex = MM_util.btcd.createrawtransaction(txs, addrs)
+    burntx_hex_signed = MM_util.btcd.signrawtransaction(burntx_hex)['hex']
     burn_txid = sendtx(burntx_hex_signed)
     
     print "BURN TXID:", burn_txid
@@ -289,7 +290,7 @@ def createmarket():
         MM_writefile(mktmsgstr)
         appendindex('market', mktmsg.hash)
         
-        bm.addSubscription(mod['obj']['bmaddr'])
+        MM_util.bm.addSubscription(mod['obj']['bmaddr'])
         print "Congratulations, you may now Register with a new Metamarket!"
         print "Market ID:", mktmsg.hash
         
@@ -339,7 +340,7 @@ def createoffer():
         tagid = raw_input("Enter a Tag ID (%d/%d): " % (i+1, numtags))
         taglist.append(tagid)
     
-    pubkey = btcd.validateaddress(btcaddr)['pubkey']
+    pubkey = MM_util.btcd.validateaddress(btcaddr)['pubkey']
     msgstr = createoffermsgstr( btcaddr, markethash, myid.hash, pubkey, \
                                         name, locale, desc, amount, price, ratio, \
                                         locktime, minrep, taglist )
@@ -363,13 +364,13 @@ def createorder():
     if myrep < minrep:
         raise Exception("Insufficient Reputation Score.")
         
-    pubkey = btcd.validateaddress(btcaddr)['pubkey']
-    multisig = btcd.createmultisig( 2, sorted([offer.obj['pubkey'], pubkey]) )
-    change_addr = btcd.getrawchangeaddress()
+    pubkey = MM_util.btcd.validateaddress(btcaddr)['pubkey']
+    multisig = MM_util.btcd.createmultisig( 2, sorted([offer.obj['pubkey'], pubkey]) )
+    change_addr = MM_util.btcd.getrawchangeaddress()
     
     def create_funding(fee):
         rawtx_hex = mktx(price, multisig['address'], change_addr, fee)
-        return btcd.signrawtransaction(rawtx_hex)['hex']
+        return MM_util.btcd.signrawtransaction(rawtx_hex)['hex']
     
     signedtx_hex = create_funding(default_fee)
     funding_fee = calc_fee(signedtx_hex)
@@ -378,7 +379,7 @@ def createorder():
     
     crypttx = base64.b64encode( simplecrypt.encrypt(pkstr, signedtx_hex) )
     
-    signedtx = btcd.decoderawtransaction(signedtx_hex)
+    signedtx = MM_util.btcd.decoderawtransaction(signedtx_hex)
     vout = searchtxops(signedtx, multisig['address'], price)
     
     msgstr = createordermsgstr(btcaddr, offer.hash, offer.obj['vendorid'], myid.hash, \
@@ -403,7 +404,7 @@ def createconf( orderhash=None ):
     ratio = decimal.Decimal(offer.obj['ratio'])
     
     pubkey = offer.obj['pubkey']
-    ms_verify = btcd.createmultisig( 2, sorted([order.obj['pubkey'], pubkey]) )
+    ms_verify = MM_util.btcd.createmultisig( 2, sorted([order.obj['pubkey'], pubkey]) )
     if ms_verify['address'] != order.obj['multisig']['address']:
         raise Exception("Multisig did not verify!")
     
@@ -413,7 +414,7 @@ def createconf( orderhash=None ):
     def create_refund(fee):
         refund_addr_obj = { buyer.obj['btcaddr']: b_portion - fee/2, 
                             btcaddr: v_portion - fee/2 }
-        return btcd.createrawtransaction(refund_op, refund_addr_obj)
+        return MM_util.btcd.createrawtransaction(refund_op, refund_addr_obj)
         
     refund_tx_hex = create_refund(default_fee)
     refund_fee = calc_fee(refund_tx_hex)
@@ -430,7 +431,7 @@ def createconf( orderhash=None ):
     prev_tx[0]["scriptPubKey"] = order.obj['spk']
     prev_tx[0]["redeemScript"] = order.obj['multisig']['redeemScript']
     
-    sig_refund_hex = btcd.signrawtransaction(refund_tx_hex, prev_tx, [wif])['hex']
+    sig_refund_hex = MM_util.btcd.signrawtransaction(refund_tx_hex, prev_tx, [wif])['hex']
     
     msgstr = createconfmsgstr(btcaddr, order.hash, myid.hash, order.obj['buyerid'], \
                                         sig_refund_hex, prev_tx )
@@ -456,9 +457,9 @@ def createpay():
     b_portion, v_portion = getamounts(ratio, price)
     refund_fee = calc_fee( conf.obj['refundtx'] )
     
-    refund_verify = btcd.decoderawtransaction(conf.obj['refundtx'])
+    refund_verify = MM_util.btcd.decoderawtransaction(conf.obj['refundtx'])
     searchtxops(refund_verify, btcaddr, b_portion - refund_fee/2)
-    complete_refund = btcd.signrawtransaction( conf.obj['refundtx'], conf.obj['prevtx'], [wif])['hex']
+    complete_refund = MM_util.btcd.signrawtransaction( conf.obj['refundtx'], conf.obj['prevtx'], [wif])['hex']
     
     print "Broadcast funding TX?:"
     if not yorn():
@@ -497,7 +498,7 @@ def createrec( payhash=None ):
     final_op = prev_tx = [ dict((key, order.obj[key]) for key in ("txid", "vout")) ]
     def create_final(fee):
         final_addr_obj = { btcaddr: price - fee }
-        return btcd.createrawtransaction(final_op, final_addr_obj)
+        return MM_util.btcd.createrawtransaction(final_op, final_addr_obj)
         
     final_tx_hex = create_final(default_fee)
     final_fee = calc_fee(final_tx_hex)
@@ -507,7 +508,7 @@ def createrec( payhash=None ):
     prev_tx[0]["scriptPubKey"] = order.obj['spk']
     prev_tx[0]["redeemScript"] = order.obj['multisig']['redeemScript']
     
-    sig_final_hex = btcd.signrawtransaction(final_tx_hex, prev_tx, [wif])['hex']
+    sig_final_hex = MM_util.btcd.signrawtransaction(final_tx_hex, prev_tx, [wif])['hex']
     
     msgstr = createrecmsgstr(btcaddr, pay.hash, myid.hash, pay.obj['buyerid'], \
                                         sig_final_hex, prev_tx )
@@ -532,9 +533,9 @@ def createfinal():
     price = decimal.Decimal(offer.obj['price'])
     time_for_refund = time.asctime( time.localtime(offer.obj['locktime']) )
     
-    final_verify = btcd.decoderawtransaction(rec.obj['finaltx'])
+    final_verify = MM_util.btcd.decoderawtransaction(rec.obj['finaltx'])
     searchtxops(final_verify, vendor.obj['btcaddr'], price - default_fee)
-    complete_final = btcd.signrawtransaction(rec.obj['finaltx'], rec.obj['prevtx'], [wif])['hex']
+    complete_final = MM_util.btcd.signrawtransaction(rec.obj['finaltx'], rec.obj['prevtx'], [wif])['hex']
     
     print "Would you like to finalize or refund escrowed funds?:"
     finorref = raw_input("Enter the word [final or refund]: ")
@@ -617,7 +618,7 @@ def checkinbox( ):
     num = 0
     mkts = 0
     
-    inbox = json.loads( bm.getAllInboxMessages() )['inboxMessages']
+    inbox = json.loads( MM_util.bm.getAllInboxMessages() )['inboxMessages']
     for i in inbox:
         subject = base64.b64decode( i['subject'] )
         if subject in ('Msg', 'MultiMsg'):
@@ -780,7 +781,7 @@ def processfeedback(msg, ver):
     prevtx = gettx(prevtxid)
     msaddr = prevtx['vout'][0]['addresses'][0]
     
-    redeemscript = btcd.decodescript(ver.obj['redeemscript'])
+    redeemscript = MM_util.btcd.decodescript(ver.obj['redeemscript'])
     
     if fromuser and touser and \
        redeemscript['p2sh'] == msaddr and \
@@ -907,7 +908,7 @@ def processmultimsg(mmsg):
 def processinbox( ):
     print "Processing Inbox."
     msginfolist = []
-    inbox = json.loads( bm.getAllInboxMessages() )['inboxMessages']
+    inbox = json.loads( MM_util.bm.getAllInboxMessages() )['inboxMessages']
     for i in inbox:
         subject = base64.b64decode( i['subject'] )
         bmmsg = base64.b64decode( i['message'] )
@@ -915,12 +916,12 @@ def processinbox( ):
             msginfo = processmsg(bmmsg)
             if msginfo:
                 msginfolist.append(msginfo)
-            bm.trashMessage( i['msgid'] )
+            MM_util.bm.trashMessage( i['msgid'] )
         elif i['toAddress'] == bmaddr and subject == 'MultiMsg':
             msginfo = processmultimsg(bmmsg)
             if msginfo:
                 msginfolist.append(msginfo)
-            bm.trashMessage( i['msgid'] )
+            MM_util.bm.trashMessage( i['msgid'] )
     return msginfolist
     
     
@@ -1017,10 +1018,10 @@ def showchan( channame ):
         chanv3 = default_chan_v3
         chanv4 = default_chan_v4
     else:
-        chanv3 = bm.getDeterministicAddress( base64.b64encode(channame), 3,1 )
-        chanv4 = bm.getDeterministicAddress( base64.b64encode(channame), 4,1 )
+        chanv3 = MM_util.bm.getDeterministicAddress( base64.b64encode(channame), 3,1 )
+        chanv4 = MM_util.bm.getDeterministicAddress( base64.b64encode(channame), 4,1 )
     
-    inbox = json.loads( bm.getAllInboxMessages() )['inboxMessages']
+    inbox = json.loads( MM_util.bm.getAllInboxMessages() )['inboxMessages']
     for i in inbox:
         if  i['toAddress'] in (chanv3, chanv4):
             sbj = base64.b64decode(i['subject'])
@@ -1028,7 +1029,7 @@ def showchan( channame ):
     
 def showchanmsg(msgid):
     print "Showing Chan Msg: %s" % msgid
-    bmmsg = json.loads( bm.getInboxMessageById(msgid) )['inboxMessage'][0]
+    bmmsg = json.loads( MM_util.bm.getInboxMessageById(msgid) )['inboxMessage'][0]
     subject = base64.b64decode(bmmsg['subject'])
     msg = base64.b64decode(bmmsg['message'])
     print "SUBJECT: %s\nMESSAGE:\n%s" % (subject, msg)
@@ -1060,7 +1061,7 @@ def sendmarketoffer(channame):
     if channame == default_channame:
         chan_addr = default_chan_v4
     else:
-        chan_addr = bm.getDeterministicAddress( base64.b64encode(channame), 4,1 )
+        chan_addr = MM_util.bm.getDeterministicAddress( base64.b64encode(channame), 4,1 )
     
     info = {    "market": mymarket,
                 "modid": myid }
@@ -1153,13 +1154,13 @@ def parseargs():
                                     help='Create a new MM Message of some type.' )
                                     
     send_msg_parser = subparsers.add_parser( \
-                        'sendmsg', help='Send any MM Message over BM.')
+                        'sendmsg', help='Send any MM Message over MM_util.bm.')
     send_msg_parser.add_argument(   '-m',
                                     '--msgid',
                                     required=True,
                                     action='store',
                                     dest='msgid',
-                                    help='Send a MM Message, given its ID; to its recipient via BM.' )
+                                    help='Send a MM Message, given its ID; to its recipient via MM_util.bm.' )
                                     
     send_market_parser = subparsers.add_parser( \
                         'sendmarketoffer', help='As a Moderator, send your Market offer to the chan.' )
@@ -1179,7 +1180,7 @@ def main():
     elif args.mode == "processinbox":
         login()
         processinbox()
-        btcd.walletlock()
+        MM_util.btcd.walletlock()
     elif args.mode == "modbanuser":
         do_modbanuser()
     elif args.mode == "modbantag":
@@ -1197,15 +1198,15 @@ def main():
     elif args.mode == "createmsg":
         login()
         createmsg(args.msgtype)
-        btcd.walletlock()
+        MM_util.btcd.walletlock()
     elif args.mode == "sendmsg":
         login()
         sendmsg(args.msgid)
-        btcd.walletlock()
+        MM_util.btcd.walletlock()
     elif args.mode == "sendmarketoffer" and entity == "mod":
         login()
         sendmarketoffer(args.channame)
-        btcd.walletlock()
+        MM_util.btcd.walletlock()
 
 msgdir = 'msg'
 SLEEP = 1
@@ -1269,11 +1270,11 @@ if entity not in ('buyer', 'vendor', 'mod'):
     raise Exception("Config: entity must be buyer, vendor or mod.")
 
 bitcoin.SelectParams(chain)
-btcd = bitcoin.rpc.RawProxy(service_port=btc_port)
-bm = xmlrpclib.ServerProxy(bm_url)
+MM_util.btcd = bitcoin.rpc.RawProxy(service_port=btc_port)
+MM_util.bm = xmlrpclib.ServerProxy(bm_url)
 
-default_chan_v3 = bm.getDeterministicAddress( base64.b64encode(default_channame), 3,1 )
-default_chan_v4 = bm.getDeterministicAddress( base64.b64encode(default_channame), 4,1 )
+default_chan_v3 = MM_util.bm.getDeterministicAddress( base64.b64encode(default_channame), 3,1 )
+default_chan_v4 = MM_util.bm.getDeterministicAddress( base64.b64encode(default_channame), 4,1 )
 
 if __name__ == "__main__":
     main()
