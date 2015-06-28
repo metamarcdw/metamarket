@@ -281,6 +281,116 @@ def modremoveoffer(offerhash):
     MM_backupfile('offer', offerhash)
     
 
+def getrep( identhash, burn_mult, feedbacklist, burnlist ):
+    numrep = 0
+    downvote_mult = 10      #TODO do not leave this hardcoded
+
+    for fb in feedbacklist:
+        if fb.obj['toid'] == identhash:
+            if fb.obj['upvote']:
+                numrep += 1
+            else:
+                numrep -= downvote_mult
+                
+    for burn in burnlist:
+        if burn.obj['userid'] == identhash:
+            try:
+                burntx_hex = btcd.getrawtransaction(burn.obj['txid'])
+            except bitcoin.rpc.JSONRPCException as jre:
+                if jre.error['code'] == -5:
+                    continue
+            burntx = btcd.decoderawtransaction( burntx_hex )
+            amount = burntx['vout'][0]['value']
+            numrep += amount * burn_mult
+            
+    return numrep
+
+
+def backupordermsgs(finalhash, finallist, reclist, paylist, conflist):
+    final = searchlistbyhash(finallist, finalhash)
+    rec = searchlistbyhash(reclist, final.obj['rechash'])
+    pay = searchlistbyhash(paylist, rec.obj['payhash'])
+    conf = searchlistbyhash(conflist, pay.obj['confhash'])
+    
+    MM_backupfile('final', finalhash)
+    MM_backupfile('rec', final.obj['rechash'])
+    MM_backupfile('pay', rec.obj['payhash'])
+    MM_backupfile('conf', pay.obj['confhash'])
+    MM_backupfile('order', conf.obj['orderhash'])
+
+
+def pretty_json( obj ):
+    return json.dumps(obj, indent=4, sort_keys=True)
+    
+def intput( prompt ):
+    try:
+        return int( raw_input(prompt) )
+    except ValueError as err:
+        print "Oops:", err
+        time.sleep(SLEEP)
+        sys.exit()
+        
+def decput( prompt ):
+    try:
+        return decimal.Decimal( raw_input(prompt) )
+    except ValueError as err:
+        print "Oops:", err
+        time.sleep(SLEEP)
+        sys.exit()
+        
+def multiline():
+    print "Enter multiple lines of input. Use '~' to end."
+    input = ''
+    while True:
+        str = raw_input()
+        if str == '~':
+            break
+        else:
+            input += str + '\n'
+    return input
+        
+def sendtx(tx):
+    try:
+        return btcd.sendrawtransaction(tx)
+    except bitcoin.rpc.JSONRPCException as jre:
+        print "TX NOT SENT.", jre
+        time.sleep(SLEEP)
+        sys.exit()
+        
+def gettx(txid):
+    while True:
+        tx = None
+        try:
+            tx = btcd.getrawtransaction(txid, 1)
+        except bitcoin.rpc.JSONRPCException as jre:
+            pass
+        if tx:
+            return tx
+        else:
+            print "Waiting for broadcast of TX..."
+            time.sleep(5)
+            
+def waitforconf(txid):
+    while True:
+        confirms = 0
+        tx = btcd.getrawtransaction(txid, 1)
+        if 'confirmations' in tx:
+            confirms = tx['confirmations']
+        if confirms >= minconf:
+            break
+        else:
+            print "Waiting for confirmation. %d/%d so far..." % ( confirms, minconf )
+            time.sleep(5)
+
+def searchtxops(tx, address, amount=None):
+    for op in tx['vout']:
+        if not amount or op['value'] == amount:
+            if address in op['scriptPubKey']['addresses']:
+                return op['n']
+    else:
+        raise Exception("No vout found matching address/amount.")
+
+
 # Creates a new Ident Msg and returns its string representation.
 def createidentmsgstr( btc_addr, bm_addr, user_name ):
     ident = { 'name': user_name,

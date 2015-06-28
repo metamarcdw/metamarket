@@ -135,34 +135,12 @@ def do_modremoveoffer( ):
     modremoveoffer(offerhash):        
         
     
-def getrep( identhash, burn_mult ):
-    numrep = 0
-    downvote_mult = 10
-    feedbacklist = loadlist('feedback')
-    burnlist = loadlist('burn')
-    
-    for fb in feedbacklist:
-        if fb.obj['toid'] == identhash:
-            if fb.obj['upvote']:
-                numrep += 1
-            else:
-                numrep -= downvote_mult
-                
-    for burn in burnlist:
-        if burn.obj['userid'] == identhash:
-            try:
-                burntx_hex = btcd.getrawtransaction(burn.obj['txid'])
-            except bitcoin.rpc.JSONRPCException as jre:
-                if jre.error['code'] == -5:
-                    continue
-            burntx = btcd.decoderawtransaction( burntx_hex )
-            amount = burntx['vout'][0]['value']
-            numrep += amount * burn_mult
-            
-    return numrep
+def do_getrep( identhash, burn_mult ):
+    getrep( identhash, burn_mult, loadlist('feedback'), loadlist('burn') )
 
+    
 # Takes a list of Verified Msgs and prints info to stdout.
-def showanylist( list, mktid ):
+def showanylist( list, mktid=None, marketlist=None ):
     for i in list:
         title = "Name"
         if i.msgname == REG:
@@ -172,10 +150,9 @@ def showanylist( list, mktid ):
             title = "TXID"
             str = i.obj['txid']
         elif i.msgname == IDENT:
-            marketlist = loadlist('market')
             market = searchlistbyhash(marketlist, mktid)
             mult = decimal.Decimal( market.obj['multiplier'] )
-            rep = getrep(i.hash, mult)
+            rep = do_getrep(i.hash, mult)
             str = "%s:\tRep: %d" % ( i.obj['name'], rep )
         elif i.msgname == TAG:
             str = i.obj['tagname']
@@ -192,95 +169,9 @@ def showanylist( list, mktid ):
         print "%s: %s\nID: %s\n" % ( title, str, i.hash )
 
     
-
-def backupordermsgs(finalhash):
-    finallist = loadlist('final')
-    reclist = loadlist('rec')
-    paylist = loadlist('pay')
-    conflist = loadlist('conf')
+def do_backupordermsgs(finalhash):
+    backupordermsgs( finalhash, loadlist('final'), loadlist('rec'), loadlist('pay'), loadlist('conf') )
     
-    final = searchlistbyhash(finallist, finalhash)
-    rec = searchlistbyhash(reclist, final.obj['rechash'])
-    pay = searchlistbyhash(paylist, rec.obj['payhash'])
-    conf = searchlistbyhash(conflist, pay.obj['confhash'])
-    
-    MM_backupfile('final', finalhash)
-    MM_backupfile('rec', final.obj['rechash'])
-    MM_backupfile('pay', rec.obj['payhash'])
-    MM_backupfile('conf', pay.obj['confhash'])
-    MM_backupfile('order', conf.obj['orderhash'])
-
-
-def pretty_json( obj ):
-    return json.dumps(obj, indent=4, sort_keys=True)
-    
-def intput( prompt ):
-    try:
-        return int( raw_input(prompt) )
-    except ValueError as err:
-        print "Oops:", err
-        time.sleep(SLEEP)
-        sys.exit()
-        
-def decput( prompt ):
-    try:
-        return decimal.Decimal( raw_input(prompt) )
-    except ValueError as err:
-        print "Oops:", err
-        time.sleep(SLEEP)
-        sys.exit()
-        
-def multiline():
-    print "Enter multiple lines of input. Use '~' to end."
-    input = ''
-    while True:
-        str = raw_input()
-        if str == '~':
-            break
-        else:
-            input += str + '\n'
-    return input
-        
-def sendtx(tx):
-    try:
-        return btcd.sendrawtransaction(tx)
-    except bitcoin.rpc.JSONRPCException as jre:
-        print "TX NOT SENT.", jre
-        time.sleep(SLEEP)
-        sys.exit()
-        
-def gettx(txid):
-    while True:
-        tx = None
-        try:
-            tx = btcd.getrawtransaction(txid, 1)
-        except bitcoin.rpc.JSONRPCException as jre:
-            pass
-        if tx:
-            return tx
-        else:
-            print "Waiting for broadcast of TX..."
-            time.sleep(5)
-            
-def waitforconf(txid):
-    while True:
-        confirms = 0
-        tx = btcd.getrawtransaction(txid, 1)
-        if 'confirmations' in tx:
-            confirms = tx['confirmations']
-        if confirms >= minconf:
-            break
-        else:
-            print "Waiting for confirmation. %d/%d so far..." % ( confirms, minconf )
-            time.sleep(5)
-
-def searchtxops(tx, address, amount=None):
-    for op in tx['vout']:
-        if not amount or op['value'] == amount:
-            if address in op['scriptPubKey']['addresses']:
-                return op['n']
-    else:
-        raise Exception("No vout found matching address/amount.")
 
 
 def createreg():
@@ -467,7 +358,7 @@ def createorder():
     price = decimal.Decimal(offer.obj['price'])
     mult = decimal.Decimal(market.obj['multiplier'])
     minrep = offer.obj['minrep']
-    myrep = getrep(myid.hash, mult)
+    myrep = do_getrep(myid.hash, mult)
     
     if myrep < minrep:
         raise Exception("Insufficient Reputation Score.")
@@ -820,7 +711,7 @@ def processorder(msg, ver):
     
     mult = decimal.Decimal(market.obj['multiplier'])
     minrep = offer.obj['minrep']
-    buyer_rep = getrep(buyer.hash, mult)
+    buyer_rep = do_getrep(buyer.hash, mult)
     
     if buyer and offer and buyer_rep >= minrep:
         MM_writefile(msg)
@@ -1149,11 +1040,11 @@ def showmsglist(msgtype):
     if msgtype not in types:
         raise Exception( "msgtype MUST be in %s" % str(types) )
     
-    mkt = None
     if msgtype == 'ident':
         mkt = raw_input("Enter a Market ID : ")
+        mkts = loadlist('market')
     list = loadlist(msgtype)
-    showanylist(list, mkt)
+    showanylist(list, mktid=mkt, marketlist=mkts)
     
 def showmsg(hash):
     print "Showing Msg: %s" % hash
