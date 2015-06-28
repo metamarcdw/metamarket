@@ -132,7 +132,7 @@ def do_modremoveoffer( ):
     print "Are you sure?:"
     if not yorn():
         return
-    modremoveoffer(offerhash):        
+    modremoveoffer(offerhash)
         
     
 def do_getrep( identhash, burn_mult ):
