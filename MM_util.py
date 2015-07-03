@@ -176,11 +176,6 @@ def unpackcastlist( caststr, index ):
         hash = MM_writefile(msg)
         appendindex(index, hash)
 
-# Asks user yes or no, returns boolean
-def yorn( ):
-    yorn = raw_input("[Y or N]: ")
-    return yorn in ('Y', 'y', 'yes', 'YES', 'Yes')
-
 
 # Breaks up a list/string into chunks of a given size.    
 def chunks(seq, n):
@@ -208,22 +203,18 @@ def reconstructmsg(mmsg_list):
     return base64.b64decode(b64msg)
     
     
-# Accepts a BM address, Msg string and prompt flag.
+# Accepts a BM address, Msg string and subject.
 # Sends any raw Msg to any BM address.
-def sendmsgviabm(to_addr, from_addr, msgstr, prompt, subject='Msg'):
+def sendmsgviabm(to_addr, from_addr, msgstr, subject='Msg'):
     MAXBMOBJSIZE = 5000 #256*1024 - 20
-    if prompt:
-        print "Are you sure you want to send this Message?"
-    if not prompt or yorn():
-        b64msg = base64.b64encode(msgstr)
-        if sys.getsizeof(b64msg) > MAXBMOBJSIZE:
-            multimsgs = breakdownbmmsg(b64msg)
-            random.shuffle(multimsgs)
-            for msg in multimsgs:
-                bm.sendMessage(to_addr, from_addr, base64.b64encode('MultiMsg'), msg)
-        else:
-            bm.sendMessage(to_addr, from_addr, base64.b64encode(subject), b64msg)
-        print "Message sent!"
+    b64msg = base64.b64encode(msgstr)
+    if sys.getsizeof(b64msg) > MAXBMOBJSIZE:
+        multimsgs = breakdownbmmsg(b64msg)
+        random.shuffle(multimsgs)
+        for msg in multimsgs:
+            bm.sendMessage(to_addr, from_addr, base64.b64encode('MultiMsg'), msg)
+    else:
+        bm.sendMessage(to_addr, from_addr, base64.b64encode(subject), b64msg)
 
         
 # Writes and index to file.
@@ -319,36 +310,6 @@ def backupordermsgs(finalhash, finallist, reclist, paylist, conflist):
     MM_backupfile('order', conf.obj['orderhash'])
 
 
-def pretty_json( obj ):
-    return json.dumps(obj, indent=4, sort_keys=True)
-    
-def intput( prompt ):
-    try:
-        return int( raw_input(prompt) )
-    except ValueError as err:
-        print "Oops:", err
-        time.sleep(SLEEP)
-        sys.exit()
-        
-def decput( prompt ):
-    try:
-        return decimal.Decimal( raw_input(prompt) )
-    except ValueError as err:
-        print "Oops:", err
-        time.sleep(SLEEP)
-        sys.exit()
-        
-def multiline():
-    print "Enter multiple lines of input. Use '~' to end."
-    input = ''
-    while True:
-        str = raw_input()
-        if str == '~':
-            break
-        else:
-            input += str + '\n'
-    return input
-        
 def sendtx(tx):
     try:
         return btcd.sendrawtransaction(tx)

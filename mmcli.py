@@ -105,7 +105,7 @@ def modbroadcast( ):
 
 # creates a "CAST Msg" from current lists and sends to new user
 def modsync( bm_addr ):
-    sendmsgviabm(bm_addr, bmaddr, synccast(), False)
+    do_sendmsgviabm(bm_addr, bmaddr, synccast(), False)
 
 def do_modbanuser( ):
     userid = raw_input("Enter a User ID: ")
@@ -173,6 +173,48 @@ def showanylist( list, mktid=None, marketlist=None ):
 def do_backupordermsgs(finalhash):
     backupordermsgs( finalhash, loadlist('final'), loadlist('rec'), loadlist('pay'), loadlist('conf') )
     
+def do_sendmsgviabm(to_addr, from_addr, msgstr, prompt, subject='Msg'):
+    if prompt:
+        print "Are you sure you want to send this Message?"
+    if not prompt or yorn():
+        sendmsgviabm(to_addr, from_addr, msgstr, subject):
+        print "Message sent!"
+
+# Asks user yes or no, returns boolean
+def yorn( ):
+    yorn = raw_input("[Y or N]: ")
+    return yorn in ('Y', 'y', 'yes', 'YES', 'Yes')
+
+def pretty_json( obj ):
+    return json.dumps(obj, indent=4, sort_keys=True)
+    
+def intput( prompt ):
+    try:
+        return int( raw_input(prompt) )
+    except ValueError as err:
+        print "Oops:", err
+        time.sleep(SLEEP)
+        sys.exit()
+        
+def decput( prompt ):
+    try:
+        return decimal.Decimal( raw_input(prompt) )
+    except ValueError as err:
+        print "Oops:", err
+        time.sleep(SLEEP)
+        sys.exit()
+        
+def multiline():
+    print "Enter multiple lines of input. Use '~' to end."
+    input = ''
+    while True:
+        str = raw_input()
+        if str == '~':
+            break
+        else:
+            input += str + '\n'
+    return input
+        
 ########################### LEFT OFF REFACTORING HERE ##############################
 
 def createreg():
@@ -1009,7 +1051,7 @@ def sendmsg(msgid, prompt=True):
         raise Exception("Bad Msg type.")
         
     tobm = searchlistbyhash( identlist, ident ).obj['bmaddr']
-    sendmsgviabm(tobm, bmaddr, msgstr, prompt)
+    do_sendmsgviabm(tobm, bmaddr, msgstr, prompt)
     
     
 def showchan( channame ):
@@ -1066,7 +1108,7 @@ def sendmarketoffer(channame):
     info = {    "market": mymarket,
                 "modid": myid }
     mktoffer = pretty_json(info)
-    sendmsgviabm( chan_addr, bmaddr, mktoffer, False, 'Mkt' )
+    do_sendmsgviabm( chan_addr, bmaddr, mktoffer, False, 'Mkt' )
     
 
 def parseargs():
