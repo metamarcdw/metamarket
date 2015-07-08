@@ -137,7 +137,7 @@ def do_modremoveoffer( ):
         
     
 def do_getrep( identhash, burn_mult ):
-    getrep( identhash, burn_mult, loadlist('feedback'), loadlist('burn') )
+    return getrep( identhash, burn_mult, loadlist('feedback'), loadlist('burn') )
 
     
 # Takes a list of Verified Msgs and prints info to stdout.
@@ -177,7 +177,7 @@ def do_sendmsgviabm(to_addr, from_addr, msgstr, prompt, subject='Msg'):
     if prompt:
         print "Are you sure you want to send this Message?"
     if not prompt or yorn():
-        sendmsgviabm(to_addr, from_addr, msgstr, subject):
+        sendmsgviabm(to_addr, from_addr, msgstr, subject)
         print "Message sent!"
 
 # Asks user yes or no, returns boolean
