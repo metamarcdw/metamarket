@@ -215,7 +215,6 @@ def multiline():
             input += str + '\n'
     return input
         
-########################### LEFT OFF REFACTORING HERE ##############################
 
 def do_createreg():
     markethash = raw_input("Enter a Market ID: ")
@@ -350,7 +349,7 @@ def createoffer():
     
     print "Offer ID:", hash
     
-def createorder():
+def do_createorder():
     offerhash = raw_input("Enter an Offer ID: ")
     offerlist = loadlist('offer')
     marketlist = loadlist('market')
@@ -364,33 +363,15 @@ def createorder():
     
     if myrep < minrep:
         raise Exception("Insufficient Reputation Score.")
-        
-    pubkey = MM_util.btcd.validateaddress(btcaddr)['pubkey']
-    multisig = MM_util.btcd.createmultisig( 2, sorted([offer.obj['pubkey'], pubkey]) )
-    change_addr = MM_util.btcd.getrawchangeaddress()
     
-    def create_funding(fee):
-        rawtx_hex = mktx(price, multisig['address'], change_addr, fee)
-        return MM_util.btcd.signrawtransaction(rawtx_hex)['hex']
-    
-    signedtx_hex = create_funding(default_fee)
-    funding_fee = calc_fee(signedtx_hex)
-    if funding_fee != default_fee:
-        signedtx_hex = create_funding(funding_fee)
-    
-    crypttx = base64.b64encode( simplecrypt.encrypt(pkstr, signedtx_hex) )
-    
-    signedtx = MM_util.btcd.decoderawtransaction(signedtx_hex)
-    vout = searchtxops(signedtx, multisig['address'], price)
-    
-    msgstr = createordermsgstr(btcaddr, offer.hash, offer.obj['vendorid'], myid.hash, \
-                                        pubkey, multisig, crypttx, signedtx['txid'], \
-                                        vout, signedtx['vout'][vout]['scriptPubKey']['hex'] )
+    msgstr = createorder(myid.hash, btcaddr, offer, price, pkstr, default_fee)
     hash = MM_writefile(msgstr)
     appendindex('order', hash)
     
     print "Order ID:", hash
-    
+        
+########################### LEFT OFF REFACTORING HERE ##############################
+
 def createconf( orderhash=None ):
     if not orderhash:
         orderhash = raw_input("Enter an Order ID: ")

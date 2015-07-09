@@ -367,8 +367,8 @@ def createreg(myidhash, signbtc, amount, mod, default_fee):
         
     reg_txid = sendtx(regtx_hex_signed)
     print "REGISTER TXID:", reg_txid
-    
     return createregmsgstr(signbtc, mod.hash, myidhash, reg_txid)
+
 
 def createburn(myidhash, signbtc, amount, default_fee):
     change_addr = MM_util.btcd.getrawchangeaddress()
@@ -401,6 +401,30 @@ def createburn(myidhash, signbtc, amount, default_fee):
     
     print "BURN TXID:", burn_txid
     return createburnmsgstr(btcaddr, myidhash, burn_txid)
+    
+    
+def createorder(myidhash, signbtc, offer, price, cryptkey, default_fee):
+    pubkey = MM_util.btcd.validateaddress(btcaddr)['pubkey']
+    multisig = MM_util.btcd.createmultisig( 2, sorted([offer.obj['pubkey'], pubkey]) )
+    change_addr = MM_util.btcd.getrawchangeaddress()
+    
+    def create_funding(fee):
+        rawtx_hex = mktx(price, multisig['address'], change_addr, fee)
+        return MM_util.btcd.signrawtransaction(rawtx_hex)['hex']
+    
+    signedtx_hex = create_funding(default_fee)
+    funding_fee = calc_fee(signedtx_hex)
+    if funding_fee != default_fee:
+        signedtx_hex = create_funding(funding_fee)
+    
+    crypttx = base64.b64encode( simplecrypt.encrypt(cryptkey, signedtx_hex) )
+    
+    signedtx = MM_util.btcd.decoderawtransaction(signedtx_hex)
+    vout = searchtxops(signedtx, multisig['address'], price)
+    
+    return createordermsgstr(signbtc, offer.hash, offer.obj['vendorid'], myidhash, \
+                                        pubkey, multisig, crypttx, signedtx['txid'], \
+                                        vout, signedtx['vout'][vout]['scriptPubKey']['hex'] )
     
 
 
