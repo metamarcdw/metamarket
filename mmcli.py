@@ -356,7 +356,6 @@ def do_createorder():
     offer = searchlistbyhash(offerlist, offerhash)
     market = searchlistbyhash(marketlist, offer.obj['markethash'])
     
-    price = decimal.Decimal(offer.obj['price'])
     mult = decimal.Decimal(market.obj['multiplier'])
     minrep = offer.obj['minrep']
     myrep = do_getrep(myid.hash, mult)
@@ -364,15 +363,14 @@ def do_createorder():
     if myrep < minrep:
         raise Exception("Insufficient Reputation Score.")
     
-    msgstr = createorder(myid.hash, btcaddr, offer, price, pkstr, default_fee)
+    msgstr = createorder(myid.hash, btcaddr, offer, pkstr, default_fee)
     hash = MM_writefile(msgstr)
     appendindex('order', hash)
     
     print "Order ID:", hash
         
-########################### LEFT OFF REFACTORING HERE ##############################
 
-def createconf( orderhash=None ):
+def do_createconf( orderhash=None ):
     if not orderhash:
         orderhash = raw_input("Enter an Order ID: ")
         
@@ -381,47 +379,14 @@ def createconf( orderhash=None ):
     order = searchlistbyhash(orderlist, orderhash)
     buyer = searchlistbyhash(identlist, order.obj['buyerid'])
     
-    offer = offerfromordermsg(order)
-    price = decimal.Decimal(offer.obj['price'])
-    ratio = decimal.Decimal(offer.obj['ratio'])
-    
-    pubkey = offer.obj['pubkey']
-    ms_verify = MM_util.btcd.createmultisig( 2, sorted([order.obj['pubkey'], pubkey]) )
-    if ms_verify['address'] != order.obj['multisig']['address']:
-        raise Exception("Multisig did not verify!")
-    
-    b_portion, v_portion = getamounts(ratio, price)
-    
-    refund_op = prev_tx = [ dict((key, order.obj[key]) for key in ("txid", "vout")) ]
-    def create_refund(fee):
-        refund_addr_obj = { buyer.obj['btcaddr']: b_portion - fee/2, 
-                            btcaddr: v_portion - fee/2 }
-        return MM_util.btcd.createrawtransaction(refund_op, refund_addr_obj)
-        
-    refund_tx_hex = create_refund(default_fee)
-    refund_fee = calc_fee(refund_tx_hex)
-    if refund_fee != default_fee:
-        refund_tx_hex = create_refund(refund_fee)
-    
-    #sets sequence to 0 (hacky as balls)
-    refund_tx_hex = refund_tx_hex[:84] + "00000000" + refund_tx_hex[92:]
-    #do nlocktime edit
-    locktime = offer.obj['locktime']
-    locktime_hex = bitcoin.core.b2lx( bytearray.fromhex(hex(locktime)[2:].rjust(8,'0')) )
-    refund_tx_hex = refund_tx_hex[:-8] + locktime_hex
-    
-    prev_tx[0]["scriptPubKey"] = order.obj['spk']
-    prev_tx[0]["redeemScript"] = order.obj['multisig']['redeemScript']
-    
-    sig_refund_hex = MM_util.btcd.signrawtransaction(refund_tx_hex, prev_tx, [wif])['hex']
-    
-    msgstr = createconfmsgstr(btcaddr, order.hash, myid.hash, order.obj['buyerid'], \
-                                        sig_refund_hex, prev_tx )
+    msgstr = createconf( myid.hash, btcaddr, order, buyer, default_fee )
     hash = MM_writefile(msgstr)
     appendindex('conf', hash)
     
     print "Confirmation ID:", hash
     return hash
+    
+########################### LEFT OFF REFACTORING HERE ##############################
     
 def createpay():
     confhash = raw_input("Enter a Confirmation ID: ")
@@ -915,9 +880,9 @@ def createmsg(msgtype):
         raise Exception( "msgtype MUST be in %s" % str(types) )
         
     if msgtype == 'reg' and entity != 'mod':
-        createreg()
+        do_createreg()
     elif msgtype == 'burn' and entity != 'mod':
-        createburn()
+        do_createburn()
     elif msgtype == 'sync' and entity != 'mod':
         createsync()
     elif msgtype == 'tag' and entity != 'buyer':
@@ -927,9 +892,9 @@ def createmsg(msgtype):
     elif msgtype == 'offer' and entity == 'vendor':
         createoffer()
     elif msgtype == 'order' and entity == 'buyer':
-        createorder()
+        do_createorder()
     elif msgtype == 'conf' and entity == 'vendor':
-        createconf()
+        do_createconf()
     elif msgtype == 'pay' and entity == 'buyer':
         createpay()
     elif msgtype == 'rec' and entity == 'vendor':

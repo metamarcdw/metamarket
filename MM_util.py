@@ -403,7 +403,8 @@ def createburn(myidhash, signbtc, amount, default_fee):
     return createburnmsgstr(btcaddr, myidhash, burn_txid)
     
     
-def createorder(myidhash, signbtc, offer, price, cryptkey, default_fee):
+def createorder(myidhash, signbtc, offer, cryptkey, default_fee):
+    price = decimal.Decimal(offer.obj['price'])
     pubkey = MM_util.btcd.validateaddress(btcaddr)['pubkey']
     multisig = MM_util.btcd.createmultisig( 2, sorted([offer.obj['pubkey'], pubkey]) )
     change_addr = MM_util.btcd.getrawchangeaddress()
@@ -425,6 +426,45 @@ def createorder(myidhash, signbtc, offer, price, cryptkey, default_fee):
     return createordermsgstr(signbtc, offer.hash, offer.obj['vendorid'], myidhash, \
                                         pubkey, multisig, crypttx, signedtx['txid'], \
                                         vout, signedtx['vout'][vout]['scriptPubKey']['hex'] )
+
+    
+def createconf( myidhash, signbtc, order, buyer, default_fee ):
+    offer = offerfromordermsg(order)
+    price = decimal.Decimal(offer.obj['price'])
+    ratio = decimal.Decimal(offer.obj['ratio'])
+    pubkey = offer.obj['pubkey']
+
+    ms_verify = MM_util.btcd.createmultisig( 2, sorted([order.obj['pubkey'], pubkey]) )
+    if ms_verify['address'] != order.obj['multisig']['address']:
+        raise Exception("Multisig did not verify!")
+    
+    b_portion, v_portion = getamounts(ratio, price)
+    
+    refund_op = prev_tx = [ dict((key, order.obj[key]) for key in ("txid", "vout")) ]
+    def create_refund(fee):
+        refund_addr_obj = { buyer.obj['btcaddr']: b_portion - fee/2, 
+                            signbtc: v_portion - fee/2 }
+        return MM_util.btcd.createrawtransaction(refund_op, refund_addr_obj)
+        
+    refund_tx_hex = create_refund(default_fee)
+    refund_fee = calc_fee(refund_tx_hex)
+    if refund_fee != default_fee:
+        refund_tx_hex = create_refund(refund_fee)
+    
+    #sets sequence to 0 (hacky as balls)
+    refund_tx_hex = refund_tx_hex[:84] + "00000000" + refund_tx_hex[92:]
+    #do nlocktime edit
+    locktime = offer.obj['locktime']
+    locktime_hex = bitcoin.core.b2lx( bytearray.fromhex(hex(locktime)[2:].rjust(8,'0')) )
+    refund_tx_hex = refund_tx_hex[:-8] + locktime_hex
+    
+    prev_tx[0]["scriptPubKey"] = order.obj['spk']
+    prev_tx[0]["redeemScript"] = order.obj['multisig']['redeemScript']
+    
+    sig_refund_hex = MM_util.btcd.signrawtransaction(refund_tx_hex, prev_tx, [wif])['hex']
+    
+    return createconfmsgstr(btcaddr, order.hash, myid.hash, order.obj['buyerid'], \
+                                        sig_refund_hex, prev_tx )
     
 
 
