@@ -217,83 +217,42 @@ def multiline():
         
 ########################### LEFT OFF REFACTORING HERE ##############################
 
-def createreg():
+def do_createreg():
     markethash = raw_input("Enter a Market ID: ")
+    
     marketlist = loadlist('market')
     identlist = loadlist('ident')
     market = searchlistbyhash(marketlist, markethash)
     mod = searchlistbyhash(identlist, market.obj['modid'])
     modbtc = mod.obj['btcaddr']
-    
     amount = decimal.Decimal(market.obj['fee'])
+    
     print "Are you sure you want to register at %s;" % market.obj['marketname']
     print "by sending %f BTC to %s?:" % ( amount, modbtc )
     if not yorn():
         sys.exit()
         
-    change_addr = MM_util.btcd.getrawchangeaddress()
-    
-    def create_regtx(fee):
-        regtx_hex = mktx(amount, modbtc, change_addr, default_fee, minconf)
-        return MM_util.btcd.signrawtransaction(regtx_hex)['hex']
-        
-    regtx_hex_signed = create_regtx(default_fee)
-    regtx_fee = calc_fee(regtx_hex_signed)
-    if regtx_fee != default_fee:
-        regtx_hex_signed = create_regtx(regtx_fee)
-        
-    reg_txid = sendtx(regtx_hex_signed)
-    print "REGISTER TXID:", reg_txid
-    
-    msgstr = createregmsgstr(btcaddr, mod.hash, myid.hash, reg_txid)
+    msgstr = createreg(myid.hash, btcaddr, amount, mod, default_fee)
     hash = MM_writefile(msgstr)
     appendindex('reg', hash)
     
     print "Registration ID:", hash
-
-def createburn():
+    
+    
+def do_createburn():
     amount = truncate( decput("Enter an amount of BTC to burn: ") )
     print "Are you sure you want to BURN %f coin(s)" % amount
     print "by sending to %s?:" % pob_address
     if not yorn():
         sys.exit()
-        
-    change_addr = MM_util.btcd.getrawchangeaddress()
-    
-    # Aggregate to main address. Includes 2 fees.
-    def create_ag(fee):
-        raw_agtx_hex = mktx(amount+default_fee, btcaddr, change_addr, fee, minconf)
-        return MM_util.btcd.signrawtransaction(raw_agtx_hex)['hex']
-        
-    sig_agtx_hex = create_ag(default_fee)
-    ag_fee = calc_fee(sig_agtx_hex)
-    if ag_fee != default_fee:
-        sig_agtx_hex = create_ag(ag_fee)
-    
-    ag_txid = sendtx(sig_agtx_hex)
-    print "AGGREGATE TXID:", ag_txid
-    waitforconf(ag_txid)
 
-    # Create raw burn TX.
-    sig_agtx = MM_util.btcd.decoderawtransaction(sig_agtx_hex)
-    vout = searchtxops(sig_agtx, btcaddr, amount+default_fee)
-    
-    txs = [{    "txid": ag_txid,
-                "vout": vout }]
-    addrs = {   pob_address: amount }
-    
-    burntx_hex = MM_util.btcd.createrawtransaction(txs, addrs)
-    burntx_hex_signed = MM_util.btcd.signrawtransaction(burntx_hex)['hex']
-    burn_txid = sendtx(burntx_hex_signed)
-    
-    print "BURN TXID:", burn_txid
-    
-    msgstr = createburnmsgstr(btcaddr, myid.hash, burn_txid)
+    msgstr = createburn(myid.hash, btcddr, amount, default_fee)
     hash = MM_writefile(msgstr)
     appendindex('burn', hash)
     
     print "Burn ID:", hash
-    
+
+        
 def createtag():
     tagname = raw_input("Enter a name for this TAG: ")
     desc = raw_input("Enter a description: ")
@@ -625,7 +584,7 @@ def createfeedback():
     ver = MM_loads(btcaddr, msgstr)
     MM_writefile(msgstr)
     appendindex('feedback', ver.hash)
-    backupordermsgs(final.hash)
+    do_backupordermsgs(final.hash)
     
     print "Feedback ID: %s" % ver.hash
     
