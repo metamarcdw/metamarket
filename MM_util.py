@@ -457,7 +457,24 @@ def createconf( myidhash, mybtc, order, offer, buyer, default_fee ):
     
     return createconfmsgstr(mybtc, order.hash, myidhash, order.obj['buyerid'], \
                                         sig_refund_hex, prev_tx )
+
     
+def createpay(myidhash, mybtc, conf, order, offer):
+    price = decimal.Decimal(offer.obj['price'])
+    ratio = decimal.Decimal(offer.obj['ratio'])
+    b_portion, v_portion = getamounts(ratio, price)
+    refund_fee = calc_fee( conf.obj['refundtx'] )
+    
+    refund_verify = MM_util.btcd.decoderawtransaction(conf.obj['refundtx'])
+    searchtxops(refund_verify, btcaddr, b_portion - refund_fee/2)
+    complete_refund = MM_util.btcd.signrawtransaction( conf.obj['refundtx'], conf.obj['prevtx'], [wif])['hex']
+    
+    fund_tx = simplecrypt.decrypt( pkstr, base64.b64decode(order.obj['crypt_fundingtx']) )
+    sendtx(fund_tx)
+    
+    return createpaymsgstr(btcaddr, conf.hash, conf.obj['vendorid'], myid.hash, \
+                                        complete_refund, address )
+
 
 
 # Creates a new Ident Msg and returns its string representation.

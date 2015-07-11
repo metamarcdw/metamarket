@@ -141,11 +141,11 @@ def do_getrep( identhash, burn_mult ):
 
 # Takes a verified "OrderMsg" and returns the associated Offer.
 def do_offerfromordermsg( msg, getorder=False ):
-    offerfromordermsg( msg, loadlist('offer'), \
-                            loadlist('order'), \
-                            loadlist('conf'), \
-                            loadlist('pay'), \
-                            loadlist('rec'), getorder ):
+    return offerfromordermsg( msg, loadlist('offer'), \
+                                   loadlist('order'), \
+                                   loadlist('conf'), \
+                                   loadlist('pay'), \
+                                   loadlist('rec'), getorder )
     
     
 # Takes a list of Verified Msgs and prints info to stdout.
@@ -270,6 +270,8 @@ def createtag():
     
     print "Tag ID:", hash
 
+################################# createmarket STILL REQUIRES REFACTORING ##############
+
 def createmarket():
     global mymarket
     
@@ -319,6 +321,7 @@ def createmarket():
         else:
             raise Exception("You are already running a Market!")
     
+    
 def createsync():
     markethash = raw_input("Enter a Market ID: ")
     marketlist = loadlist('market')
@@ -329,6 +332,7 @@ def createsync():
     appendindex('sync', hash)
     
     print "Sync ID:", hash
+    
     
 def createoffer():
     markethash = raw_input("Enter a Market ID: ")
@@ -395,9 +399,8 @@ def do_createconf( orderhash=None ):
     print "Confirmation ID:", hash
     return hash
     
-########################### LEFT OFF REFACTORING HERE ##############################
     
-def createpay():
+def do_createpay():
     confhash = raw_input("Enter a Confirmation ID: ")
     address = raw_input("Enter an Address: ")
     
@@ -412,24 +415,13 @@ def createpay():
     order = searchlistbyhash(orderlist, conf.obj['orderhash'])
     offer = do_offerfromordermsg(conf)
     
-    price = decimal.Decimal(offer.obj['price'])
-    ratio = decimal.Decimal(offer.obj['ratio'])
-    b_portion, v_portion = getamounts(ratio, price)
-    refund_fee = calc_fee( conf.obj['refundtx'] )
-    
-    refund_verify = MM_util.btcd.decoderawtransaction(conf.obj['refundtx'])
-    searchtxops(refund_verify, btcaddr, b_portion - refund_fee/2)
-    complete_refund = MM_util.btcd.signrawtransaction( conf.obj['refundtx'], conf.obj['prevtx'], [wif])['hex']
-    
-    fund_tx = simplecrypt.decrypt( pkstr, base64.b64decode(order.obj['crypt_fundingtx']) )
-    sendtx(fund_tx)
-    
-    msgstr = createpaymsgstr(btcaddr, conf.hash, conf.obj['vendorid'], myid.hash, \
-                                        complete_refund, address )
+    msgstr = createpay(myid.hash, btcaddr, conf, order, offer)
     hash = MM_writefile(msgstr)
     appendindex('pay', hash)
     
     print "Payment ID:", hash
+    
+########################### LEFT OFF REFACTORING HERE ##############################
     
 def createrec( payhash=None ):
     if not payhash:
@@ -905,7 +897,7 @@ def createmsg(msgtype):
     elif msgtype == 'conf' and entity == 'vendor':
         do_createconf()
     elif msgtype == 'pay' and entity == 'buyer':
-        createpay()
+        do_createpay()
     elif msgtype == 'rec' and entity == 'vendor':
         createrec()
     elif msgtype == 'final' and entity == 'buyer':
