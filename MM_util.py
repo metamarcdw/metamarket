@@ -83,14 +83,7 @@ def btcfrommsg(entity, msgstr):
     ids = loadlist('ident')
     return searchlistbyhash( ids, idhash ).obj['btcaddr']
 
-# Takes a verified "OrderMsg" and returns the associated Offer.
-def offerfromordermsg( msg, getorder=False ):
-    offerlist = loadlist('offer')
-    orderlist = loadlist('order')
-    conflist = loadlist('conf')
-    paylist = loadlist('pay')
-    reclist = loadlist('rec')
-    
+def offerfromordermsg( msg, offerlist, orderlist, conflist, paylist, reclist, getorder=False ):
     if msg.msgname == ORDER:
         return searchlistbyhash(offerlist, msg.obj['offerhash'])
     elif msg.msgname == CONF:
@@ -352,7 +345,7 @@ def searchtxops(tx, address, amount=None):
         raise Exception("No vout found matching address/amount.")
 
 
-def createreg(myidhash, signbtc, amount, mod, default_fee):
+def createreg(myidhash, mybtc, amount, mod, default_fee):
     modbtc = mod.obj['btcaddr']
     change_addr = MM_util.btcd.getrawchangeaddress()
     
@@ -367,15 +360,15 @@ def createreg(myidhash, signbtc, amount, mod, default_fee):
         
     reg_txid = sendtx(regtx_hex_signed)
     print "REGISTER TXID:", reg_txid
-    return createregmsgstr(signbtc, mod.hash, myidhash, reg_txid)
+    return createregmsgstr(mybtc, mod.hash, myidhash, reg_txid)
 
 
-def createburn(myidhash, signbtc, amount, default_fee):
+def createburn(myidhash, mybtc, amount, default_fee):
     change_addr = MM_util.btcd.getrawchangeaddress()
     
     # Aggregate to main address. Includes 2 fees.
     def create_ag(fee):
-        raw_agtx_hex = mktx(amount+default_fee, btcaddr, change_addr, fee, minconf)
+        raw_agtx_hex = mktx(amount+default_fee, mybtc, change_addr, fee, minconf)
         return MM_util.btcd.signrawtransaction(raw_agtx_hex)['hex']
         
     sig_agtx_hex = create_ag(default_fee)
@@ -389,7 +382,7 @@ def createburn(myidhash, signbtc, amount, default_fee):
 
     # Create raw burn TX.
     sig_agtx = MM_util.btcd.decoderawtransaction(sig_agtx_hex)
-    vout = searchtxops(sig_agtx, btcaddr, amount+default_fee)
+    vout = searchtxops(sig_agtx, mybtc, amount+default_fee)
     
     txs = [{    "txid": ag_txid,
                 "vout": vout }]
@@ -400,12 +393,12 @@ def createburn(myidhash, signbtc, amount, default_fee):
     burn_txid = sendtx(burntx_hex_signed)
     
     print "BURN TXID:", burn_txid
-    return createburnmsgstr(btcaddr, myidhash, burn_txid)
+    return createburnmsgstr(mybtc, myidhash, burn_txid)
     
     
-def createorder(myidhash, signbtc, offer, cryptkey, default_fee):
+def createorder(myidhash, mybtc, offer, cryptkey, default_fee):
     price = decimal.Decimal(offer.obj['price'])
-    pubkey = MM_util.btcd.validateaddress(btcaddr)['pubkey']
+    pubkey = MM_util.btcd.validateaddress(mybtc)['pubkey']
     multisig = MM_util.btcd.createmultisig( 2, sorted([offer.obj['pubkey'], pubkey]) )
     change_addr = MM_util.btcd.getrawchangeaddress()
     
@@ -423,13 +416,12 @@ def createorder(myidhash, signbtc, offer, cryptkey, default_fee):
     signedtx = MM_util.btcd.decoderawtransaction(signedtx_hex)
     vout = searchtxops(signedtx, multisig['address'], price)
     
-    return createordermsgstr(signbtc, offer.hash, offer.obj['vendorid'], myidhash, \
+    return createordermsgstr(mybtc, offer.hash, offer.obj['vendorid'], myidhash, \
                                         pubkey, multisig, crypttx, signedtx['txid'], \
                                         vout, signedtx['vout'][vout]['scriptPubKey']['hex'] )
 
     
-def createconf( myidhash, signbtc, order, buyer, default_fee ):
-    offer = offerfromordermsg(order)
+def createconf( myidhash, mybtc, order, offer, buyer, default_fee ):
     price = decimal.Decimal(offer.obj['price'])
     ratio = decimal.Decimal(offer.obj['ratio'])
     pubkey = offer.obj['pubkey']
@@ -443,7 +435,7 @@ def createconf( myidhash, signbtc, order, buyer, default_fee ):
     refund_op = prev_tx = [ dict((key, order.obj[key]) for key in ("txid", "vout")) ]
     def create_refund(fee):
         refund_addr_obj = { buyer.obj['btcaddr']: b_portion - fee/2, 
-                            signbtc: v_portion - fee/2 }
+                            mybtc: v_portion - fee/2 }
         return MM_util.btcd.createrawtransaction(refund_op, refund_addr_obj)
         
     refund_tx_hex = create_refund(default_fee)
@@ -463,7 +455,7 @@ def createconf( myidhash, signbtc, order, buyer, default_fee ):
     
     sig_refund_hex = MM_util.btcd.signrawtransaction(refund_tx_hex, prev_tx, [wif])['hex']
     
-    return createconfmsgstr(btcaddr, order.hash, myid.hash, order.obj['buyerid'], \
+    return createconfmsgstr(mybtc, order.hash, myidhash, order.obj['buyerid'], \
                                         sig_refund_hex, prev_tx )
     
 

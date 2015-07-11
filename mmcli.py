@@ -139,6 +139,14 @@ def do_modremoveoffer( ):
 def do_getrep( identhash, burn_mult ):
     return getrep( identhash, burn_mult, loadlist('feedback'), loadlist('burn') )
 
+# Takes a verified "OrderMsg" and returns the associated Offer.
+def do_offerfromordermsg( msg, getorder=False ):
+    offerfromordermsg( msg, loadlist('offer'), \
+                            loadlist('order'), \
+                            loadlist('conf'), \
+                            loadlist('pay'), \
+                            loadlist('rec'), getorder ):
+    
     
 # Takes a list of Verified Msgs and prints info to stdout.
 def showanylist( list, mktid=None, marketlist=None ):
@@ -165,7 +173,7 @@ def showanylist( list, mktid=None, marketlist=None ):
             title = "Message"
             str = i.obj['message']
         else:
-            offer = offerfromordermsg(i)
+            offer = do_offerfromordermsg(i)
             str = "%s;\t%s:\t%s BTC" % ( offer.obj['name'], offer.obj['amount'], offer.obj['price'] )
         print "%s: %s\nID: %s\n" % ( title, str, i.hash )
 
@@ -377,9 +385,10 @@ def do_createconf( orderhash=None ):
     orderlist = loadlist('order')
     identlist = loadlist('ident')
     order = searchlistbyhash(orderlist, orderhash)
+    offer = do_offerfromordermsg(order)
     buyer = searchlistbyhash(identlist, order.obj['buyerid'])
     
-    msgstr = createconf( myid.hash, btcaddr, order, buyer, default_fee )
+    msgstr = createconf( myid.hash, btcaddr, order, offer, buyer, default_fee )
     hash = MM_writefile(msgstr)
     appendindex('conf', hash)
     
@@ -392,12 +401,16 @@ def createpay():
     confhash = raw_input("Enter a Confirmation ID: ")
     address = raw_input("Enter an Address: ")
     
+    print "Broadcast funding TX?:"
+    if not yorn():
+        sys.exit(0)
+    
     conflist = loadlist('conf')
     orderlist = loadlist('order')
 
     conf = searchlistbyhash(conflist, confhash)
     order = searchlistbyhash(orderlist, conf.obj['orderhash'])
-    offer = offerfromordermsg(conf)
+    offer = do_offerfromordermsg(conf)
     
     price = decimal.Decimal(offer.obj['price'])
     ratio = decimal.Decimal(offer.obj['ratio'])
@@ -407,10 +420,6 @@ def createpay():
     refund_verify = MM_util.btcd.decoderawtransaction(conf.obj['refundtx'])
     searchtxops(refund_verify, btcaddr, b_portion - refund_fee/2)
     complete_refund = MM_util.btcd.signrawtransaction( conf.obj['refundtx'], conf.obj['prevtx'], [wif])['hex']
-    
-    print "Broadcast funding TX?:"
-    if not yorn():
-        sys.exit(0)
     
     fund_tx = simplecrypt.decrypt( pkstr, base64.b64decode(order.obj['crypt_fundingtx']) )
     sendtx(fund_tx)
@@ -433,7 +442,7 @@ def createrec( payhash=None ):
     pay = searchlistbyhash(paylist, payhash)
     conf = searchlistbyhash(conflist, pay.obj['confhash'])
     order = searchlistbyhash(orderlist, conf.obj['orderhash'])
-    offer = offerfromordermsg(pay)
+    offer = do_offerfromordermsg(pay)
     price = decimal.Decimal(offer.obj['price'])
     
     # Accept payment.
@@ -476,7 +485,7 @@ def createfinal():
     pay = searchlistbyhash(paylist, rec.obj['payhash'])
     vendor = searchlistbyhash(identlist, rec.obj['vendorid'])
     
-    offer = offerfromordermsg(rec)
+    offer = do_offerfromordermsg(rec)
     price = decimal.Decimal(offer.obj['price'])
     time_for_refund = time.asctime( time.localtime(offer.obj['locktime']) )
     
@@ -515,8 +524,8 @@ def createfeedback():
     
     finallist = loadlist('final')
     final = searchlistbyhash(finallist, finalhash)
-    offer = offerfromordermsg(final)
-    order = offerfromordermsg(final, getorder=True)
+    offer = do_offerfromordermsg(final)
+    order = do_offerfromordermsg(final, getorder=True)
     
     if entity == 'buyer':
         fromid = final.obj['buyerid']
@@ -653,7 +662,7 @@ def processoffer(msg, ver):
 def processorder(msg, ver):
     identlist = loadlist("ident")
     marketlist = loadlist('market')
-    offer = offerfromordermsg(ver)
+    offer = do_offerfromordermsg(ver)
     buyer = searchlistbyhash(identlist, ver.obj['buyerid'])
     market = searchlistbyhash(marketlist, offer.obj['markethash'])
     
