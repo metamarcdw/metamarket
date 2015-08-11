@@ -39,8 +39,8 @@ def login( wp=None ):
     print "BTC Address: %s\nBM Address: %s" % ( btcaddr, bmaddr )
     
     MM_util.unlockwallet(wp)
-    if not MM_util.btcd.validateaddress(btcaddr)['ismine'] or \
-        MM_util.bm.createDeterministicAddresses(base64.b64encode(pkstr)) != []:
+    if MM_util.bm.createDeterministicAddresses(base64.b64encode(pkstr)) != [] or \
+        not MM_util.btcd.validateaddress(btcaddr)['ismine']:
         importkeys()
     
     identlist = MM_util.loadlist('ident')
