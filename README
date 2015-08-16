@@ -48,6 +48,16 @@ cd ~/metamarket
 sudo chmod u+x *.py
 ./mmcli.py --help
 
+INSTALL REGTEST SUITE (Linux):
+cd ~/.bitcoin
+wget http://metamarket.biz/test_suite/regtest_conf.tar.gz
+tar -x -f regtest_conf.tar.gz
+
+cd ~
+wget http://metamarket.biz/test_suite/test_suite_scripts.tar.gz
+tar -x -f test_suite_scripts.tar.gz
+./copyscripts
+
 
 INSTALL ON WINDOWS:
 
