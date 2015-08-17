@@ -13,7 +13,7 @@ bitcoin-qt
 
 Install Bitmessage - http://bitmessage.org
 sudo apt-get install python openssl git python-qt4
-git clone https://github.com/Bitmessage/PyBitmessage $HOME/PyBitmessage 
+git clone https://github.com/Bitmessage/PyBitmessage ~/PyBitmessage 
 ~/PyBitmessage/src/bitmessagemain.py 
 
 Edit ~/.config/PyBitmessage/keys.dat
@@ -43,9 +43,8 @@ sudo pip install pycrypto
 sudo pip install simple-crypt
 sudo pip install pycoin
 sudo pip install python-bitcoinlib
-git clone https://github.com/metamarcdw/metamarket.git $HOME/metamarket 
+git clone https://github.com/metamarcdw/metamarket.git ~/metamarket 
 cd ~/metamarket
-sudo chmod u+x *.py
 ./mmcli.py --help
 
 INSTALL REGTEST SUITE (Linux):
