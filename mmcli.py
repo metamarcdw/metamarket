@@ -700,7 +700,7 @@ def createfeedback():
         toid = final.obj['buyerid']
         
     msgstr = MM_util.createfeedbackmsgstr(btcaddr, offer.obj['markethash'], finalhash, fromid, toid, \
-                                            final.obj['finaltxid'], order.obj['multisig']['redeemscript'], upvote, message)
+                                            final.obj['finaltxid'], order.obj['multisig']['redeemScript'], upvote, message)
     ver = MM_util.MM_loads(btcaddr, msgstr)
     MM_util.MM_writefile(msgstr)
     MM_util.appendindex('feedback', ver.hash)
