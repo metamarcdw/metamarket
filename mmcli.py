@@ -1001,9 +1001,12 @@ def processmsg(msg):
 def processmultimsg(mmsg):
     mmsgobj = MM_util.MultiMsg(**json.loads(mmsg))
     fname = "multimsg.dat"
-    mmsgfile = open(fname, 'r')
-    mmsgdict = json.load(mmsgfile)
-    mmsgfile.close()
+    if os.path.exists(fname):
+        mmsgfile = open(fname, 'r')
+        mmsgdict = json.load(mmsgfile)
+        mmsgfile.close()
+    else:
+        mmsgdict = {}
     msginfo = None
     
     if mmsgobj.hash in mmsgdict:
