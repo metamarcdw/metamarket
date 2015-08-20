@@ -897,10 +897,10 @@ def processfeedback(msg, ver):
     fromuser = MM_util.searchlistbyhash(identlist, ver.obj['fromid'])
     touser = MM_util.searchlistbyhash(identlist, ver.obj['toid'])
     
-    finaltx = gettx(txid)
+    finaltx = gettx(ver.obj['finaltxid'])
     prevtxid = finaltx['vin'][0]['txid']
     prevtx = gettx(prevtxid)
-    msaddr = prevtx['vout'][0]['addresses'][0]
+    msaddr = prevtx['vout'][1]['scriptPubKey']['addresses'][0]
     
     redeemscript = MM_util.btcd.decodescript(ver.obj['redeemscript'])
     
