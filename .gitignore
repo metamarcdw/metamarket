@@ -1,4 +1,5 @@
 *.pyc
 *.dat
 *.txt
+dist/
 msg/
