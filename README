@@ -60,11 +60,11 @@ tar -x -f test_suite_scripts.tar.gz
 
 INSTALL ON WINDOWS:
 
-Download ZIP from https://github.com/metamarcdw/metamarket/archive/master.zip
-Unzip metamarket-master
+Download TAR from https://github.com/metamarcdw/metamarket/releases/download/v0.1.0-alpha/METAmarket-win32-v0.1.0-alpha.tar.gz
+Extract METAmarket-v0.1.0-alpha
 Open Command Prompt
-cd C:\metamarket-master\dist
-mmcli --help
+cd C:\METAmarket-v0.1.0-alpha
+mmcli.exe --help
 
 
 * * *
