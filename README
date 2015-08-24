@@ -43,8 +43,11 @@ sudo pip install pycrypto
 sudo pip install simple-crypt
 sudo pip install pycoin
 sudo pip install python-bitcoinlib
-git clone https://github.com/metamarcdw/metamarket.git ~/metamarket 
-cd ~/metamarket
+export install_dir=~
+cd $install_dir
+wget https://github.com/metamarcdw/metamarket/archive/v0.1.0-alpha.tar.gz
+tar -x -f v0.1.0-alpha.tar.gz
+cd metamarket-0.1.0-alpha
 ./mmcli.py --help
 
 INSTALL REGTEST SUITE (Linux):
@@ -52,7 +55,7 @@ cd ~/.bitcoin
 wget http://metamarket.biz/test_suite/regtest_conf.tar.gz
 tar -x -f regtest_conf.tar.gz
 
-cd ~
+cd $install_dir
 wget http://metamarket.biz/test_suite/test_suite_scripts.tar.gz
 tar -x -f test_suite_scripts.tar.gz
 ./copyscripts
@@ -60,10 +63,10 @@ tar -x -f test_suite_scripts.tar.gz
 
 INSTALL ON WINDOWS:
 
-Download TAR from https://github.com/metamarcdw/metamarket/releases/download/v0.1.0-alpha/METAmarket-win32-v0.1.0-alpha.tar.gz
-Extract METAmarket-v0.1.0-alpha
+Download ZIP from https://github.com/metamarcdw/metamarket/releases/download/v0.1.0-alpha/metamarket-win32-0.1.0-alpha.zip
+Extract metamarket-win32-0.1.0-alpha
 Open Command Prompt
-cd C:\METAmarket-v0.1.0-alpha
+cd %HOMEPATH%\Downloads\metamarket-win32-0.1.0-alpha
 mmcli.exe --help
 
 
