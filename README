@@ -36,15 +36,19 @@ rpcpassword=password
 
 INSTALL ON UBUNTU GNU/LINUX:
 
+DEPENDENCIES:
 sudo apt-get install python-dev libssl-dev python-pip
 sudo pip install simplejson
 sudo pip install scrypt
 sudo pip install pycrypto
 sudo pip install simple-crypt
 sudo pip install pycoin
-sudo pip install python-bitcoinlib
 export install_dir=~
 cd $install_dir
+git clone https://github.com/petertodd/python-bitcoinlib.git
+python python-bitcoinlib/setup.py install
+
+INSTALL METAmarket:
 wget https://github.com/metamarcdw/metamarket/archive/v0.1.0-alpha.tar.gz
 tar -x -f v0.1.0-alpha.tar.gz
 cd metamarket-0.1.0-alpha
