@@ -472,8 +472,34 @@ def createpay(myidhash, mybtc, conf, order, offer):
     fund_tx = simplecrypt.decrypt( pkstr, base64.b64decode(order.obj['crypt_fundingtx']) )
     sendtx(fund_tx)
     
-    return createpaymsgstr(btcaddr, conf.hash, conf.obj['vendorid'], myid.hash, \
+    return createpaymsgstr(mybtc, conf.hash, conf.obj['vendorid'], myidhash, \
                                         complete_refund, address )
+
+
+def createrec( myidhash, mybtc, pay, order, price ):
+    fund_tx = gettx(order.obj['txid'])
+    searchtxops(fund_tx, order.obj['multisig']['address'], price)
+    waitforconf(order.obj['txid'])
+    
+    final_op = prev_tx = [ dict((key, order.obj[key]) for key in ("txid", "vout")) ]
+    def create_final(fee):
+        final_addr_obj = { btcaddr: price - fee }
+        return MM_util.btcd.createrawtransaction(final_op, final_addr_obj)
+        
+    final_tx_hex = create_final(default_fee)
+    final_fee = calc_fee(final_tx_hex)
+    if final_fee != default_fee:
+        final_tx_hex = create_final(final_fee)
+
+    prev_tx[0]["scriptPubKey"] = order.obj['spk']
+    prev_tx[0]["redeemScript"] = order.obj['multisig']['redeemScript']
+    
+    sig_final_hex = MM_util.btcd.signrawtransaction(final_tx_hex, prev_tx, [wif])['hex']
+    
+    return createrecmsgstr(mybtc, pay.hash, myidhash, pay.obj['buyerid'], \
+                                        sig_final_hex, prev_tx )
+    
+
 
 
 

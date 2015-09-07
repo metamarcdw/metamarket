@@ -421,9 +421,8 @@ def do_createpay():
     
     print "Payment ID:", hash
     
-########################### LEFT OFF REFACTORING HERE ##############################
     
-def createrec( payhash=None ):
+def do_createrec( payhash=None ):
     if not payhash:
         payhash = raw_input("Enter a Payment ID: ")
     
@@ -437,35 +436,16 @@ def createrec( payhash=None ):
     offer = do_offerfromordermsg(pay)
     price = decimal.Decimal(offer.obj['price'])
     
-    # Accept payment.
-    fund_tx = gettx(order.obj['txid'])
-    searchtxops(fund_tx, order.obj['multisig']['address'], price)
-    waitforconf(order.obj['txid'])
+    msgstr = createrec(myid.hash, btcaddr, pay, order, price)
     print "FUNDS SUCCESSFULLY ESCROWED. SHIP PRODUCT NOW."
-    
-    final_op = prev_tx = [ dict((key, order.obj[key]) for key in ("txid", "vout")) ]
-    def create_final(fee):
-        final_addr_obj = { btcaddr: price - fee }
-        return MM_util.btcd.createrawtransaction(final_op, final_addr_obj)
-        
-    final_tx_hex = create_final(default_fee)
-    final_fee = calc_fee(final_tx_hex)
-    if final_fee != default_fee:
-        final_tx_hex = create_final(final_fee)
-
-    prev_tx[0]["scriptPubKey"] = order.obj['spk']
-    prev_tx[0]["redeemScript"] = order.obj['multisig']['redeemScript']
-    
-    sig_final_hex = MM_util.btcd.signrawtransaction(final_tx_hex, prev_tx, [wif])['hex']
-    
-    msgstr = createrecmsgstr(btcaddr, pay.hash, myid.hash, pay.obj['buyerid'], \
-                                        sig_final_hex, prev_tx )
     hash = MM_writefile(msgstr)
     appendindex('rec', hash)
     
     print "Reciept ID:", hash
     return hash
     
+########################### LEFT OFF REFACTORING HERE ##############################
+
 def createfinal():
     rechash = raw_input("Enter a Reciept ID: ")
     
