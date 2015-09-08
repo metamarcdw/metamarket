@@ -446,7 +446,7 @@ def do_createrec( payhash=None ):
     
 ########################### LEFT OFF REFACTORING HERE ##############################
 
-def createfinal():
+def do_createfinal():
     rechash = raw_input("Enter a Reciept ID: ")
     
     reclist = loadlist('rec')
@@ -459,30 +459,25 @@ def createfinal():
     
     offer = do_offerfromordermsg(rec)
     price = decimal.Decimal(offer.obj['price'])
-    time_for_refund = time.asctime( time.localtime(offer.obj['locktime']) )
     
-    final_verify = MM_util.btcd.decoderawtransaction(rec.obj['finaltx'])
-    searchtxops(final_verify, vendor.obj['btcaddr'], price - default_fee)
-    complete_final = MM_util.btcd.signrawtransaction(rec.obj['finaltx'], rec.obj['prevtx'], [wif])['hex']
+    time_for_refund = time.asctime( time.localtime(offer.obj['locktime']) )
     
     print "Would you like to finalize or refund escrowed funds?:"
     finorref = raw_input("Enter the word [final or refund]: ")
     print "Are you sure?"
     if not yorn():
         sys.exit()
-        
+    
     if finorref == 'final':
-        final_tx = complete_final
+        finalflag = True
     elif finorref == 'refund':
         print "Your refund tx will be sent to Bitcoin Core,"
         print "but cannot be confirmed until after", time_for_refund
-        final_tx = pay.obj['refundhex']
+        finalflag = False
     else:
         raise Exception("Must enter 'final' or 'refund'")
-        
-    final_txid = sendtx(final_tx)
     
-    msgstr = createfinalmsgstr(btcaddr, rec.hash, rec.obj['vendorid'], myid.hash, final_txid )
+    msgstr = createfinal(myid.hash, btcaddr, finalflag, )
     hash = MM_writefile(msgstr)
     appendindex('final', hash)
     

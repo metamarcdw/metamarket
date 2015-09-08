@@ -500,6 +500,18 @@ def createrec( myidhash, mybtc, pay, order, price ):
                                         sig_final_hex, prev_tx )
     
 
+def createfinal(myidhash, mybtc, finalflag, rec, vendor, offer, price):
+    final_verify = MM_util.btcd.decoderawtransaction(rec.obj['finaltx'])
+    searchtxops(final_verify, vendor.obj['btcaddr'], price - default_fee)
+    complete_final = MM_util.btcd.signrawtransaction(rec.obj['finaltx'], rec.obj['prevtx'], [wif])['hex']
+    
+    if finalflag:
+        final_tx = complete_final
+    else:
+        final_tx = pay.obj['refundhex']
+    final_txid = sendtx(final_tx)
+    
+    return createfinalmsgstr(mybtc, rec.hash, rec.obj['vendorid'], myidhash, final_txid )
 
 
 
