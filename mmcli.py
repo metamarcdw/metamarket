@@ -444,7 +444,6 @@ def do_createrec( payhash=None ):
     print "Reciept ID:", hash
     return hash
     
-########################### LEFT OFF REFACTORING HERE ##############################
 
 def do_createfinal():
     rechash = raw_input("Enter a Reciept ID: ")
@@ -483,7 +482,8 @@ def do_createfinal():
     
     print "Finalize ID:", hash
     
-def createfeedback():
+
+def do_createfeedback():
     finalhash = raw_input("Enter a Finalize ID: ")
     print "Were you satisfied with this sale?:"
     upvote = yorn()
@@ -494,15 +494,7 @@ def createfeedback():
     offer = do_offerfromordermsg(final)
     order = do_offerfromordermsg(final, getorder=True)
     
-    if entity == 'buyer':
-        fromid = final.obj['buyerid']
-        toid = final.obj['vendorid']
-    elif entity == 'vendor':
-        fromid = final.obj['vendorid']
-        toid = final.obj['buyerid']
-        
-    msgstr = createfeedbackmsgstr(btcaddr, offer.obj['markethash'], finalhash, fromid, toid, \
-                                            final.obj['finaltxid'], order.obj['multisig']['redeemscript'], upvote, message)
+    msgstr = createfeedback(myid.hash, btcaddr, entity, upvote, message, final, offer, order)
     ver = MM_loads(btcaddr, msgstr)
     MM_writefile(msgstr)
     appendindex('feedback', ver.hash)
@@ -510,6 +502,8 @@ def createfeedback():
     
     print "Feedback ID: %s" % ver.hash
     
+########################### LEFT OFF REFACTORING HERE ##############################
+
 def createcancel():
     orderhash = raw_input("Enter an Order ID: ")
     orderlist = loadlist('order')
@@ -874,11 +868,11 @@ def createmsg(msgtype):
     elif msgtype == 'pay' and entity == 'buyer':
         do_createpay()
     elif msgtype == 'rec' and entity == 'vendor':
-        createrec()
+        do_createrec()
     elif msgtype == 'final' and entity == 'buyer':
-        createfinal()
+        do_createfinal()
     elif msgtype == 'feedback' and entity != 'mod':
-        createfeedback()
+        do_createfeedback()
     elif msgtype == 'cancel' and entity != 'mod':
         createcancel()
     else:

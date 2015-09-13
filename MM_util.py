@@ -514,6 +514,17 @@ def createfinal(myidhash, mybtc, finalflag, rec, vendor, offer, price):
     return createfinalmsgstr(mybtc, rec.hash, rec.obj['vendorid'], myidhash, final_txid )
 
 
+def createfeedback(myidhash, mybtc, entity, upvote, message, final, offer, order):
+    if entity == 'buyer':
+        fromid = final.obj['buyerid']
+        toid = final.obj['vendorid']
+    elif entity == 'vendor':
+        fromid = final.obj['vendorid']
+        toid = final.obj['buyerid']
+        
+    return createfeedbackmsgstr(btcaddr, offer.obj['markethash'], finalhash, fromid, toid, \
+                                            final.obj['finaltxid'], order.obj['multisig']['redeemscript'], upvote, message)
+
 
 # Creates a new Ident Msg and returns its string representation.
 def createidentmsgstr( btc_addr, bm_addr, user_name ):
