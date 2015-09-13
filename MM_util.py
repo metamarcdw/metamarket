@@ -359,7 +359,7 @@ def createreg(myidhash, mybtc, amount, mod, default_fee):
         regtx_hex_signed = create_regtx(regtx_fee)
         
     reg_txid = sendtx(regtx_hex_signed)
-    print "REGISTER TXID:", reg_txid
+    # print "REGISTER TXID:", reg_txid
     return createregmsgstr(mybtc, mod.hash, myidhash, reg_txid)
 
 
@@ -377,7 +377,7 @@ def createburn(myidhash, mybtc, amount, default_fee):
         sig_agtx_hex = create_ag(ag_fee)
     
     ag_txid = sendtx(sig_agtx_hex)
-    print "AGGREGATE TXID:", ag_txid
+    # print "AGGREGATE TXID:", ag_txid
     waitforconf(ag_txid)
 
     # Create raw burn TX.
@@ -392,7 +392,7 @@ def createburn(myidhash, mybtc, amount, default_fee):
     burntx_hex_signed = MM_util.btcd.signrawtransaction(burntx_hex)['hex']
     burn_txid = sendtx(burntx_hex_signed)
     
-    print "BURN TXID:", burn_txid
+    # print "BURN TXID:", burn_txid
     return createburnmsgstr(mybtc, myidhash, burn_txid)
     
     

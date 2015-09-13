@@ -260,7 +260,7 @@ def do_createburn():
     print "Burn ID:", hash
 
         
-def createtag():
+def do_createtag():
     tagname = raw_input("Enter a name for this TAG: ")
     desc = raw_input("Enter a description: ")
     
@@ -270,9 +270,8 @@ def createtag():
     
     print "Tag ID:", hash
 
-################################# createmarket STILL REQUIRES REFACTORING ##############
 
-def createmarket():
+def do_createmarket():
     global mymarket
     
     if entity != 'mod':
@@ -322,7 +321,7 @@ def createmarket():
             raise Exception("You are already running a Market!")
     
     
-def createsync():
+def do_createsync():
     markethash = raw_input("Enter a Market ID: ")
     marketlist = loadlist('market')
     market = searchlistbyhash(marketlist, markethash)
@@ -334,7 +333,7 @@ def createsync():
     print "Sync ID:", hash
     
     
-def createoffer():
+def do_createoffer():
     markethash = raw_input("Enter a Market ID: ")
     name = raw_input("Enter a name for this OFFER: ")
     locale = raw_input("Enter a locale: ")
@@ -841,13 +840,13 @@ def createmsg(msgtype):
     elif msgtype == 'burn' and entity != 'mod':
         do_createburn()
     elif msgtype == 'sync' and entity != 'mod':
-        createsync()
+        do_createsync()
     elif msgtype == 'tag' and entity != 'buyer':
-        createtag()
+        do_createtag()
     elif msgtype == 'market':
-        createmarket()
+        do_createmarket()
     elif msgtype == 'offer' and entity == 'vendor':
-        createoffer()
+        do_createoffer()
     elif msgtype == 'order' and entity == 'buyer':
         do_createorder()
     elif msgtype == 'conf' and entity == 'vendor':
