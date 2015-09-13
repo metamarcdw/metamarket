@@ -494,38 +494,27 @@ def do_createfeedback():
     offer = do_offerfromordermsg(final)
     order = do_offerfromordermsg(final, getorder=True)
     
-    msgstr = createfeedback(myid.hash, btcaddr, entity, upvote, message, final, offer, order)
+    msgstr = createfeedback(btcaddr, entity, upvote, message, final, offer, order)
     hash = MM_writefile(msgstr)
     appendindex('feedback', hash)
     do_backupordermsgs(final.hash)
     
     print "Feedback ID: %s" % hash
     
-########################### LEFT OFF REFACTORING HERE ##############################
 
-def createcancel():
+def do_createcancel():
     orderhash = raw_input("Enter an Order ID: ")
     orderlist = loadlist('order')
     conflist = loadlist('conf')
     order = searchlistbyhash(orderlist, orderhash)
     
-    MM_backupfile('order', orderhash)
-    
-    toid = None
-    if entity == 'buyer':
-        toid = order.obj['vendorid']
-        for conf in conflist:
-            if conf.obj['orderhash'] == orderhash:
-                MM_backupfile('conf', conf.hash)
-    else:
-        toid = order.obj['buyerid']
-    
-    msgstr = createcancelmsgstr(btcaddr, myid.hash, toid, orderhash)
+    msgstr = createcancel(btcaddr, myid.hash, entity, conflist, order)
     hash = MM_writefile(msgstr)
     appendindex('cancel', hash)
     
     print "Cancel ID: %s" % hash
     
+########################### LEFT OFF REFACTORING HERE ##############################
     
     
 def checkinbox( ):
@@ -872,7 +861,7 @@ def createmsg(msgtype):
     elif msgtype == 'feedback' and entity != 'mod':
         do_createfeedback()
     elif msgtype == 'cancel' and entity != 'mod':
-        createcancel()
+        do_createcancel()
     else:
         raise Exception("Incorrect Entity or Msg type.")
         

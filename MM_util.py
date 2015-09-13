@@ -514,7 +514,7 @@ def createfinal(myidhash, mybtc, finalflag, rec, vendor, offer, price):
     return createfinalmsgstr(mybtc, rec.hash, rec.obj['vendorid'], myidhash, final_txid )
 
 
-def createfeedback(myidhash, mybtc, entity, upvote, message, final, offer, order):
+def createfeedback(mybtc, entity, upvote, message, final, offer, order):
     if entity == 'buyer':
         fromid = final.obj['buyerid']
         toid = final.obj['vendorid']
@@ -522,8 +522,23 @@ def createfeedback(myidhash, mybtc, entity, upvote, message, final, offer, order
         fromid = final.obj['vendorid']
         toid = final.obj['buyerid']
         
-    return createfeedbackmsgstr(btcaddr, offer.obj['markethash'], finalhash, fromid, toid, \
+    return createfeedbackmsgstr(mybtc, offer.obj['markethash'], finalhash, fromid, toid, \
                                             final.obj['finaltxid'], order.obj['multisig']['redeemscript'], upvote, message)
+
+
+def createcancel(myidhash, mybtc, entity, conflist, order):
+    MM_backupfile('order', orderhash)
+    
+    toid = None
+    if entity == 'buyer':
+        toid = order.obj['vendorid']
+        for conf in conflist:
+            if conf.obj['orderhash'] == orderhash:
+                MM_backupfile('conf', conf.hash)
+    else:
+        toid = order.obj['buyerid']
+    
+    return createcancelmsgstr(mybtc, myidhash, toid, orderhash)
 
 
 # Creates a new Ident Msg and returns its string representation.
