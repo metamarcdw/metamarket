@@ -521,11 +521,10 @@ def createcancel():
         toid = order.obj['buyerid']
     
     msgstr = createcancelmsgstr(btcaddr, myid.hash, toid, orderhash)
-    ver = MM_loads(btcaddr, msgstr)
-    MM_writefile(msgstr)
-    appendindex('cancel', ver.hash)
+    hash = MM_writefile(msgstr)
+    appendindex('cancel', hash)
     
-    print "Cancel ID: %s" % ver.hash
+    print "Cancel ID: %s" % hash
     
     
     
