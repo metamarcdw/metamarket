@@ -1,20 +1,21 @@
-METAmarket-
-Trustless Federated Marketplaces
+# METAmarket - Trustless Federated Marketplaces
 http://metamarket.biz
 
 * * *
 
-REQUIREMENTS:
+*REQUIREMENTS:*
+```
 Install Bitcoin Core - http://bitcoin.org
 sudo apt-add-repository ppa:bitcoin/bitcoin
 sudo apt-get update
 sudo apt-get install bitcoin-qt
 bitcoin-qt
-
-Install Bitmessage - http://bitmessage.org
+```
+*Install Bitmessage* - http://bitmessage.org
+```
 sudo apt-get install python openssl git python-qt4
 git clone https://github.com/Bitmessage/PyBitmessage ~/PyBitmessage 
-~/PyBitmessage/src/bitmessagemain.py 
+~/PyBitmessage/src/bitmessagemain.py
 
 Edit ~/.config/PyBitmessage/keys.dat
 Or   %APPDATA%\PyBitmessage\keys.dat on Windows
@@ -32,11 +33,12 @@ server=1
 testnet=1
 rpcuser=user
 rpcpassword=password
+```
 
+*INSTALL ON UBUNTU GNU/LINUX:*
 
-INSTALL ON UBUNTU GNU/LINUX:
-
-DEPENDENCIES:
+**DEPENDENCIES:**
+```
 sudo apt-get install python-dev libssl-dev python-pip
 sudo pip install simplejson
 sudo pip install scrypt
@@ -47,14 +49,18 @@ export install_dir=~
 cd $install_dir
 git clone https://github.com/petertodd/python-bitcoinlib.git
 python python-bitcoinlib/setup.py install
+```
 
-INSTALL METAmarket:
+**INSTALL METAmarket:**
+```
 wget https://github.com/metamarcdw/metamarket/archive/v0.1.0-alpha.tar.gz
 tar -x -f v0.1.0-alpha.tar.gz
 cd metamarket-0.1.0-alpha
 ./mmcli.py --help
+```
 
-INSTALL REGTEST SUITE (Linux):
+**INSTALL REGTEST SUITE (Linux):**
+```
 cd ~/.bitcoin
 wget http://metamarket.biz/test_suite/regtest_conf.tar.gz
 tar -x -f regtest_conf.tar.gz
@@ -63,19 +69,20 @@ cd $install_dir
 wget http://metamarket.biz/test_suite/test_suite_scripts.tar.gz
 tar -x -f test_suite_scripts.tar.gz
 ./copyscripts
+```
 
-
-INSTALL ON WINDOWS:
-
+*INSTALL ON WINDOWS:*
+```
 Download ZIP from https://github.com/metamarcdw/metamarket/releases/download/v0.1.0-alpha/metamarket-win32-0.1.0-alpha.zip
 Extract metamarket-win32-0.1.0-alpha
 Open Command Prompt
 cd %HOMEPATH%\Downloads\metamarket-win32-0.1.0-alpha
 mmcli.exe --help
-
+```
 
 * * *
-
+*Usage:*
+```
 usage: mmcli.py [-h] [-e ENTITY] [-c CHAIN] [-p BTC_PORT]
                 {checkinbox,processinbox,modbanuser,modbantag,modremoveoffer,showchan,showchanmsg,showmsglist,showmsg,createmsg,sendmsg,sendmarketoffer}
                 ...
@@ -107,3 +114,4 @@ optional arguments:
                         Choose which blockchain to use: testnet or mainnet.
   -p BTC_PORT, --btcport BTC_PORT
                         Use a specific RPC port to connect to Bitcoin Core.
+```
