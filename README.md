@@ -4,8 +4,9 @@ http://metamarket.biz
 * * *
 
 *REQUIREMENTS:*
+
+*Install Bitcoin Core* - http://bitcoin.org
 ```
-Install Bitcoin Core - http://bitcoin.org
 sudo apt-add-repository ppa:bitcoin/bitcoin
 sudo apt-get update
 sudo apt-get install bitcoin-qt
@@ -16,19 +17,21 @@ bitcoin-qt
 sudo apt-get install python openssl git python-qt4
 git clone https://github.com/Bitmessage/PyBitmessage ~/PyBitmessage 
 ~/PyBitmessage/src/bitmessagemain.py
-
-Edit ~/.config/PyBitmessage/keys.dat
-Or   %APPDATA%\PyBitmessage\keys.dat on Windows
+```
+Edit ```~/.config/PyBitmessage/keys.dat```  
+Or ```%APPDATA%\PyBitmessage\keys.dat``` on Windows  
 Add:
+```
 apienabled = True
 apiport = 8442
 apiinterface = 127.0.0.1
 apiusername = username
 apipassword = password
-
-Edit ~/.bitcoin/bitcoin.conf
-Or   %APPDATA%\Bitcoin\bitcoin.conf on Windows
+```
+Edit ```~/.bitcoin/bitcoin.conf```  
+Or ```%APPDATA%\Bitcoin\bitcoin.conf``` on Windows  
 Add:
+```
 server=1
 testnet=1
 rpcuser=user
@@ -72,10 +75,12 @@ tar -x -f test_suite_scripts.tar.gz
 ```
 
 *INSTALL ON WINDOWS:*
-```
-Download ZIP from https://github.com/metamarcdw/metamarket/releases/download/v0.1.0-alpha/metamarket-win32-0.1.0-alpha.zip
-Extract metamarket-win32-0.1.0-alpha
+
+Download ZIP from  
+https://github.com/metamarcdw/metamarket/releases/download/v0.1.0-alpha/metamarket-win32-0.1.0-alpha.zip  
+Extract metamarket-win32-0.1.0-alpha  
 Open Command Prompt
+```
 cd %HOMEPATH%\Downloads\metamarket-win32-0.1.0-alpha
 mmcli.exe --help
 ```
