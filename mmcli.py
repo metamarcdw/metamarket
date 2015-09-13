@@ -495,12 +495,11 @@ def do_createfeedback():
     order = do_offerfromordermsg(final, getorder=True)
     
     msgstr = createfeedback(myid.hash, btcaddr, entity, upvote, message, final, offer, order)
-    ver = MM_loads(btcaddr, msgstr)
-    MM_writefile(msgstr)
-    appendindex('feedback', ver.hash)
+    hash = MM_writefile(msgstr)
+    appendindex('feedback', hash)
     do_backupordermsgs(final.hash)
     
-    print "Feedback ID: %s" % ver.hash
+    print "Feedback ID: %s" % hash
     
 ########################### LEFT OFF REFACTORING HERE ##############################
 
