@@ -29,6 +29,9 @@ class MyForm(QtGui.QMainWindow):
         
         self.loggedIn = False
         
+        # loadindex ...
+        # loadlist ...
+        
     def showLoginDlg(self):
         self.loginDlg = LoginDlg(self)
         if self.loginDlg.exec_():
@@ -42,7 +45,18 @@ class MyForm(QtGui.QMainWindow):
             print "Name: %s" % name
             print "Pswd: %s" % pswd
             self.loggedIn = True
-        
+    
+    
+    def yorn(self, prompt):
+        reply = QMessageBox.question(self, "Question", prompt, QMessageBox.Yes|QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            return True
+        elif reply == QMessageBox.No:
+            return False
+    
+    def info(self, message):
+        QMessageBox.information(self, "Information", message, QMessageBox.Ok)
+    
 
 def run():
     app = QtGui.QApplication(sys.argv)
