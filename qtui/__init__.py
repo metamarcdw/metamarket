@@ -25,13 +25,30 @@ class MyForm(QtGui.QMainWindow):
         QtGui.QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        
         #INIT ALL DATA STRUCTURES
         
         self.loggedIn = False
         
-        # loadindex ...
-        # loadlist ...
+        self.marketlist = MM_util.loadlist('market')
+        self.identlist = MM_util.loadlist('ident')
+        self.offerlist = MM_util.loadlist('offer')
+        self.orderlist = MM_util.loadlist('order')
+        self.conflist = MM_util.loadlist('conf')
+        self.paylist = MM_util.loadlist('pay')
+        self.reclist = MM_util.loadlist('rec')
+        self.finallist = MM_util.loadlist('final')
+        self.feedbacklist = MM_util.loadlist('feedback')
         
+        bannedtags = MM_util.loadindex('bannedtags')
+        
+        self.updateUi()
+    
+    def updateUi(self):
+        #INIT MAINWINDOW UI WITH DATA FROM ALL DATA STRUCTURES
+        pass
+    
+    
     def showLoginDlg(self):
         self.loginDlg = LoginDlg(self)
         if self.loginDlg.exec_():
