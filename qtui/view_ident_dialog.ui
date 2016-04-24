@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>114</height>
+    <height>119</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
-    <widget class="QGroupBox" name="view_ident_groupbox">
+    <widget class="QGroupBox" name="viewIdentGroupbox">
      <property name="title">
       <string>View Identity: Identname</string>
      </property>
@@ -23,21 +23,21 @@
       <item row="0" column="0">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QLabel" name="hash_label">
+         <widget class="QLabel" name="hashLabel">
           <property name="text">
            <string>ID hash: </string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="btcaddr_label">
+         <widget class="QLabel" name="btcaddrLabel">
           <property name="text">
            <string>BTC address: </string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="bmaddr_label">
+         <widget class="QLabel" name="bmaddrLabel">
           <property name="text">
            <string>BM address: </string>
           </property>

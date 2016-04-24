@@ -1,18 +1,23 @@
 import sys
+import os.path
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+
+import MM_util
 
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from metamarket_qt import *
-from login_dialog import *
-from view_ident_dialog import *
-from view_offer_dialog import *
-from view_market_dialog import *
-from view_chanmsg_dialog import *
-from import_market_dialog import *
-from send_chanmsg_dialog import *
-from about_dialog import *
+from LoginDlg import LoginDlg
+from ViewIdentDlg import ViewIdentDlg
+from ViewOfferDlg import ViewOfferDlg
+from ViewMarketDlg import ViewMarketDlg
+from ViewChanmsgDlg import ViewChanmsgDlg
+from ImportMarketDlg import ImportMarketDlg
+from SendChanmsgDlg import SendChanmsgDlg
+from AboutDlg import AboutDlg
 
 class MyForm(QtGui.QMainWindow):
     
@@ -20,75 +25,30 @@ class MyForm(QtGui.QMainWindow):
         QtGui.QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        #INIT ALL DATA STRUCTURES
         
-    def showLoginDialog(self):
-        self.loginDialogInstance = loginDialog(self)
-        if self.loginDialogInstance.exec_():
-            pass
+        self.loggedIn = False
         
-    
-class loginDialog(QtGui.QDialog):
-    def __init__(self, parent):
-        QtGui.QWidget.__init__(self, parent)
-        self.ui = Ui_login_dialog()
-        self.ui.setupUi(self)
-        self.parent = parent
-
-class viewIdentDialog(QtGui.QDialog):
-    def __init__(self, parent):
-        QtGui.QWidget.__init__(self, parent)
-        self.ui = Ui_view_ident_dialog()
-        self.ui.setupUi(self)
-        self.parent = parent
-
-class viewOfferDialog(QtGui.QDialog):
-    def __init__(self, parent):
-        QtGui.QWidget.__init__(self, parent)
-        self.ui = Ui_view_offer_dialog()
-        self.ui.setupUi(self)
-        self.parent = parent
-
-class viewMarketDialog(QtGui.QDialog):
-    def __init__(self, parent):
-        QtGui.QWidget.__init__(self, parent)
-        self.ui = Ui_view_market_dialog()
-        self.ui.setupUi(self)
-        self.parent = parent
-
-class viewChanmsgDialog(QtGui.QDialog):
-    def __init__(self, parent):
-        QtGui.QWidget.__init__(self, parent)
-        self.ui = Ui_view_chanmsg_dialog()
-        self.ui.setupUi(self)
-        self.parent = parent
-
-class importMarketDialog(QtGui.QDialog):
-    def __init__(self, parent):
-        QtGui.QWidget.__init__(self, parent)
-        self.ui = Ui_import_market_dialog()
-        self.ui.setupUi(self)
-        self.parent = parent
-
-class sendChanmsgDialog(QtGui.QDialog):
-    def __init__(self, parent):
-        QtGui.QWidget.__init__(self, parent)
-        self.ui = Ui_send_chanmsg_dialog()
-        self.ui.setupUi(self)
-        self.parent = parent
-
-class aboutDialog(QtGui.QDialog):
-    def __init__(self, parent):
-        QtGui.QWidget.__init__(self, parent)
-        self.ui = Ui_about_dialog()
-        self.ui.setupUi(self)
-        self.parent = parent
-
+    def showLoginDlg(self):
+        self.loginDlg = LoginDlg(self)
+        if self.loginDlg.exec_():
+            return self.loginDlg.result()
+        
+    def login(self):
+        credentials = self.showLoginDlg()
+        if credentials:
+            name, pswd = credentials
+            # Stub for login method
+            print "Name: %s" % name
+            print "Pswd: %s" % pswd
+            self.loggedIn = True
+        
 
 def run():
     app = QtGui.QApplication(sys.argv)
     myapp = MyForm()
     myapp.show()
-    myapp.showLoginDialog()
+    myapp.login()
     sys.exit(app.exec_())
     
     

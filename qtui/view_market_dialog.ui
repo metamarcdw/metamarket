@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QGroupBox" name="view_market_groupbox">
+      <widget class="QGroupBox" name="viewMarketGroupBox">
        <property name="title">
         <string>View Market: Marketname</string>
        </property>
@@ -25,7 +25,7 @@
         <item row="1" column="0">
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
-           <widget class="QPlainTextEdit" name="desc_plaintextedit">
+           <widget class="QPlainTextEdit" name="descPlainTextEdit">
             <property name="lineWrapMode">
              <enum>QPlainTextEdit::NoWrap</enum>
             </property>
@@ -35,21 +35,21 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="regfee_label">
+           <widget class="QLabel" name="regFeeLabel">
             <property name="text">
              <string>Registration Fee: </string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="burn_mult_label">
+           <widget class="QLabel" name="burnMultLabel">
             <property name="text">
              <string>BURN Multiplier: </string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="downvote_mult_label">
+           <widget class="QLabel" name="downvoteMultLabel">
             <property name="text">
              <string>Downvote Multiplier: </string>
             </property>
@@ -58,7 +58,7 @@
          </layout>
         </item>
         <item row="0" column="0">
-         <widget class="QLabel" name="desc_label">
+         <widget class="QLabel" name="descLabel">
           <property name="text">
            <string>Description:</string>
           </property>
@@ -68,13 +68,13 @@
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="json_groupbox">
+      <widget class="QGroupBox" name="jsonGroupBox">
        <property name="title">
         <string>Market JSON:</string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
-         <widget class="QPlainTextEdit" name="json_plaintextedit">
+         <widget class="QPlainTextEdit" name="jsonPlainTextEdit">
           <property name="lineWrapMode">
            <enum>QPlainTextEdit::NoWrap</enum>
           </property>

@@ -3,8 +3,8 @@
 
 # Form implementation generated from reading ui file 'login_dialog.ui'
 #
-# Created: Sun Jun 14 13:04:14 2015
-#      by: PyQt4 UI code generator 4.11.2
+# Created: Sat Apr 23 14:08:55 2016
+#      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -27,7 +27,7 @@ except AttributeError:
 class Ui_login_dialog(object):
     def setupUi(self, login_dialog):
         login_dialog.setObjectName(_fromUtf8("login_dialog"))
-        login_dialog.resize(400, 180)
+        login_dialog.resize(400, 195)
         self.gridLayout = QtGui.QGridLayout(login_dialog)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.verticalLayout = QtGui.QVBoxLayout()
@@ -36,19 +36,19 @@ class Ui_login_dialog(object):
         self.groupBox.setObjectName(_fromUtf8("groupBox"))
         self.gridLayout_2 = QtGui.QGridLayout(self.groupBox)
         self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
-        self.pswd_lineedit = QtGui.QLineEdit(self.groupBox)
-        self.pswd_lineedit.setEchoMode(QtGui.QLineEdit.Password)
-        self.pswd_lineedit.setObjectName(_fromUtf8("pswd_lineedit"))
-        self.gridLayout_2.addWidget(self.pswd_lineedit, 3, 0, 1, 1)
-        self.pswd_label = QtGui.QLabel(self.groupBox)
-        self.pswd_label.setObjectName(_fromUtf8("pswd_label"))
-        self.gridLayout_2.addWidget(self.pswd_label, 2, 0, 1, 1)
-        self.name_lineedit = QtGui.QLineEdit(self.groupBox)
-        self.name_lineedit.setObjectName(_fromUtf8("name_lineedit"))
-        self.gridLayout_2.addWidget(self.name_lineedit, 1, 0, 1, 1)
-        self.name_label = QtGui.QLabel(self.groupBox)
-        self.name_label.setObjectName(_fromUtf8("name_label"))
-        self.gridLayout_2.addWidget(self.name_label, 0, 0, 1, 1)
+        self.pswdLineEdit = QtGui.QLineEdit(self.groupBox)
+        self.pswdLineEdit.setEchoMode(QtGui.QLineEdit.Password)
+        self.pswdLineEdit.setObjectName(_fromUtf8("pswdLineEdit"))
+        self.gridLayout_2.addWidget(self.pswdLineEdit, 3, 0, 1, 1)
+        self.pswdLabel = QtGui.QLabel(self.groupBox)
+        self.pswdLabel.setObjectName(_fromUtf8("pswdLabel"))
+        self.gridLayout_2.addWidget(self.pswdLabel, 2, 0, 1, 1)
+        self.nameLineEdit = QtGui.QLineEdit(self.groupBox)
+        self.nameLineEdit.setObjectName(_fromUtf8("nameLineEdit"))
+        self.gridLayout_2.addWidget(self.nameLineEdit, 1, 0, 1, 1)
+        self.nameLabel = QtGui.QLabel(self.groupBox)
+        self.nameLabel.setObjectName(_fromUtf8("nameLabel"))
+        self.gridLayout_2.addWidget(self.nameLabel, 0, 0, 1, 1)
         self.verticalLayout.addWidget(self.groupBox)
         self.buttonBox = QtGui.QDialogButtonBox(login_dialog)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
@@ -62,14 +62,14 @@ class Ui_login_dialog(object):
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), login_dialog.accept)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), login_dialog.reject)
         QtCore.QMetaObject.connectSlotsByName(login_dialog)
-        login_dialog.setTabOrder(self.name_lineedit, self.pswd_lineedit)
-        login_dialog.setTabOrder(self.pswd_lineedit, self.buttonBox)
+        login_dialog.setTabOrder(self.nameLineEdit, self.pswdLineEdit)
+        login_dialog.setTabOrder(self.pswdLineEdit, self.buttonBox)
 
     def retranslateUi(self, login_dialog):
         login_dialog.setWindowTitle(_translate("login_dialog", "Welcome to METAmarket", None))
         self.groupBox.setTitle(_translate("login_dialog", "Please login:", None))
-        self.pswd_label.setText(_translate("login_dialog", "Password", None))
-        self.name_label.setText(_translate("login_dialog", "Username", None))
+        self.pswdLabel.setText(_translate("login_dialog", "Password", None))
+        self.nameLabel.setText(_translate("login_dialog", "Username", None))
 
 
 if __name__ == "__main__":

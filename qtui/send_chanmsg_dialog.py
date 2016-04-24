@@ -3,8 +3,8 @@
 
 # Form implementation generated from reading ui file 'send_chanmsg_dialog.ui'
 #
-# Created: Mon May 25 16:41:49 2015
-#      by: PyQt4 UI code generator 4.11.2
+# Created: Sat Apr 23 19:42:45 2016
+#      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -37,7 +37,7 @@ class Ui_send_chanmsg_dialog(object):
         self.gridLayout_2 = QtGui.QGridLayout(self.groupBox)
         self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
         self.plainTextEdit = QtGui.QPlainTextEdit(self.groupBox)
-        self.plainTextEdit.setLineWrapMode(QtGui.QPlainTextEdit.NoWrap)
+        self.plainTextEdit.setLineWrapMode(QtGui.QPlainTextEdit.WidgetWidth)
         self.plainTextEdit.setObjectName(_fromUtf8("plainTextEdit"))
         self.gridLayout_2.addWidget(self.plainTextEdit, 0, 0, 1, 1)
         self.verticalLayout.addWidget(self.groupBox)

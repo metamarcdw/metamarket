@@ -25,7 +25,7 @@
         <item row="0" column="0">
          <widget class="QPlainTextEdit" name="plainTextEdit">
           <property name="lineWrapMode">
-           <enum>QPlainTextEdit::NoWrap</enum>
+           <enum>QPlainTextEdit::WidgetWidth</enum>
           </property>
          </widget>
         </item>
