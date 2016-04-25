@@ -16,17 +16,17 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="1" column="0">
-     <widget class="QTabWidget" name="tabwidget">
+     <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="chan_tab">
+      <widget class="QWidget" name="chanTab">
        <attribute name="title">
         <string>Channel</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="1" column="0">
-         <widget class="QGroupBox" name="chan_groupbox">
+         <widget class="QGroupBox" name="chanGroupBox">
           <property name="title">
            <string>Channel: METAMARKET</string>
           </property>
@@ -34,26 +34,26 @@
            <item row="0" column="0">
             <layout class="QVBoxLayout" name="verticalLayout">
              <item>
-              <widget class="QListWidget" name="chan_list"/>
+              <widget class="QListWidget" name="chanListWidget"/>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout">
                <item>
-                <widget class="QPushButton" name="chan_send_button">
+                <widget class="QPushButton" name="chanSendButton">
                  <property name="text">
                   <string>Send Message</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="chan_view_button">
+                <widget class="QPushButton" name="chanViewButton">
                  <property name="text">
                   <string>View Message</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="chan_delete_button">
+                <widget class="QPushButton" name="chanDeleteButton">
                  <property name="text">
                   <string>Delete Message</string>
                  </property>
@@ -68,13 +68,13 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="market_tab">
+      <widget class="QWidget" name="marketTab">
        <attribute name="title">
         <string>Markets</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_7">
         <item row="0" column="0">
-         <widget class="QGroupBox" name="market_groupbox">
+         <widget class="QGroupBox" name="marketGroupBox">
           <property name="title">
            <string>Available Markets:</string>
           </property>
@@ -82,7 +82,7 @@
            <item row="0" column="0">
             <layout class="QVBoxLayout" name="verticalLayout_3">
              <item>
-              <widget class="QTableWidget" name="market_table">
+              <widget class="QTableWidget" name="marketTableWidget">
                <attribute name="horizontalHeaderStretchLastSection">
                 <bool>true</bool>
                </attribute>
@@ -101,21 +101,21 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_3">
                <item>
-                <widget class="QPushButton" name="market_import_button">
+                <widget class="QPushButton" name="marketImportButton">
                  <property name="text">
                   <string>Import Market</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="market_view_button">
+                <widget class="QPushButton" name="marketViewButton">
                  <property name="text">
                   <string>View Market</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="market_delete_button">
+                <widget class="QPushButton" name="marketDeleteButton">
                  <property name="text">
                   <string>Delete Market</string>
                  </property>
@@ -130,13 +130,13 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="offer_tab">
+      <widget class="QWidget" name="offerTab">
        <attribute name="title">
         <string>Offers</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_12">
         <item row="0" column="0">
-         <widget class="QGroupBox" name="offer_groupbox">
+         <widget class="QGroupBox" name="offerGroupBox">
           <property name="title">
            <string>Available Offers: Market Name</string>
           </property>
@@ -146,10 +146,10 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
-                <widget class="QComboBox" name="offer_mkt_combobox"/>
+                <widget class="QComboBox" name="offerMktComboBox"/>
                </item>
                <item>
-                <widget class="QLineEdit" name="offer_search_lineedit">
+                <widget class="QLineEdit" name="offerSearchLineEdit">
                  <property name="text">
                   <string>Search</string>
                  </property>
@@ -158,7 +158,7 @@
               </layout>
              </item>
              <item>
-              <widget class="QTableWidget" name="offer_tablewidget">
+              <widget class="QTableWidget" name="offerTableWidget">
                <attribute name="horizontalHeaderStretchLastSection">
                 <bool>true</bool>
                </attribute>
@@ -187,21 +187,21 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_7">
                <item>
-                <widget class="QPushButton" name="offer_order_button">
+                <widget class="QPushButton" name="offerOrderButton">
                  <property name="text">
                   <string>Order</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="offer_view_button">
+                <widget class="QPushButton" name="offerViewButton">
                  <property name="text">
                   <string>View Offer</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="offer_delete_button">
+                <widget class="QPushButton" name="offerDeleteButton">
                  <property name="text">
                   <string>Delete Offer</string>
                  </property>
@@ -216,13 +216,13 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="order_tab">
+      <widget class="QWidget" name="orderTab">
        <attribute name="title">
         <string>Orders</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
         <item row="0" column="0">
-         <widget class="QGroupBox" name="order_groupbox">
+         <widget class="QGroupBox" name="orderGroupBox">
           <property name="title">
            <string>My Orders:</string>
           </property>
@@ -230,7 +230,7 @@
            <item row="0" column="0">
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
-              <widget class="QTableWidget" name="orders_table">
+              <widget class="QTableWidget" name="orderTableWidget">
                <attribute name="horizontalHeaderStretchLastSection">
                 <bool>true</bool>
                </attribute>
@@ -264,21 +264,21 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_2">
                <item>
-                <widget class="QPushButton" name="order_process_button">
+                <widget class="QPushButton" name="orderProcessButton">
                  <property name="text">
                   <string>Process</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="order_view_button">
+                <widget class="QPushButton" name="orderViewButton">
                  <property name="text">
                   <string>View Offer</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="order_cancel_button">
+                <widget class="QPushButton" name="orderCancelButton">
                  <property name="text">
                   <string>Cancel Order</string>
                  </property>
@@ -293,7 +293,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="ident_tab">
+      <widget class="QWidget" name="identTab">
        <attribute name="title">
         <string>Identities</string>
        </attribute>
@@ -301,7 +301,7 @@
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="QGroupBox" name="ident_myid_groupbox">
+           <widget class="QGroupBox" name="identMyidGroupBox">
             <property name="title">
              <string>My Identity:</string>
             </property>
@@ -309,21 +309,21 @@
              <item row="0" column="0">
               <layout class="QVBoxLayout" name="verticalLayout_5">
                <item>
-                <widget class="QLabel" name="ident_myid_label">
+                <widget class="QLabel" name="identMyidLabel">
                  <property name="text">
                   <string>ID Hash: </string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="ident_btcaddr_label">
+                <widget class="QLabel" name="identBtcaddrLabel">
                  <property name="text">
                   <string>BTC Address: </string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="ident_bmaddr_label">
+                <widget class="QLabel" name="identBmaddrLabel">
                  <property name="text">
                   <string>BM Address: </string>
                  </property>
@@ -335,7 +335,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QGroupBox" name="ident_groupbox">
+           <widget class="QGroupBox" name="identGroupBox">
             <property name="title">
              <string>Known Identities:</string>
             </property>
@@ -345,10 +345,10 @@
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_5">
                  <item>
-                  <widget class="QComboBox" name="ident_market_combobox"/>
+                  <widget class="QComboBox" name="identMktComboBox"/>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="ident_search_lineedit">
+                  <widget class="QLineEdit" name="identSearchLineEdit">
                    <property name="text">
                     <string>Search</string>
                    </property>
@@ -357,7 +357,7 @@
                 </layout>
                </item>
                <item>
-                <widget class="QTableWidget" name="ident_table">
+                <widget class="QTableWidget" name="identTableWidget">
                  <attribute name="horizontalHeaderStretchLastSection">
                   <bool>true</bool>
                  </attribute>
@@ -381,21 +381,21 @@
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_4">
                  <item>
-                  <widget class="QPushButton" name="ident_reg_button">
+                  <widget class="QPushButton" name="identRegButton">
                    <property name="text">
                     <string>Register My Identity</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="ident_view_button">
+                  <widget class="QPushButton" name="identViewButton">
                    <property name="text">
                     <string>View Identity</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="ident_burn_button">
+                  <widget class="QPushButton" name="identBurnButton">
                    <property name="text">
                     <string>BURN BTC</string>
                    </property>
@@ -422,7 +422,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>20</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
