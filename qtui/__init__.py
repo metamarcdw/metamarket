@@ -1,6 +1,6 @@
 import sys
 import os.path
-sys.path.append(
+sys.path.append(    # Make sure we can access MM_util in the parent directory
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
 import MM_util
@@ -40,7 +40,7 @@ class MyForm(QtGui.QMainWindow):
         self.finallist = MM_util.loadlist('final')
         self.feedbacklist = MM_util.loadlist('feedback')
         
-        bannedtags = MM_util.loadindex('bannedtags')
+        self.bannedtags = MM_util.loadindex('bannedtags')
         
         self.updateUi()
     
@@ -50,9 +50,9 @@ class MyForm(QtGui.QMainWindow):
     
     
     def showLoginDlg(self):
-        self.loginDlg = LoginDlg(self)
-        if self.loginDlg.exec_():
-            return self.loginDlg.result()
+        loginDlg = LoginDlg(self)
+        if loginDlg.exec_():
+            return loginDlg.result()
         
     def login(self):
         credentials = self.showLoginDlg()
