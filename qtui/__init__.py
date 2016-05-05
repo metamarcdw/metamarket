@@ -147,6 +147,22 @@ class MyForm(QtGui.QMainWindow,
             return True
         return False
     
+    @pyqtSignature("")
+    def on_actionLogin_triggered(self):
+        if self.loggedIn:
+            self.info("You are already logged in!")
+        else:
+            self.login()
+    
+    
+    def showAboutDlg(self):
+        aboutDlg = AboutDlg(self)
+        aboutDlg.show()
+    
+    @pyqtSignature("")
+    def on_actionAbout_triggered(self):
+        self.showAboutDlg()
+    
     
     def input(self, prompt, password=False):
         if password:
@@ -167,10 +183,20 @@ class MyForm(QtGui.QMainWindow,
     def info(self, message):
         QMessageBox.information(self, "Information", message, QMessageBox.Ok)
     
+    
+    def quit(self):
+        #TODO: Save all data to flat files
+        self.close()
+        sys.exit(0) # <-- Not sure if needed
+    
     def sockErr(self):
         self.info("Please make sure Bitcoin Core and Bitmessage "+\
                 "are up and running before launching METAmarket.")
-        sys.exit(0)
+        self.quit()
+    
+    @pyqtSignature("")
+    def on_actionClose_triggered(self):
+        self.quit()
     
 
 def run():
