@@ -54,15 +54,19 @@ class MyForm(QtGui.QMainWindow,
         self.myid = None
         self.mymarket = None
         
-        self.marketlist = MM_util.loadlist('market')
-        self.identlist = MM_util.loadlist('ident')
-        self.offerlist = MM_util.loadlist('offer')
-        self.orderlist = MM_util.loadlist('order')
-        self.conflist = MM_util.loadlist('conf')
-        self.paylist = MM_util.loadlist('pay')
-        self.reclist = MM_util.loadlist('rec')
-        self.finallist = MM_util.loadlist('final')
-        self.feedbacklist = MM_util.loadlist('feedback')
+        try:
+            self.marketlist = MM_util.loadlist('market')
+            self.identlist = MM_util.loadlist('ident')
+            self.offerlist = MM_util.loadlist('offer')
+            self.orderlist = MM_util.loadlist('order')
+            self.conflist = MM_util.loadlist('conf')
+            self.paylist = MM_util.loadlist('pay')
+            self.reclist = MM_util.loadlist('rec')
+            self.finallist = MM_util.loadlist('final')
+            self.feedbacklist = MM_util.loadlist('feedback')
+        except socket.error:
+            self.sockErr()
+
         self.bannedtags = MM_util.loadindex('bannedtags')
         
         self.updateUi()
@@ -79,44 +83,45 @@ class MyForm(QtGui.QMainWindow,
         
     def login(self):
         credentials = self.showLoginDlg()
-        if credentials:
-            self.username, self.passphrase = credentials
+        if not credentials:
+            return
+        
+        self.username, self.passphrase = credentials
+        
+        hash = hashlib.sha256(self.passphrase).hexdigest()
+        pkbytes = scrypt.hash(hash, self.username, N=2**18, buflen=32)
+        self.pkstr = bitcoin.core.b2x(pkbytes)
+        se = long(self.pkstr, 16)
+        pk = pycoin.key.Key(secret_exponent=se, netcode=self.netcode)
+        
+        self.wif = pk.wif()
+        self.btcaddr = pk.address()
+        try:
+            self.bmaddr = MM_util.bm.getDeterministicAddress( base64.b64encode(self.pkstr), 4, 1 )
             
-            hash = hashlib.sha256(self.passphrase).hexdigest()
-            pkbytes = scrypt.hash(hash, self.username, N=2**18, buflen=32)
-            self.pkstr = bitcoin.core.b2x(pkbytes)
-            se = long(self.pkstr, 16)
-            pk = pycoin.key.Key(secret_exponent=se, netcode=self.netcode)
-            
-            self.wif = pk.wif()
-            self.btcaddr = pk.address()
-            try:
-                self.bmaddr = MM_util.bm.getDeterministicAddress( base64.b64encode(self.pkstr), 4, 1 )
-                
-                wp = self.input("Please enter your Bitcoin Core wallet encryption passphrase:", True)
-                MM_util.unlockwallet(wp)
-            
-            except socket.error:
-                self.info("Please make sure Bitcoin Core and Bitmessage "+\
-                        "are up and running before launching METAmarket.")
-                sys.exit(0)
-            
-            if MM_util.bm.createDeterministicAddresses(base64.b64encode(self.pkstr)) == [] or \
-                not MM_util.btcd.validateaddress(self.btcaddr)['ismine']:
-                self.importkeys()
-                        
-            myidstr = MM_util.createidentmsgstr(self.btcaddr, self.bmaddr, self.username)
-            self.myid = MM_util.MM_loads( self.btcaddr, myidstr )
-            
-            if not MM_util.searchlistbyhash(self.identlist, self.myid.hash):
-                self.register(myidstr)
-            
-            if self.entity == 'mod':
-                for i in self.marketlist:
-                    if i.obj['modid'] == self.myid.hash:
-                        self.mymarket = i
-            
-            self.loggedIn = True
+            wp = self.input("Please enter your Bitcoin Core wallet encryption passphrase:", True)
+            MM_util.unlockwallet(wp)
+        except socket.error:
+            self.sockErr()
+        
+        if MM_util.bm.createDeterministicAddresses(base64.b64encode(self.pkstr)) == [] or \
+            not MM_util.btcd.validateaddress(self.btcaddr)['ismine']:
+            if not self.importkeys():
+                return
+                    
+        myidstr = MM_util.createidentmsgstr(self.btcaddr, self.bmaddr, self.username)
+        self.myid = MM_util.MM_loads( self.btcaddr, myidstr )
+        
+        if not MM_util.searchlistbyhash(self.identlist, self.myid.hash):
+            if not self.register(myidstr):
+                return
+        
+        if self.entity == 'mod':
+            for i in self.marketlist:
+                if i.obj['modid'] == self.myid.hash:
+                    self.mymarket = i
+        
+        self.loggedIn = True
     
     def importkeys(self):
         if self.yorn("Bitcoin private key not found in wallet or "+\
@@ -127,17 +132,20 @@ class MyForm(QtGui.QMainWindow,
                 MM_util.btcd.importprivkey(wif, username, False)
                 
                 self.info("REMEMBER TO SECURELY BACKUP YOUR wallet.dat AND keys.dat files!")
+                return True
             else:
-                raise Exception("Passwords did not match.")
+                self.info("Passwords did not match.")
         else:
-            MM_util.bm.deleteAddress(bmaddr)
+            MM_util.bm.deleteAddress(self.bmaddr)
+        return False
         
     def register(self, idstr):
-        print 
         if self.yorn("We were not able to find your ID on file. "+\
                 "Is this a new identity you would like to create?"):
             MM_util.MM_writefile(idstr)
             MM_util.appendindex('ident', self.myid.hash)
+            return True
+        return False
     
     
     def input(self, prompt, password=False):
@@ -158,6 +166,11 @@ class MyForm(QtGui.QMainWindow,
     
     def info(self, message):
         QMessageBox.information(self, "Information", message, QMessageBox.Ok)
+    
+    def sockErr(self):
+        self.info("Please make sure Bitcoin Core and Bitmessage "+\
+                "are up and running before launching METAmarket.")
+        sys.exit(0)
     
 
 def run():
