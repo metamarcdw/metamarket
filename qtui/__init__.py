@@ -44,7 +44,6 @@ class MyForm(QtGui.QMainWindow,
         MM_util.bm = xmlrpclib.ServerProxy(self.bm_url)
         
         self.loggedIn = False
-        self.entity = None
         self.username = None
         self.passphrase = None
         self.pkstr = None
@@ -122,11 +121,6 @@ class MyForm(QtGui.QMainWindow,
             if not self.register(myidstr):
                 return
         
-        if self.entity == 'mod':
-            for i in self.marketlist:
-                if i.obj['modid'] == self.myid.hash:
-                    self.mymarket = i
-        
         self.info("You are now logged in as: %s" % self.username)
         self.loggedIn = True
         self.updateUi()
@@ -143,6 +137,7 @@ class MyForm(QtGui.QMainWindow,
                 return True
             else:
                 self.info("Passwords did not match.")
+                return False
         else:
             MM_util.bm.deleteAddress(self.bmaddr)
             return False
