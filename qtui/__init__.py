@@ -72,8 +72,14 @@ class MyForm(QtGui.QMainWindow,
         self.updateUi()
     
     def updateUi(self):
-        #INIT MAINWINDOW UI WITH DATA FROM ALL DATA STRUCTURES
-        pass
+        #UPDATE MAINWINDOW UI WITH DATA FROM ALL DATA STRUCTURES
+        
+        # Update 'Identities' Tab:
+        if self.loggedIn:
+            self.setWindowTitle("METAmarket-Qt [%s]" % self.username)
+            self.identMyidLabel.setText("ID Hash: %s" % self.myid.hash)
+            self.identBtcaddrLabel.setText("BTC Address: %s" % self.btcaddr)
+            self.identBmaddrLabel.setText("BM Address: %s" % self.bmaddr)
     
     
     def showLoginDlg(self):
@@ -99,7 +105,7 @@ class MyForm(QtGui.QMainWindow,
         try:
             self.bmaddr = MM_util.bm.getDeterministicAddress( base64.b64encode(self.pkstr), 4, 1 )
             
-            wp = self.input("Please enter your Bitcoin Core wallet encryption passphrase:", True)
+            wp = self.input("Please enter your Bitcoin Core wallet encryption passphrase:", password=True)
             MM_util.unlockwallet(wp)
         except socket.error:
             self.sockErr()
@@ -121,15 +127,17 @@ class MyForm(QtGui.QMainWindow,
                 if i.obj['modid'] == self.myid.hash:
                     self.mymarket = i
         
+        self.info("You are now logged in as: %s" % self.username)
         self.loggedIn = True
+        self.updateUi()
     
     def importkeys(self):
         if self.yorn("Bitcoin private key not found in wallet or "+\
                 "Bitmessage identity does not exist. Import your "+\
                 "BTC private key and create your BM ID?"):
-            pass2 = self.input("Please re-enter your passphrase:", True)
+            pass2 = self.input("Please re-enter your passphrase:", password=True)
             if pass2 == self.passphrase:
-                MM_util.btcd.importprivkey(wif, username, False)
+                MM_util.btcd.importprivkey(self.wif, self.username, False)
                 
                 self.info("REMEMBER TO SECURELY BACKUP YOUR wallet.dat AND keys.dat files!")
                 return True
@@ -137,7 +145,7 @@ class MyForm(QtGui.QMainWindow,
                 self.info("Passwords did not match.")
         else:
             MM_util.bm.deleteAddress(self.bmaddr)
-        return False
+            return False
         
     def register(self, idstr):
         if self.yorn("We were not able to find your ID on file. "+\
@@ -145,7 +153,8 @@ class MyForm(QtGui.QMainWindow,
             MM_util.MM_writefile(idstr)
             MM_util.appendindex('ident', self.myid.hash)
             return True
-        return False
+        else:
+            return False
     
     @pyqtSignature("")
     def on_actionLogin_triggered(self):
@@ -183,16 +192,16 @@ class MyForm(QtGui.QMainWindow,
     def info(self, message):
         QMessageBox.information(self, "Information", message, QMessageBox.Ok)
     
+    def sockErr(self):
+        self.info("Please make sure Bitcoin Core and Bitmessage "+\
+                "are up and running before launching METAmarket.")
+        self.quit()
+    
     
     def quit(self):
         #TODO: Save all data to flat files
         self.close()
         sys.exit(0) # <-- Not sure if needed
-    
-    def sockErr(self):
-        self.info("Please make sure Bitcoin Core and Bitmessage "+\
-                "are up and running before launching METAmarket.")
-        self.quit()
     
     @pyqtSignature("")
     def on_actionClose_triggered(self):
