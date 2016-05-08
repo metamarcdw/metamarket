@@ -34,7 +34,21 @@
            <item row="0" column="0">
             <layout class="QVBoxLayout" name="verticalLayout">
              <item>
-              <widget class="QListWidget" name="chanListWidget"/>
+              <widget class="QTableWidget" name="chanTableWidget">
+               <attribute name="horizontalHeaderStretchLastSection">
+                <bool>true</bool>
+               </attribute>
+               <column>
+                <property name="text">
+                 <string>Subject</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Message ID</string>
+                </property>
+               </column>
+              </widget>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout">

@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Sun May  8 23:02:11 2016
+# Created: Mon May  9 00:33:56 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -44,9 +44,16 @@ class Ui_MainWindow(object):
         self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
         self.verticalLayout = QtGui.QVBoxLayout()
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.chanListWidget = QtGui.QListWidget(self.chanGroupBox)
-        self.chanListWidget.setObjectName(_fromUtf8("chanListWidget"))
-        self.verticalLayout.addWidget(self.chanListWidget)
+        self.chanTableWidget = QtGui.QTableWidget(self.chanGroupBox)
+        self.chanTableWidget.setObjectName(_fromUtf8("chanTableWidget"))
+        self.chanTableWidget.setColumnCount(2)
+        self.chanTableWidget.setRowCount(0)
+        item = QtGui.QTableWidgetItem()
+        self.chanTableWidget.setHorizontalHeaderItem(0, item)
+        item = QtGui.QTableWidgetItem()
+        self.chanTableWidget.setHorizontalHeaderItem(1, item)
+        self.chanTableWidget.horizontalHeader().setStretchLastSection(True)
+        self.verticalLayout.addWidget(self.chanTableWidget)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         self.chanSendButton = QtGui.QPushButton(self.chanGroupBox)
@@ -281,6 +288,10 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "METAmarket-Qt", None))
         self.chanGroupBox.setTitle(_translate("MainWindow", "Channel: METAMARKET", None))
+        item = self.chanTableWidget.horizontalHeaderItem(0)
+        item.setText(_translate("MainWindow", "Subject", None))
+        item = self.chanTableWidget.horizontalHeaderItem(1)
+        item.setText(_translate("MainWindow", "Message ID", None))
         self.chanSendButton.setText(_translate("MainWindow", "Send Message", None))
         self.chanViewButton.setText(_translate("MainWindow", "View Message", None))
         self.chanDeleteButton.setText(_translate("MainWindow", "Delete Message", None))
