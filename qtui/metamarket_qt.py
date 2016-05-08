@@ -3,8 +3,8 @@
 
 # Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Mon Apr 25 23:01:44 2016
-#      by: PyQt4 UI code generator 4.11.3
+# Created: Sun May  8 23:02:11 2016
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -262,9 +262,6 @@ class Ui_MainWindow(object):
         self.menuHelp = QtGui.QMenu(self.menubar)
         self.menuHelp.setObjectName(_fromUtf8("menuHelp"))
         MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtGui.QStatusBar(MainWindow)
-        self.statusbar.setObjectName(_fromUtf8("statusbar"))
-        MainWindow.setStatusBar(self.statusbar)
         self.actionClose = QtGui.QAction(MainWindow)
         self.actionClose.setObjectName(_fromUtf8("actionClose"))
         self.actionAbout = QtGui.QAction(MainWindow)
