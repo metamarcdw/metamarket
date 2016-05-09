@@ -8,7 +8,7 @@ import bitcoin, bitcoin.rpc, bitcoin.core, pycoin.key.Key
 import scrypt, simplecrypt
 import simplejson as json
 import ConfigParser
-import hashlib, time, decimal, socket
+import hashlib, time, decimal, socket, httplib
 import xmlrpclib, base64
 
 from PyQt4 import QtCore, QtGui
@@ -101,11 +101,6 @@ class MyForm(QtGui.QMainWindow,
             self.identBmaddrLabel.setText("BM Address: %s" % self.bmaddr)
     
     
-    @pyqtSignature("")
-    def on_chanSendButton_clicked(self):
-        pass
-    
-    
     def showLoginDlg(self):
         loginDlg = LoginDlg(self)
         if loginDlg.exec_():
@@ -133,6 +128,8 @@ class MyForm(QtGui.QMainWindow,
             MM_util.unlockwallet(wp)
         except socket.error:
             self.sockErr()
+        except httplib.BadStatusLine:
+            pass
         
         if MM_util.bm.createDeterministicAddresses(base64.b64encode(self.pkstr)) == [] or \
             not MM_util.btcd.validateaddress(self.btcaddr)['ismine']:
@@ -191,6 +188,33 @@ class MyForm(QtGui.QMainWindow,
     @pyqtSignature("")
     def on_actionAbout_triggered(self):
         self.showAboutDlg()
+    
+    
+    def showSendChanmsgDlg(self):
+        sendChanmsgDlg = SendChanmsgDlg(self)
+        if sendChanmsgDlg.exec_():
+            return sendChanmsgDlg.result()
+    
+    @pyqtSignature("")
+    def on_chanSendButton_clicked(self):
+        message = self.showSendChanmsgDlg()
+        # MM_util.sendmsgviabm(...)
+    
+    
+    def showViewChanmsgDlg(self, message):
+        viewChanmsgDlg = ViewChanmsgDlg(message, self)
+        viewChanmsgDlg.show()
+    
+    @pyqtSignature("")
+    def on_chanViewButton_clicked(self):
+        selection = self.chanTableWidget.selectedItems()
+        if not selection:
+            return
+        
+        msgid = str( selection[1].text() )
+        bmmsg = json.loads( MM_util.bm.getInboxMessageByID(msgid) )['inboxMessage'][0]
+        message = base64.b64decode( bmmsg['message'] )
+        self.showViewChanmsgDlg(message)
     
     
     def input(self, prompt, password=False):
