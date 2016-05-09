@@ -73,12 +73,11 @@ class MyForm(QtGui.QMainWindow,
     
     def updateUi(self):
         #UPDATE MAINWINDOW UI WITH DATA FROM ALL DATA STRUCTURES
+        if not loggedIn:
+            return
         
         # Update 'Channel' Tab:
-        try:
-            self.inbox = json.loads( MM_util.bm.getAllInboxMessages() )['inboxMessages']
-        except socket.error:
-            self.sockErr()
+        self.inbox = json.loads( MM_util.bm.getAllInboxMessages() )['inboxMessages']
         
         if self.inbox:
             chanMsgs = []
