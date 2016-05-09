@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Mon May  9 01:23:28 2016
+# Created: Mon May  9 02:23:10 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -55,6 +55,7 @@ class Ui_MainWindow(object):
         self.chanTableWidget.setHorizontalHeaderItem(1, item)
         self.chanTableWidget.horizontalHeader().setSortIndicatorShown(True)
         self.chanTableWidget.horizontalHeader().setStretchLastSection(True)
+        self.chanTableWidget.verticalHeader().setVisible(False)
         self.verticalLayout.addWidget(self.chanTableWidget)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
@@ -92,6 +93,7 @@ class Ui_MainWindow(object):
         self.marketTableWidget.setHorizontalHeaderItem(1, item)
         self.marketTableWidget.horizontalHeader().setSortIndicatorShown(True)
         self.marketTableWidget.horizontalHeader().setStretchLastSection(True)
+        self.marketTableWidget.verticalHeader().setVisible(False)
         self.verticalLayout_3.addWidget(self.marketTableWidget)
         self.horizontalLayout_3 = QtGui.QHBoxLayout()
         self.horizontalLayout_3.setObjectName(_fromUtf8("horizontalLayout_3"))
@@ -142,6 +144,7 @@ class Ui_MainWindow(object):
         self.offerTableWidget.setHorizontalHeaderItem(3, item)
         self.offerTableWidget.horizontalHeader().setSortIndicatorShown(True)
         self.offerTableWidget.horizontalHeader().setStretchLastSection(True)
+        self.offerTableWidget.verticalHeader().setVisible(False)
         self.verticalLayout_7.addWidget(self.offerTableWidget)
         self.horizontalLayout_7 = QtGui.QHBoxLayout()
         self.horizontalLayout_7.setObjectName(_fromUtf8("horizontalLayout_7"))
@@ -185,6 +188,7 @@ class Ui_MainWindow(object):
         self.orderTableWidget.setHorizontalHeaderItem(4, item)
         self.orderTableWidget.horizontalHeader().setSortIndicatorShown(True)
         self.orderTableWidget.horizontalHeader().setStretchLastSection(True)
+        self.orderTableWidget.verticalHeader().setVisible(False)
         self.verticalLayout_2.addWidget(self.orderTableWidget)
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
@@ -252,6 +256,7 @@ class Ui_MainWindow(object):
         self.identTableWidget.setHorizontalHeaderItem(2, item)
         self.identTableWidget.horizontalHeader().setSortIndicatorShown(True)
         self.identTableWidget.horizontalHeader().setStretchLastSection(True)
+        self.identTableWidget.verticalHeader().setVisible(False)
         self.verticalLayout_4.addWidget(self.identTableWidget)
         self.horizontalLayout_4 = QtGui.QHBoxLayout()
         self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
