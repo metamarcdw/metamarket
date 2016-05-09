@@ -52,6 +52,7 @@ class MyForm(QtGui.QMainWindow,
         self.bmaddr = None
         self.myid = None
         self.mymarket = None
+        self.inbox = None
         
         try:
             self.marketlist = MM_util.loadlist('market')
@@ -72,6 +73,27 @@ class MyForm(QtGui.QMainWindow,
     
     def updateUi(self):
         #UPDATE MAINWINDOW UI WITH DATA FROM ALL DATA STRUCTURES
+        
+        # Update 'Channel' Tab:
+        try:
+            self.inbox = json.loads( MM_util.bm.getAllInboxMessages() )['inboxMessages']
+        except socket.error:
+            self.sockErr()
+        
+        if self.inbox:
+            chanMsgs = []
+            for msg in self.inbox:
+                subject = base64.b64decode( msg['subject'] )
+                if subject not in ('Mkt', 'Msg', 'MultiMsg'):
+                    chanMsgs.append(msg)
+            
+            numChanMsgs = len(chanMsgs)
+            self.chanTableWidget.setRowCount(numChanMsgs)
+            for i in range(numChanMsgs):
+                subject = base64.b64decode( chanMsgs[i]['subject'] )
+                msgid = chanMsgs[i]['msgid']
+                self.chanTableWidget.setItem( i, 0, QTableWidgetItem(subject) )
+                self.chanTableWidget.setItem( i, 1, QTableWidgetItem(msgid) )
         
         # Update 'Identities' Tab:
         if self.loggedIn:

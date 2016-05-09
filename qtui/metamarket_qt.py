@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Mon May  9 00:33:56 2016
+# Created: Mon May  9 01:23:28 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -45,6 +45,7 @@ class Ui_MainWindow(object):
         self.verticalLayout = QtGui.QVBoxLayout()
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.chanTableWidget = QtGui.QTableWidget(self.chanGroupBox)
+        self.chanTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.chanTableWidget.setObjectName(_fromUtf8("chanTableWidget"))
         self.chanTableWidget.setColumnCount(2)
         self.chanTableWidget.setRowCount(0)
@@ -52,6 +53,7 @@ class Ui_MainWindow(object):
         self.chanTableWidget.setHorizontalHeaderItem(0, item)
         item = QtGui.QTableWidgetItem()
         self.chanTableWidget.setHorizontalHeaderItem(1, item)
+        self.chanTableWidget.horizontalHeader().setSortIndicatorShown(True)
         self.chanTableWidget.horizontalHeader().setStretchLastSection(True)
         self.verticalLayout.addWidget(self.chanTableWidget)
         self.horizontalLayout = QtGui.QHBoxLayout()
@@ -80,6 +82,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_3 = QtGui.QVBoxLayout()
         self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
         self.marketTableWidget = QtGui.QTableWidget(self.marketGroupBox)
+        self.marketTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.marketTableWidget.setObjectName(_fromUtf8("marketTableWidget"))
         self.marketTableWidget.setColumnCount(2)
         self.marketTableWidget.setRowCount(0)
@@ -87,6 +90,7 @@ class Ui_MainWindow(object):
         self.marketTableWidget.setHorizontalHeaderItem(0, item)
         item = QtGui.QTableWidgetItem()
         self.marketTableWidget.setHorizontalHeaderItem(1, item)
+        self.marketTableWidget.horizontalHeader().setSortIndicatorShown(True)
         self.marketTableWidget.horizontalHeader().setStretchLastSection(True)
         self.verticalLayout_3.addWidget(self.marketTableWidget)
         self.horizontalLayout_3 = QtGui.QHBoxLayout()
@@ -124,6 +128,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addWidget(self.offerSearchLineEdit)
         self.verticalLayout_7.addLayout(self.horizontalLayout_6)
         self.offerTableWidget = QtGui.QTableWidget(self.offerGroupBox)
+        self.offerTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.offerTableWidget.setObjectName(_fromUtf8("offerTableWidget"))
         self.offerTableWidget.setColumnCount(4)
         self.offerTableWidget.setRowCount(0)
@@ -135,6 +140,7 @@ class Ui_MainWindow(object):
         self.offerTableWidget.setHorizontalHeaderItem(2, item)
         item = QtGui.QTableWidgetItem()
         self.offerTableWidget.setHorizontalHeaderItem(3, item)
+        self.offerTableWidget.horizontalHeader().setSortIndicatorShown(True)
         self.offerTableWidget.horizontalHeader().setStretchLastSection(True)
         self.verticalLayout_7.addWidget(self.offerTableWidget)
         self.horizontalLayout_7 = QtGui.QHBoxLayout()
@@ -163,6 +169,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2 = QtGui.QVBoxLayout()
         self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.orderTableWidget = QtGui.QTableWidget(self.orderGroupBox)
+        self.orderTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.orderTableWidget.setObjectName(_fromUtf8("orderTableWidget"))
         self.orderTableWidget.setColumnCount(5)
         self.orderTableWidget.setRowCount(0)
@@ -176,6 +183,7 @@ class Ui_MainWindow(object):
         self.orderTableWidget.setHorizontalHeaderItem(3, item)
         item = QtGui.QTableWidgetItem()
         self.orderTableWidget.setHorizontalHeaderItem(4, item)
+        self.orderTableWidget.horizontalHeader().setSortIndicatorShown(True)
         self.orderTableWidget.horizontalHeader().setStretchLastSection(True)
         self.verticalLayout_2.addWidget(self.orderTableWidget)
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
@@ -232,6 +240,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.addWidget(self.identSearchLineEdit)
         self.verticalLayout_4.addLayout(self.horizontalLayout_5)
         self.identTableWidget = QtGui.QTableWidget(self.identGroupBox)
+        self.identTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.identTableWidget.setObjectName(_fromUtf8("identTableWidget"))
         self.identTableWidget.setColumnCount(3)
         self.identTableWidget.setRowCount(0)
@@ -241,6 +250,7 @@ class Ui_MainWindow(object):
         self.identTableWidget.setHorizontalHeaderItem(1, item)
         item = QtGui.QTableWidgetItem()
         self.identTableWidget.setHorizontalHeaderItem(2, item)
+        self.identTableWidget.horizontalHeader().setSortIndicatorShown(True)
         self.identTableWidget.horizontalHeader().setStretchLastSection(True)
         self.verticalLayout_4.addWidget(self.identTableWidget)
         self.horizontalLayout_4 = QtGui.QHBoxLayout()
@@ -288,6 +298,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "METAmarket-Qt", None))
         self.chanGroupBox.setTitle(_translate("MainWindow", "Channel: METAMARKET", None))
+        self.chanTableWidget.setSortingEnabled(True)
         item = self.chanTableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Subject", None))
         item = self.chanTableWidget.horizontalHeaderItem(1)
@@ -297,6 +308,7 @@ class Ui_MainWindow(object):
         self.chanDeleteButton.setText(_translate("MainWindow", "Delete Message", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.chanTab), _translate("MainWindow", "Channel", None))
         self.marketGroupBox.setTitle(_translate("MainWindow", "Available Markets:", None))
+        self.marketTableWidget.setSortingEnabled(True)
         item = self.marketTableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Name", None))
         item = self.marketTableWidget.horizontalHeaderItem(1)
@@ -307,6 +319,7 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.marketTab), _translate("MainWindow", "Markets", None))
         self.offerGroupBox.setTitle(_translate("MainWindow", "Available Offers: Market Name", None))
         self.offerSearchLineEdit.setText(_translate("MainWindow", "Search", None))
+        self.offerTableWidget.setSortingEnabled(True)
         item = self.offerTableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Name", None))
         item = self.offerTableWidget.horizontalHeaderItem(1)
@@ -320,6 +333,7 @@ class Ui_MainWindow(object):
         self.offerDeleteButton.setText(_translate("MainWindow", "Delete Offer", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.offerTab), _translate("MainWindow", "Offers", None))
         self.orderGroupBox.setTitle(_translate("MainWindow", "My Orders:", None))
+        self.orderTableWidget.setSortingEnabled(True)
         item = self.orderTableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Status", None))
         item = self.orderTableWidget.horizontalHeaderItem(1)
@@ -340,6 +354,7 @@ class Ui_MainWindow(object):
         self.identBmaddrLabel.setText(_translate("MainWindow", "BM Address: ", None))
         self.identGroupBox.setTitle(_translate("MainWindow", "Known Identities:", None))
         self.identSearchLineEdit.setText(_translate("MainWindow", "Search", None))
+        self.identTableWidget.setSortingEnabled(True)
         item = self.identTableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Name", None))
         item = self.identTableWidget.horizontalHeaderItem(1)
