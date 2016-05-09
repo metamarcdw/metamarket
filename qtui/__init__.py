@@ -73,26 +73,25 @@ class MyForm(QtGui.QMainWindow,
     
     def updateUi(self):
         #UPDATE MAINWINDOW UI WITH DATA FROM ALL DATA STRUCTURES
-        if not loggedIn:
+        if not self.loggedIn:
             return
         
         # Update 'Channel' Tab:
         self.inbox = json.loads( MM_util.bm.getAllInboxMessages() )['inboxMessages']
         
-        if self.inbox:
-            chanMsgs = []
-            for msg in self.inbox:
-                subject = base64.b64decode( msg['subject'] )
-                if subject not in ('Mkt', 'Msg', 'MultiMsg'):
-                    chanMsgs.append(msg)
-            
-            numChanMsgs = len(chanMsgs)
-            self.chanTableWidget.setRowCount(numChanMsgs)
-            for i in range(numChanMsgs):
-                subject = base64.b64decode( chanMsgs[i]['subject'] )
-                msgid = chanMsgs[i]['msgid']
-                self.chanTableWidget.setItem( i, 0, QTableWidgetItem(subject) )
-                self.chanTableWidget.setItem( i, 1, QTableWidgetItem(msgid) )
+        chanMsgs = []
+        for msg in self.inbox:
+            subject = base64.b64decode( msg['subject'] )
+            if subject not in ('Mkt', 'Msg', 'MultiMsg'):
+                chanMsgs.append(msg)
+        
+        numChanMsgs = len(chanMsgs)
+        self.chanTableWidget.setRowCount(numChanMsgs)
+        for i in range(numChanMsgs):
+            subject = base64.b64decode( chanMsgs[i]['subject'] )
+            msgid = chanMsgs[i]['msgid']
+            self.chanTableWidget.setItem( i, 0, QTableWidgetItem(subject) )
+            self.chanTableWidget.setItem( i, 1, QTableWidgetItem(msgid) )
         
         # Update 'Identities' Tab:
         if self.loggedIn:
@@ -100,6 +99,11 @@ class MyForm(QtGui.QMainWindow,
             self.identMyidLabel.setText("ID Hash: %s" % self.myid.hash)
             self.identBtcaddrLabel.setText("BTC Address: %s" % self.btcaddr)
             self.identBmaddrLabel.setText("BM Address: %s" % self.bmaddr)
+    
+    
+    @pyqtSignature("")
+    def on_chanSendButton_clicked(self):
+        pass
     
     
     def showLoginDlg(self):
