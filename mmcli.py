@@ -10,6 +10,7 @@
 # propagated, or distributed except according to the terms contained in the
 # LICENSE file.
 
+from MM_util import *
 import MM_util
 import bitcoin, bitcoin.rpc, bitcoin.core, pycoin.key.Key
 import scrypt, simplecrypt
@@ -38,33 +39,33 @@ def login( wp=None ):
     
     print "BTC Address: %s\nBM Address: %s" % ( btcaddr, bmaddr )
     
-    MM_util.unlockwallet(wp)
-    if MM_util.bm.createDeterministicAddresses(base64.b64encode(pkstr)) == [] or \
-        not MM_util.btcd.validateaddress(btcaddr)['ismine']:
+    unlockwallet(wp)
+    if not MM_util.btcd.validateaddress(btcaddr)['ismine'] or \
+        MM_util.bm.createDeterministicAddresses(base64.b64encode(pkstr)) != []:
         importkeys()
     
-    identlist = MM_util.loadlist('ident')
+    identlist = loadlist('ident')
     
-    myidstr = MM_util.createidentmsgstr(btcaddr, bmaddr, username)
-    myid = MM_util.MM_loads( btcaddr, myidstr )
+    myidstr = createidentmsgstr(btcaddr, bmaddr, username)
+    myid = MM_loads( btcaddr, myidstr )
     print "My ID: %s" % myid.hash
     
-    if not MM_util.searchlistbyhash(identlist, myid.hash):
+    if not searchlistbyhash(identlist, myid.hash):
         register(myidstr)
     
     if entity == 'mod':
-        marketlist = MM_util.loadlist('market')
+        marketlist = loadlist('market')
         for i in marketlist:
             if i.obj['modid'] == myid.hash:
                 mymarket = i
                 print "My Market ID:", mymarket.hash
-        bannedtags = MM_util.loadindex('bannedtags')
+        bannedtags = loadindex('bannedtags')
         
 def importkeys( ):
     print "Bitcoin private key not found in wallet"
     print "or Bitmessage identity does not exist."
     print "Import your BTC private key and create your BM ID?"
-    if MM_util.yorn():
+    if yorn():
         pass2 = getpass.getpass("Please re-enter your passphrase: ")
         if pass2 == passphrase:
             MM_util.btcd.importprivkey(wif, username, False)
@@ -81,21 +82,21 @@ def importkeys( ):
 def register( idstr ):
     print "We were not able to find your ID on file."
     print "Is this a new identity you would like to create?"
-    if not MM_util.yorn():
+    if not yorn():
         login()
     else:
-        MM_util.MM_writefile(idstr)
-        MM_util.appendindex('ident', myid.hash)
+        MM_writefile(idstr)
+        appendindex('ident', myid.hash)
         
         
 def synccast( ):
-    identlist = MM_util.loadlist('ident')
-    burnlist = MM_util.loadlist('burn')
-    taglist = MM_util.loadlist('tags')
-    offerlist = MM_util.loadlist('offer')
-    feedbacklist = MM_util.loadlist('feedback')
+    identlist = loadlist('ident')
+    burnlist = loadlist('burn')
+    taglist = loadlist('tags')
+    offerlist = loadlist('offer')
+    feedbacklist = loadlist('feedback')
     
-    return MM_util.createcastmsgstr(btcaddr, myid.hash, \
+    return createcastmsgstr(btcaddr, myid.hash, \
                 identlist, burnlist, taglist, offerlist, feedbacklist)
     
 # creates a "CAST Msg" from current lists and broadcasts over BM
@@ -104,125 +105,93 @@ def modbroadcast( ):
 
 # creates a "CAST Msg" from current lists and sends to new user
 def modsync( bm_addr ):
-    MM_util.sendmsgviabm(bm_addr, bmaddr, synccast(), False)
+    do_sendmsgviabm(bm_addr, bmaddr, synccast(), False)
 
-def modbanuser( ):
+def do_modbanuser( ):
     userid = raw_input("Enter a User ID: ")
     print "Are you sure?:"
-    if not MM_util.yorn():
+    if not yorn():
         return
         
-    identlist = MM_util.loadlist('ident')
-    offerlist = MM_util.loadlist('offer')
+    identlist = loadlist('ident')
+    offerlist = loadlist('offer')
     
-    user = MM_util.searchlistbyhash(identlist, userid)
-    if user:
-        MM_util.bm.addAddressToBlackWhiteList( user.obj['bmaddr'], "Banned: %s" % user.obj['name'] )
-        MM_util.MM_backupfile('ident', userid)
-        
-        for offer in offerlist:
-            if offer.obj['vendorid'] == user.hash:
-                MM_util.MM_backupfile('offer', offer.hash)
-                    
-def modbantag( ):
+    modbanuser(userid, identlist, offerlist)
+    
+def do_modbantag( ):
     taghash = raw_input("Enter a Tag ID: ")
     print "Are you sure?:"
-    if not MM_util.yorn():
+    if not yorn():
         return
         
+    offerlist = loadlist('offer')
     bannedtags.append(taghash)
-    MM_util.appendindex('bannedtags', taghash)
-    MM_util.MM_backupfile('tags', taghash)
-    
-    offerlist = MM_util.loadlist('offer')
-    for offer in offerlist:
-        for tag in offer.obj['tags']:
-            if tag in bannedtags:
-                MM_util.MM_backupfile('offer', offer.hash)
-                
-def modremoveoffer( ):
+    modbantag(taghash, offerlist, bannedtags)
+
+def do_modremoveoffer( ):
     offerhash = raw_input("Enter an Offer ID: ")
     print "Are you sure?:"
-    if not MM_util.yorn():
+    if not yorn():
         return
-    MM_util.MM_backupfile('offer', offerhash)
+    modremoveoffer(offerhash)
+        
     
-    
-def getrep( identhash, burn_mult ):
-    numrep = 0
-    downvote_mult = 10
-    feedbacklist = MM_util.loadlist('feedback')
-    burnlist = MM_util.loadlist('burn')
-    
-    for fb in feedbacklist:
-        if fb.obj['toid'] == identhash:
-            if fb.obj['upvote']:
-                numrep += 1
-            else:
-                numrep -= downvote_mult
-                
-    for burn in burnlist:
-        if burn.obj['userid'] == identhash:
-            try:
-                burntx_hex = MM_util.btcd.getrawtransaction(burn.obj['txid'])
-            except bitcoin.rpc.JSONRPCException as jre:
-                if jre.error['code'] == -5:
-                    continue
-            burntx = MM_util.btcd.decoderawtransaction( burntx_hex )
-            amount = burntx['vout'][0]['value']
-            numrep += amount * burn_mult
-            
-    return numrep
+def do_getrep( identhash, burn_mult ):
+    return getrep( identhash, burn_mult, loadlist('feedback'), loadlist('burn') )
 
+# Takes a verified "OrderMsg" and returns the associated Offer.
+def do_offerfromordermsg( msg, getorder=False ):
+    return offerfromordermsg( msg, loadlist('offer'), \
+                                   loadlist('order'), \
+                                   loadlist('conf'), \
+                                   loadlist('pay'), \
+                                   loadlist('rec'), getorder )
+    
+    
 # Takes a list of Verified Msgs and prints info to stdout.
-def showanylist( list, mktid ):
+def showanylist( list, mktid=None, marketlist=None ):
     for i in list:
         title = "Name"
-        if i.msgname == MM_util.REG:
+        if i.msgname == REG:
             title = "User ID"
             str = i.obj['userid']
-        elif i.msgname == MM_util.BURN:
+        elif i.msgname == BURN:
             title = "TXID"
             str = i.obj['txid']
-        elif i.msgname == MM_util.IDENT:
-            marketlist = MM_util.loadlist('market')
-            market = MM_util.searchlistbyhash(marketlist, mktid)
+        elif i.msgname == IDENT:
+            market = searchlistbyhash(marketlist, mktid)
             mult = decimal.Decimal( market.obj['multiplier'] )
-            rep = getrep(i.hash, mult)
+            rep = do_getrep(i.hash, mult)
             str = "%s:\tRep: %d" % ( i.obj['name'], rep )
-        elif i.msgname == MM_util.TAG:
+        elif i.msgname == TAG:
             str = i.obj['tagname']
-        elif i.msgname == MM_util.MARKET:
+        elif i.msgname == MARKET:
             str = i.obj['marketname']
-        elif i.msgname == MM_util.OFFER:
+        elif i.msgname == OFFER:
             str = "%s;\t%s:\t%s BTC" % ( i.obj['name'], i.obj['amount'], i.obj['price'] )
-        elif i.msgname == MM_util.FEEDBACK:
+        elif i.msgname == FEEDBACK:
             title = "Message"
             str = i.obj['message']
         else:
-            offer = MM_util.offerfromordermsg(i)
+            offer = do_offerfromordermsg(i)
             str = "%s;\t%s:\t%s BTC" % ( offer.obj['name'], offer.obj['amount'], offer.obj['price'] )
         print "%s: %s\nID: %s\n" % ( title, str, i.hash )
 
     
-
-def backupordermsgs(finalhash):
-    finallist = MM_util.loadlist('final')
-    reclist = MM_util.loadlist('rec')
-    paylist = MM_util.loadlist('pay')
-    conflist = MM_util.loadlist('conf')
+def do_backupordermsgs(finalhash):
+    backupordermsgs( finalhash, loadlist('final'), loadlist('rec'), loadlist('pay'), loadlist('conf') )
     
-    final = MM_util.searchlistbyhash(finallist, finalhash)
-    rec = MM_util.searchlistbyhash(reclist, final.obj['rechash'])
-    pay = MM_util.searchlistbyhash(paylist, rec.obj['payhash'])
-    conf = MM_util.searchlistbyhash(conflist, pay.obj['confhash'])
-    
-    MM_util.MM_backupfile('final', finalhash)
-    MM_util.MM_backupfile('rec', final.obj['rechash'])
-    MM_util.MM_backupfile('pay', rec.obj['payhash'])
-    MM_util.MM_backupfile('conf', pay.obj['confhash'])
-    MM_util.MM_backupfile('order', conf.obj['orderhash'])
+def do_sendmsgviabm(to_addr, from_addr, msgstr, prompt, subject='Msg'):
+    if prompt:
+        print "Are you sure you want to send this Message?"
+    if not prompt or yorn():
+        sendmsgviabm(to_addr, from_addr, msgstr, subject)
+        print "Message sent!"
 
+# Asks user yes or no, returns boolean
+def yorn( ):
+    yorn = raw_input("[Y or N]: ")
+    return yorn in ('Y', 'y', 'yes', 'YES', 'Yes')
 
 def pretty_json( obj ):
     return json.dumps(obj, indent=4, sort_keys=True)
@@ -254,136 +223,55 @@ def multiline():
             input += str + '\n'
     return input
         
-def sendtx(tx):
-    try:
-        return MM_util.btcd.sendrawtransaction(tx)
-    except bitcoin.rpc.JSONRPCException as jre:
-        print "TX NOT SENT.", jre
-        time.sleep(SLEEP)
-        sys.exit()
-        
-def gettx(txid):
-    while True:
-        tx = None
-        try:
-            tx = MM_util.btcd.getrawtransaction(txid, 1)
-        except bitcoin.rpc.JSONRPCException as jre:
-            pass
-        if tx:
-            return tx
-        else:
-            print "Waiting for broadcast of TX..."
-            time.sleep(5)
-            
-def waitforconf(txid):
-    while True:
-        confirms = 0
-        tx = MM_util.btcd.getrawtransaction(txid, 1)
-        if 'confirmations' in tx:
-            confirms = tx['confirmations']
-        if confirms >= minconf:
-            break
-        else:
-            print "Waiting for confirmation. %d/%d so far..." % ( confirms, minconf )
-            time.sleep(5)
 
-def searchtxops(tx, address, amount=None):
-    for op in tx['vout']:
-        if not amount or op['value'] == amount:
-            if address in op['scriptPubKey']['addresses']:
-                return op['n']
-    else:
-        raise Exception("No vout found matching address/amount.")
-
-
-def createreg():
+def do_createreg():
     markethash = raw_input("Enter a Market ID: ")
-    marketlist = MM_util.loadlist('market')
-    identlist = MM_util.loadlist('ident')
-    market = MM_util.searchlistbyhash(marketlist, markethash)
-    mod = MM_util.searchlistbyhash(identlist, market.obj['modid'])
-    modbtc = mod.obj['btcaddr']
     
+    marketlist = loadlist('market')
+    identlist = loadlist('ident')
+    market = searchlistbyhash(marketlist, markethash)
+    mod = searchlistbyhash(identlist, market.obj['modid'])
+    modbtc = mod.obj['btcaddr']
     amount = decimal.Decimal(market.obj['fee'])
+    
     print "Are you sure you want to register at %s;" % market.obj['marketname']
     print "by sending %f BTC to %s?:" % ( amount, modbtc )
-    if not MM_util.yorn():
+    if not yorn():
         sys.exit()
         
-    change_addr = MM_util.btcd.getrawchangeaddress()
-    
-    def create_regtx(fee):
-        regtx_hex = MM_util.mktx(amount, modbtc, change_addr, default_fee, minconf)
-        return MM_util.btcd.signrawtransaction(regtx_hex)['hex']
-        
-    regtx_hex_signed = create_regtx(default_fee)
-    regtx_fee = MM_util.calc_fee(regtx_hex_signed)
-    if regtx_fee != default_fee:
-        regtx_hex_signed = create_regtx(regtx_fee)
-        
-    reg_txid = sendtx(regtx_hex_signed)
-    print "REGISTER TXID:", reg_txid
-    
-    msgstr = MM_util.createregmsgstr(btcaddr, mod.hash, myid.hash, reg_txid)
-    hash = MM_util.MM_writefile(msgstr)
-    MM_util.appendindex('reg', hash)
+    msgstr = createreg(myid.hash, btcaddr, amount, mod, default_fee)
+    hash = MM_writefile(msgstr)
+    appendindex('reg', hash)
     
     print "Registration ID:", hash
-
-def createburn():
-    amount = MM_util.truncate( decput("Enter an amount of BTC to burn: ") )
+    
+    
+def do_createburn():
+    amount = truncate( decput("Enter an amount of BTC to burn: ") )
     print "Are you sure you want to BURN %f coin(s)" % amount
     print "by sending to %s?:" % pob_address
-    if not MM_util.yorn():
+    if not yorn():
         sys.exit()
-        
-    change_addr = MM_util.btcd.getrawchangeaddress()
-    
-    # Aggregate to main address. Includes 2 fees.
-    def create_ag(fee):
-        raw_agtx_hex = MM_util.mktx(amount+default_fee, btcaddr, change_addr, fee, minconf)
-        return MM_util.btcd.signrawtransaction(raw_agtx_hex)['hex']
-        
-    sig_agtx_hex = create_ag(default_fee)
-    ag_fee = MM_util.calc_fee(sig_agtx_hex)
-    if ag_fee != default_fee:
-        sig_agtx_hex = create_ag(ag_fee)
-    
-    ag_txid = sendtx(sig_agtx_hex)
-    print "AGGREGATE TXID:", ag_txid
-    waitforconf(ag_txid)
 
-    # Create raw burn TX.
-    sig_agtx = MM_util.btcd.decoderawtransaction(sig_agtx_hex)
-    vout = searchtxops(sig_agtx, btcaddr, amount+default_fee)
-    
-    txs = [{    "txid": ag_txid,
-                "vout": vout }]
-    addrs = {   pob_address: amount }
-    
-    burntx_hex = MM_util.btcd.createrawtransaction(txs, addrs)
-    burntx_hex_signed = MM_util.btcd.signrawtransaction(burntx_hex)['hex']
-    burn_txid = sendtx(burntx_hex_signed)
-    
-    print "BURN TXID:", burn_txid
-    
-    msgstr = MM_util.createburnmsgstr(btcaddr, myid.hash, burn_txid)
-    hash = MM_util.MM_writefile(msgstr)
-    MM_util.appendindex('burn', hash)
+    msgstr = createburn(myid.hash, btcddr, amount, default_fee)
+    hash = MM_writefile(msgstr)
+    appendindex('burn', hash)
     
     print "Burn ID:", hash
-    
-def createtag():
+
+        
+def do_createtag():
     tagname = raw_input("Enter a name for this TAG: ")
     desc = raw_input("Enter a description: ")
     
-    msgstr = MM_util.createtagmsgstr(btcaddr, myid.hash, tagname, desc)
-    hash = MM_util.MM_writefile(msgstr)
-    MM_util.appendindex('tags', hash)
+    msgstr = createtagmsgstr(btcaddr, myid.hash, tagname, desc)
+    hash = MM_writefile(msgstr)
+    appendindex('tags', hash)
     
     print "Tag ID:", hash
 
-def createmarket():
+
+def do_createmarket():
     global mymarket
     
     if entity != 'mod':
@@ -394,22 +282,22 @@ def createmarket():
         market = info['market']
         
         idb64 = base64.b64encode( json.dumps(mod['obj'], sort_keys=True) )
-        idmsg = MM_util.Msg( idb64, mod['sig'], mod['hash'], mod['msgname'] )
+        idmsg = Msg( idb64, mod['sig'], mod['hash'], mod['msgname'] )
         idmsgstr = json.dumps(idmsg)
         
-        if not MM_util.readmsg(idmsgstr): # Verifies sig/hash
+        if not readmsg(idmsgstr): # Verifies sig/hash
             raise Exception("New Market creation failed..")
-        MM_util.MM_writefile(idmsgstr)
-        MM_util.appendindex('ident', idmsg.hash)
+        MM_writefile(idmsgstr)
+        appendindex('ident', idmsg.hash)
         
         mktb64 = base64.b64encode( json.dumps(market['obj'], sort_keys=True) )
-        mktmsg = MM_util.Msg( mktb64, market['sig'], market['hash'], market['msgname'] )
+        mktmsg = Msg( mktb64, market['sig'], market['hash'], market['msgname'] )
         mktmsgstr = json.dumps(mktmsg)
         
-        if not MM_util.readmsg(mktmsgstr): # Verifies sig/hash
+        if not readmsg(mktmsgstr): # Verifies sig/hash
             raise Exception("New Market creation failed..")
-        MM_util.MM_writefile(mktmsgstr)
-        MM_util.appendindex('market', mktmsg.hash)
+        MM_writefile(mktmsgstr)
+        appendindex('market', mktmsg.hash)
         
         MM_util.bm.addSubscription(mod['obj']['bmaddr'])
         print "Congratulations, you may now Register with a new Metamarket!"
@@ -420,37 +308,39 @@ def createmarket():
             marketname = raw_input("Enter a name for this MARKET: ")
             print "Enter a description:"
             desc = multiline()
-            reg_fee = str( MM_util.truncate( decput("Enter a registration fee: ") ) )
+            reg_fee = str( truncate( decput("Enter a registration fee: ") ) )
             burn_mult = str( decput("Enter a Burn Multiplier: ") )
             
-            msgstr = MM_util.createmarketmsgstr(btcaddr, myid.hash, marketname, desc, reg_fee, burn_mult)
-            mymarket = MM_util.MM_loads(btcaddr, msgstr)
-            MM_util.MM_writefile(msgstr)
-            MM_util.appendindex('market', mymarket.hash)
+            msgstr = createmarketmsgstr(btcaddr, myid.hash, marketname, desc, reg_fee, burn_mult)
+            mymarket = MM_loads(btcaddr, msgstr)
+            MM_writefile(msgstr)
+            appendindex('market', mymarket.hash)
             print "Congratulations, you are the proud new Owner of a new Metamarket!"
             print "Market ID:", mymarket.hash
         else:
             raise Exception("You are already running a Market!")
     
-def createsync():
-    markethash = raw_input("Enter a Market ID: ")
-    marketlist = MM_util.loadlist('market')
-    market = MM_util.searchlistbyhash(marketlist, markethash)
     
-    msgstr = MM_util.createsyncmsgstr(btcaddr, market.obj['modid'], myid.hash)
-    hash = MM_util.MM_writefile(msgstr)
-    MM_util.appendindex('sync', hash)
+def do_createsync():
+    markethash = raw_input("Enter a Market ID: ")
+    marketlist = loadlist('market')
+    market = searchlistbyhash(marketlist, markethash)
+    
+    msgstr = createsyncmsgstr(btcaddr, market.obj['modid'], myid.hash)
+    hash = MM_writefile(msgstr)
+    appendindex('sync', hash)
     
     print "Sync ID:", hash
     
-def createoffer():
+    
+def do_createoffer():
     markethash = raw_input("Enter a Market ID: ")
     name = raw_input("Enter a name for this OFFER: ")
     locale = raw_input("Enter a locale: ")
     print "Enter a description:"
     desc = multiline()
     amount = raw_input("Enter an amount: ")
-    price = str( MM_util.truncate( decput("Enter a price: ") ) )
+    price = str( truncate( decput("Enter a price: ") ) )
     ratio = str( decput("Enter a refund ratio: ") )
     locktime = intput("Enter a locktime: ")
     minrep = intput("Enter a minimum Reputation Score: ")
@@ -462,276 +352,166 @@ def createoffer():
         taglist.append(tagid)
     
     pubkey = MM_util.btcd.validateaddress(btcaddr)['pubkey']
-    msgstr = MM_util.createoffermsgstr( btcaddr, markethash, myid.hash, pubkey, \
+    msgstr = createoffermsgstr( btcaddr, markethash, myid.hash, pubkey, \
                                         name, locale, desc, amount, price, ratio, \
                                         locktime, minrep, taglist )
-    hash = MM_util.MM_writefile(msgstr)
-    MM_util.appendindex('offer', hash)
+    hash = MM_writefile(msgstr)
+    appendindex('offer', hash)
     
     print "Offer ID:", hash
     
-def createorder():
+def do_createorder():
     offerhash = raw_input("Enter an Offer ID: ")
-    offerlist = MM_util.loadlist('offer')
-    marketlist = MM_util.loadlist('market')
-    offer = MM_util.searchlistbyhash(offerlist, offerhash)
-    market = MM_util.searchlistbyhash(marketlist, offer.obj['markethash'])
+    offerlist = loadlist('offer')
+    marketlist = loadlist('market')
+    offer = searchlistbyhash(offerlist, offerhash)
+    market = searchlistbyhash(marketlist, offer.obj['markethash'])
     
-    price = decimal.Decimal(offer.obj['price'])
     mult = decimal.Decimal(market.obj['multiplier'])
     minrep = offer.obj['minrep']
-    myrep = getrep(myid.hash, mult)
+    myrep = do_getrep(myid.hash, mult)
     
     if myrep < minrep:
         raise Exception("Insufficient Reputation Score.")
-        
-    pubkey = MM_util.btcd.validateaddress(btcaddr)['pubkey']
-    multisig = MM_util.btcd.createmultisig( 2, sorted([offer.obj['pubkey'], pubkey]) )
-    change_addr = MM_util.btcd.getrawchangeaddress()
     
-    def create_funding(fee):
-        rawtx_hex = MM_util.mktx(price, multisig['address'], change_addr, fee)
-        return MM_util.btcd.signrawtransaction(rawtx_hex)['hex']
-    
-    signedtx_hex = create_funding(default_fee)
-    funding_fee = MM_util.calc_fee(signedtx_hex)
-    if funding_fee != default_fee:
-        signedtx_hex = create_funding(funding_fee)
-    
-    crypttx = base64.b64encode( simplecrypt.encrypt(pkstr, signedtx_hex) )
-    
-    signedtx = MM_util.btcd.decoderawtransaction(signedtx_hex)
-    vout = searchtxops(signedtx, multisig['address'], price)
-    
-    msgstr = MM_util.createordermsgstr(btcaddr, offer.hash, offer.obj['vendorid'], myid.hash, \
-                                        pubkey, multisig, crypttx, signedtx['txid'], \
-                                        vout, signedtx['vout'][vout]['scriptPubKey']['hex'] )
-    hash = MM_util.MM_writefile(msgstr)
-    MM_util.appendindex('order', hash)
+    msgstr = createorder(myid.hash, btcaddr, offer, pkstr, default_fee)
+    hash = MM_writefile(msgstr)
+    appendindex('order', hash)
     
     print "Order ID:", hash
-    
-def createconf( orderhash=None ):
+        
+
+def do_createconf( orderhash=None ):
     if not orderhash:
         orderhash = raw_input("Enter an Order ID: ")
         
-    orderlist = MM_util.loadlist('order')
-    identlist = MM_util.loadlist('ident')
-    order = MM_util.searchlistbyhash(orderlist, orderhash)
-    buyer = MM_util.searchlistbyhash(identlist, order.obj['buyerid'])
+    orderlist = loadlist('order')
+    identlist = loadlist('ident')
+    order = searchlistbyhash(orderlist, orderhash)
+    offer = do_offerfromordermsg(order)
+    buyer = searchlistbyhash(identlist, order.obj['buyerid'])
     
-    offer = MM_util.offerfromordermsg(order)
-    price = decimal.Decimal(offer.obj['price'])
-    ratio = decimal.Decimal(offer.obj['ratio'])
-    
-    pubkey = offer.obj['pubkey']
-    ms_verify = MM_util.btcd.createmultisig( 2, sorted([order.obj['pubkey'], pubkey]) )
-    if ms_verify['address'] != order.obj['multisig']['address']:
-        raise Exception("Multisig did not verify!")
-    
-    b_portion, v_portion = MM_util.getamounts(ratio, price)
-    
-    refund_op = prev_tx = [ dict((key, order.obj[key]) for key in ("txid", "vout")) ]
-    def create_refund(fee):
-        refund_addr_obj = { buyer.obj['btcaddr']: b_portion - fee/2, 
-                            btcaddr: v_portion - fee/2 }
-        return MM_util.btcd.createrawtransaction(refund_op, refund_addr_obj)
-        
-    refund_tx_hex = create_refund(default_fee)
-    refund_fee = MM_util.calc_fee(refund_tx_hex)
-    if refund_fee != default_fee:
-        refund_tx_hex = create_refund(refund_fee)
-    
-    #sets sequence to 0 (hacky as balls)
-    refund_tx_hex = refund_tx_hex[:84] + "00000000" + refund_tx_hex[92:]
-    #do nlocktime edit
-    locktime = offer.obj['locktime']
-    locktime_hex = bitcoin.core.b2lx( bytearray.fromhex(hex(locktime)[2:].rjust(8,'0')) )
-    refund_tx_hex = refund_tx_hex[:-8] + locktime_hex
-    
-    prev_tx[0]["scriptPubKey"] = order.obj['spk']
-    prev_tx[0]["redeemScript"] = order.obj['multisig']['redeemScript']
-    
-    sig_refund_hex = MM_util.btcd.signrawtransaction(refund_tx_hex, prev_tx, [wif])['hex']
-    
-    msgstr = MM_util.createconfmsgstr(btcaddr, order.hash, myid.hash, order.obj['buyerid'], \
-                                        sig_refund_hex, prev_tx )
-    hash = MM_util.MM_writefile(msgstr)
-    MM_util.appendindex('conf', hash)
+    msgstr = createconf( myid.hash, btcaddr, order, offer, buyer, default_fee )
+    hash = MM_writefile(msgstr)
+    appendindex('conf', hash)
     
     print "Confirmation ID:", hash
     return hash
     
-def createpay():
+    
+def do_createpay():
     confhash = raw_input("Enter a Confirmation ID: ")
     address = raw_input("Enter an Address: ")
     
-    conflist = MM_util.loadlist('conf')
-    orderlist = MM_util.loadlist('order')
-
-    conf = MM_util.searchlistbyhash(conflist, confhash)
-    order = MM_util.searchlistbyhash(orderlist, conf.obj['orderhash'])
-    offer = MM_util.offerfromordermsg(conf)
-    
-    price = decimal.Decimal(offer.obj['price'])
-    ratio = decimal.Decimal(offer.obj['ratio'])
-    b_portion, v_portion = MM_util.getamounts(ratio, price)
-    refund_fee = MM_util.calc_fee( conf.obj['refundtx'] )
-    
-    refund_verify = MM_util.btcd.decoderawtransaction(conf.obj['refundtx'])
-    searchtxops(refund_verify, btcaddr, b_portion - refund_fee/2)
-    complete_refund = MM_util.btcd.signrawtransaction( conf.obj['refundtx'], conf.obj['prevtx'], [wif])['hex']
-    
     print "Broadcast funding TX?:"
-    if not MM_util.yorn():
+    if not yorn():
         sys.exit(0)
     
-    fund_tx = simplecrypt.decrypt( pkstr, base64.b64decode(order.obj['crypt_fundingtx']) )
-    sendtx(fund_tx)
+    conflist = loadlist('conf')
+    orderlist = loadlist('order')
+
+    conf = searchlistbyhash(conflist, confhash)
+    order = searchlistbyhash(orderlist, conf.obj['orderhash'])
+    offer = do_offerfromordermsg(conf)
     
-    msgstr = MM_util.createpaymsgstr(btcaddr, conf.hash, conf.obj['vendorid'], myid.hash, \
-                                        complete_refund, address )
-    hash = MM_util.MM_writefile(msgstr)
-    MM_util.appendindex('pay', hash)
+    msgstr = createpay(myid.hash, btcaddr, conf, order, offer)
+    hash = MM_writefile(msgstr)
+    appendindex('pay', hash)
     
     print "Payment ID:", hash
     
-def createrec( payhash=None ):
+    
+def do_createrec( payhash=None ):
     if not payhash:
         payhash = raw_input("Enter a Payment ID: ")
     
-    paylist = MM_util.loadlist('pay')
-    conflist = MM_util.loadlist('conf')
-    orderlist = MM_util.loadlist('order')
+    paylist = loadlist('pay')
+    conflist = loadlist('conf')
+    orderlist = loadlist('order')
     
-    pay = MM_util.searchlistbyhash(paylist, payhash)
-    conf = MM_util.searchlistbyhash(conflist, pay.obj['confhash'])
-    order = MM_util.searchlistbyhash(orderlist, conf.obj['orderhash'])
-    offer = MM_util.offerfromordermsg(pay)
+    pay = searchlistbyhash(paylist, payhash)
+    conf = searchlistbyhash(conflist, pay.obj['confhash'])
+    order = searchlistbyhash(orderlist, conf.obj['orderhash'])
+    offer = do_offerfromordermsg(pay)
     price = decimal.Decimal(offer.obj['price'])
     
-    # Accept payment.
-    fund_tx = gettx(order.obj['txid'])
-    searchtxops(fund_tx, order.obj['multisig']['address'], price)
-    waitforconf(order.obj['txid'])
+    msgstr = createrec(myid.hash, btcaddr, pay, order, price)
     print "FUNDS SUCCESSFULLY ESCROWED. SHIP PRODUCT NOW."
-    
-    final_op = prev_tx = [ dict((key, order.obj[key]) for key in ("txid", "vout")) ]
-    def create_final(fee):
-        final_addr_obj = { btcaddr: price - fee }
-        return MM_util.btcd.createrawtransaction(final_op, final_addr_obj)
-        
-    final_tx_hex = create_final(default_fee)
-    final_fee = MM_util.calc_fee(final_tx_hex)
-    if final_fee != default_fee:
-        final_tx_hex = create_final(final_fee)
-
-    prev_tx[0]["scriptPubKey"] = order.obj['spk']
-    prev_tx[0]["redeemScript"] = order.obj['multisig']['redeemScript']
-    
-    sig_final_hex = MM_util.btcd.signrawtransaction(final_tx_hex, prev_tx, [wif])['hex']
-    
-    msgstr = MM_util.createrecmsgstr(btcaddr, pay.hash, myid.hash, pay.obj['buyerid'], \
-                                        sig_final_hex, prev_tx )
-    hash = MM_util.MM_writefile(msgstr)
-    MM_util.appendindex('rec', hash)
+    hash = MM_writefile(msgstr)
+    appendindex('rec', hash)
     
     print "Reciept ID:", hash
     return hash
     
-def createfinal():
+
+def do_createfinal():
     rechash = raw_input("Enter a Reciept ID: ")
     
-    reclist = MM_util.loadlist('rec')
-    paylist = MM_util.loadlist('pay')
-    identlist = MM_util.loadlist('ident')
+    reclist = loadlist('rec')
+    paylist = loadlist('pay')
+    identlist = loadlist('ident')
     
-    rec = MM_util.searchlistbyhash(reclist, rechash)
-    pay = MM_util.searchlistbyhash(paylist, rec.obj['payhash'])
-    vendor = MM_util.searchlistbyhash(identlist, rec.obj['vendorid'])
+    rec = searchlistbyhash(reclist, rechash)
+    pay = searchlistbyhash(paylist, rec.obj['payhash'])
+    vendor = searchlistbyhash(identlist, rec.obj['vendorid'])
     
-    offer = MM_util.offerfromordermsg(rec)
+    offer = do_offerfromordermsg(rec)
     price = decimal.Decimal(offer.obj['price'])
-    time_for_refund = time.asctime( time.localtime(offer.obj['locktime']) )
     
-    final_verify = MM_util.btcd.decoderawtransaction(rec.obj['finaltx'])
-    searchtxops(final_verify, vendor.obj['btcaddr'], price - default_fee)
-    complete_final = MM_util.btcd.signrawtransaction(rec.obj['finaltx'], rec.obj['prevtx'], [wif])['hex']
+    time_for_refund = time.asctime( time.localtime(offer.obj['locktime']) )
     
     print "Would you like to finalize or refund escrowed funds?:"
     finorref = raw_input("Enter the word [final or refund]: ")
     print "Are you sure?"
-    if not MM_util.yorn():
+    if not yorn():
         sys.exit()
-        
+    
     if finorref == 'final':
-        final_tx = complete_final
+        finalflag = True
     elif finorref == 'refund':
         print "Your refund tx will be sent to Bitcoin Core,"
         print "but cannot be confirmed until after", time_for_refund
-        final_tx = pay.obj['refundhex']
+        finalflag = False
     else:
         raise Exception("Must enter 'final' or 'refund'")
-        
-    final_txid = sendtx(final_tx)
     
-    msgstr = MM_util.createfinalmsgstr(btcaddr, rec.hash, rec.obj['vendorid'], myid.hash, final_txid )
-    hash = MM_util.MM_writefile(msgstr)
-    MM_util.appendindex('final', hash)
+    msgstr = createfinal(myid.hash, btcaddr, finalflag, )
+    hash = MM_writefile(msgstr)
+    appendindex('final', hash)
     
     print "Finalize ID:", hash
     
-def createfeedback():
+
+def do_createfeedback():
     finalhash = raw_input("Enter a Finalize ID: ")
     print "Were you satisfied with this sale?:"
-    upvote = MM_util.yorn()
+    upvote = yorn()
     message = raw_input("Enter a Message: ")
     
-    finallist = MM_util.loadlist('final')
-    final = MM_util.searchlistbyhash(finallist, finalhash)
-    offer = MM_util.offerfromordermsg(final)
-    order = MM_util.offerfromordermsg(final, getorder=True)
+    finallist = loadlist('final')
+    final = searchlistbyhash(finallist, finalhash)
+    offer = do_offerfromordermsg(final)
+    order = do_offerfromordermsg(final, getorder=True)
     
-    if entity == 'buyer':
-        fromid = final.obj['buyerid']
-        toid = final.obj['vendorid']
-    elif entity == 'vendor':
-        fromid = final.obj['vendorid']
-        toid = final.obj['buyerid']
-        
-    msgstr = MM_util.createfeedbackmsgstr(btcaddr, offer.obj['markethash'], finalhash, fromid, toid, \
-                                            final.obj['finaltxid'], order.obj['multisig']['redeemScript'], upvote, message)
-    ver = MM_util.MM_loads(btcaddr, msgstr)
-    MM_util.MM_writefile(msgstr)
-    MM_util.appendindex('feedback', ver.hash)
-    backupordermsgs(final.hash)
+    msgstr = createfeedback(btcaddr, entity, upvote, message, final, offer, order)
+    hash = MM_writefile(msgstr)
+    appendindex('feedback', hash)
+    do_backupordermsgs(final.hash)
     
-    print "Feedback ID: %s" % ver.hash
+    print "Feedback ID: %s" % hash
     
-def createcancel():
+
+def do_createcancel():
     orderhash = raw_input("Enter an Order ID: ")
-    orderlist = MM_util.loadlist('order')
-    conflist = MM_util.loadlist('conf')
-    order = MM_util.searchlistbyhash(orderlist, orderhash)
+    orderlist = loadlist('order')
+    conflist = loadlist('conf')
+    order = searchlistbyhash(orderlist, orderhash)
     
-    MM_util.MM_backupfile('order', orderhash)
+    msgstr = createcancel(btcaddr, myid.hash, entity, conflist, order)
+    hash = MM_writefile(msgstr)
+    appendindex('cancel', hash)
     
-    toid = None
-    if entity == 'buyer':
-        toid = order.obj['vendorid']
-        for conf in conflist:
-            if conf.obj['orderhash'] == orderhash:
-                MM_util.MM_backupfile('conf', conf.hash)
-    else:
-        toid = order.obj['buyerid']
-    
-    msgstr = MM_util.createcancelmsgstr(btcaddr, myid.hash, toid, orderhash)
-    ver = MM_util.MM_loads(btcaddr, msgstr)
-    MM_util.MM_writefile(msgstr)
-    MM_util.appendindex('cancel', ver.hash)
-    
-    print "Cancel ID: %s" % ver.hash
-    
+    print "Cancel ID: %s" % hash
     
     
 def checkinbox( ):
@@ -754,252 +534,153 @@ def checkinbox( ):
     return num > 0
     
     
-def processreg(msg, ver):
+def do_processreg(msg, ver):
     if not allownewregs:
         return
-        
-    reg_tx = gettx(ver.obj['txid'])
-    waitforconf(ver.obj['txid'])
-    fee = decimal.Decimal(mymarket.obj['fee'])
-    searchtxops(reg_tx, btcaddr, fee)
-    
-    MM_util.MM_writefile(msg)
-    MM_util.appendindex('reg', ver.hash)
+    processreg(msg, ver)
     print "REG Msg accepted:\n%s" % pretty_json(ver)
     
-def processident(msg, ver):
-    reglist = MM_util.loadlist('reg')
-    
-    for reg in reglist:
-        if reg.obj['userid'] == ver.hash:
-            MM_util.MM_writefile(msg)
-            MM_util.appendindex('ident', ver.hash)
-            print "IDENT Msg accepted:\n%s" % pretty_json(ver)
-            return
+def do_processident(msg, ver):
+    reglist = loadlist('reg')
+    if processident(msg, ver, reglist):
+        print "IDENT Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("IDENT Msg rejected.")
         
-def processburn(msg, ver):
-    identlist = MM_util.loadlist("ident")
-    user = MM_util.searchlistbyhash(identlist, ver.obj['userid'])
-    burntxid = ver.obj['txid']
-    burn_tx = gettx(burntxid)
-    ag_tx = gettx( burn_tx['vin'][0]['txid'] )
-    
-    searchtxops(ag_tx, user.obj['btcaddr'])
-    searchtxops(burn_tx, pob_address)
-    
-    if user:
-        waitforconf(burntxid)
-        
-        MM_util.MM_writefile(msg)
-        MM_util.appendindex('burn', ver.hash)
+def do_processburn(msg, ver):
+    identlist = loadlist("ident")
+    if processburn(msg, ver, identlist):
         print "BURN Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("BURN Msg rejected.")
         
-def processtag(msg, ver):
-    identlist = MM_util.loadlist("ident")
-    
-    if allownewtags and \
-       ver.hash not in bannedtags and \
-       MM_util.searchlistbyhash(identlist, ver.obj['vendorid']):
-        MM_util.MM_writefile(msg)
-        MM_util.appendindex('tags', ver.hash)
-        print "TAG Msg accepted:\n%s" % pretty_json(ver)
-    else:
-        print("TAG Msg rejected.")
+def do_processtag(msg, ver):
+    identlist = loadlist("ident")
+    if allownewtags and ver.hash not in bannedtags:
+        if processtag(msg, ver, identlist):
+            print "TAG Msg accepted:\n%s" % pretty_json(ver)
+        else:
+            print("TAG Msg rejected.")
         
-def processoffer(msg, ver):
-    identlist = MM_util.loadlist("ident")
-    
-    if allownewoffers and \
-      MM_util.searchlistbyhash(identlist, ver.obj['vendorid']):
-        for tag in ver.obj['tags']:
-            if tag in bannedtags:
-                return
-        MM_util.MM_writefile(msg)
-        MM_util.appendindex('offer', ver.hash)
-        print "OFFER Msg accepted:\n%s" % pretty_json(ver)
-    else:
-        print("OFFER Msg rejected.")
+def do_processoffer(msg, ver):
+    identlist = loadlist("ident")
+    for tag in ver.obj['tags']:
+        if tag in bannedtags:
+            return
+    if allownewoffers:
+        if processoffer(msg, ver, identlist):
+            print "OFFER Msg accepted:\n%s" % pretty_json(ver)
+        else:
+            print("OFFER Msg rejected.")
           
-def processorder(msg, ver):
-    identlist = MM_util.loadlist("ident")
-    marketlist = MM_util.loadlist('market')
-    offer = MM_util.offerfromordermsg(ver)
-    buyer = MM_util.searchlistbyhash(identlist, ver.obj['buyerid'])
-    market = MM_util.searchlistbyhash(marketlist, offer.obj['markethash'])
-    
-    mult = decimal.Decimal(market.obj['multiplier'])
-    minrep = offer.obj['minrep']
-    buyer_rep = getrep(buyer.hash, mult)
-    
-    if buyer and offer and buyer_rep >= minrep:
-        MM_util.MM_writefile(msg)
-        MM_util.appendindex('order', ver.hash)
+def do_processorder(msg, ver):
+    identlist = loadlist("ident")
+    marketlist = loadlist('market')
+    if processorder(msg, ver, identlist, marketlist):
         print "ORDER Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("ORDER Msg rejected.")
-          
-def processconf(msg, ver):
-    identlist = MM_util.loadlist("ident")
-    orderlist = MM_util.loadlist("order")
-    
-    if MM_util.searchlistbyhash(identlist, ver.obj['vendorid']) and \
-       MM_util.searchlistbyhash(orderlist, ver.obj['orderhash']):
-        MM_util.MM_writefile(msg)
-        MM_util.appendindex('conf', ver.hash)
+        
+def do_processconf(msg, ver):
+    identlist = loadlist("ident")
+    orderlist = loadlist("order")
+    if processconf(msg, ver, identlist, orderlist):
         print "CONF Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("CONF Msg rejected.")
-          
-def processpay(msg, ver):
-    identlist = MM_util.loadlist("ident")
-    conflist = MM_util.loadlist("conf")
-    
-    if MM_util.searchlistbyhash(identlist, ver.obj['buyerid']) and \
-       MM_util.searchlistbyhash(conflist, ver.obj['confhash']):
-        MM_util.MM_writefile(msg)
-        MM_util.appendindex('pay', ver.hash)
+        
+def do_processpay(msg, ver):
+    identlist = loadlist("ident")
+    conflist = loadlist("conf")
+    if processpay(msg, ver, identlist, conflist):
         print "PAY Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("PAY Msg rejected.")
         
-def processrec(msg, ver):
-    identlist = MM_util.loadlist("ident")
-    paylist = MM_util.loadlist("pay")
-    
-    if MM_util.searchlistbyhash(identlist, ver.obj['vendorid']) and \
-       MM_util.searchlistbyhash(paylist, ver.obj['payhash']):
-        MM_util.MM_writefile(msg)
-        MM_util.appendindex('rec', ver.hash)
+def do_processrec(msg, ver):
+    identlist = loadlist("ident")
+    paylist = loadlist("pay")
+    if processrec(msg, ver, identlist, paylist):
         print "REC Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("REC Msg rejected.")
-        
-def processfinal(msg, ver):
-    identlist = MM_util.loadlist("ident")
-    reclist = MM_util.loadlist("rec")
     
-    if MM_util.searchlistbyhash(identlist, ver.obj['buyerid']) and \
-       MM_util.searchlistbyhash(reclist, ver.obj['rechash']):
-        MM_util.MM_writefile(msg)
-        MM_util.appendindex('final', ver.hash)
+def do_processfinal(msg, ver):
+    identlist = loadlist("ident")
+    reclist = loadlist("rec")
+    if processfinal(msg, ver, identlist, reclist):
         print "FINAL Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("FINAL Msg rejected.")
-        
-def processfeedback(msg, ver):
-    identlist = MM_util.loadlist("ident")
-    finallist = MM_util.loadlist("final")
     
-    fromuser = MM_util.searchlistbyhash(identlist, ver.obj['fromid'])
-    touser = MM_util.searchlistbyhash(identlist, ver.obj['toid'])
-    
-    finaltx = gettx(ver.obj['finaltxid'])
-    prevtxid = finaltx['vin'][0]['txid']
-    prevtx = gettx(prevtxid)
-    msaddr = prevtx['vout'][1]['scriptPubKey']['addresses'][0]
-    
-    redeemscript = MM_util.btcd.decodescript(ver.obj['redeemscript'])
-    
-    if fromuser and touser and \
-       redeemscript['p2sh'] == msaddr and \
-       fromuser.obj['btcaddr'] in redeemscript['addresses'] and \
-       touser.obj['btcaddr'] in redeemscript['addresses']:
-    
-        MM_util.MM_writefile(msg)
-        MM_util.appendindex('feedback', ver.hash)
+def do_processfeedback(msg, ver):
+    identlist = loadlist("ident")
+    if processfeedback(msg, ver, identlist):
         print "FEEDBACK Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("FEEDBACK Msg rejected.")
-
-def processsync(msg, ver):
-    identlist = MM_util.loadlist("ident")
-    user = MM_util.searchlistbyhash(identlist, ver.obj['userid'])
     
-    if user:
-        modsync(user.obj['bmaddr'])
-        MM_util.MM_writefile(msg)
-        MM_util.appendindex('sync', ver.hash)
+def do_processsync(msg, ver):
+    identlist = loadlist("ident")
+    if processsync(msg, ver, identlist):
         print "SYNC Msg accepted:\n%s" % pretty_json(ver)
-        print "SYNCing up with user:\n%s" % user.hash
     else:
         print("SYNC Msg rejected.")
-        
-def processcast(msg, ver):
-    identlist = MM_util.loadlist("ident")
     
-    if MM_util.searchlistbyhash(identlist, ver.obj['modid']):
-        MM_util.unpackcastlist(ver.obj['identlist'], 'ident')
-        MM_util.unpackcastlist(ver.obj['burnlist'], 'burn')
-        MM_util.unpackcastlist(ver.obj['taglist'], 'tags')
-        MM_util.unpackcastlist(ver.obj['offerlist'], 'offer')
-        MM_util.unpackcastlist(ver.obj['feedbacklist'], 'feedback')
+def do_processcast(msg, ver):
+    identlist = loadlist("ident")
+    if processcast(msg, ver, identlist):
         print "CAST Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("CAST Msg rejected.")
-        
-def processcancel(msg, ver):
-    identlist = MM_util.loadlist('ident')
-    orderlist = MM_util.loadlist('order')
-    conflist = MM_util.loadlist('conf')
     
-    if MM_util.searchlistbyhash(identlist, ver.obj['fromid']) and \
-       MM_util.searchlistbyhash(orderlist, ver.obj['orderhash']):
-        MM_util.MM_backupfile('order', ver.obj['orderhash'])
-        
-        if entity == 'vendor':
-            for conf in conflist:
-                if conf.obj['orderhash'] == ver.obj['orderhash']:
-                    MM_util.MM_backupfile('conf', conf.hash)
-                    
-        MM_util.MM_writefile(msg)
-        MM_util.appendindex('sync', ver.hash)
+def do_processcancel(msg, ver):
+    identlist = loadlist('ident')
+    orderlist = loadlist('order')
+    conflist = loadlist('conf')
+    if processcancel(msg, ver, identlist, orderlist, conflist):
         print "CANCEL Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("CANCEL Msg rejected.")
-        
-        
+    
 
 def processmsg(msg):
-    ver = MM_util.readmsg(msg) # Verifies sig/hash
+    ver = readmsg(msg) # Verifies sig/hash
     
-    if ver.msgname == MM_util.IDENT and entity == 'mod':
-        processident(msg, ver)
-    elif ver.msgname == MM_util.REG and entity == 'mod':
-        processreg(msg, ver)
-    elif ver.msgname == MM_util.BURN and entity == 'mod':
-        processburn(msg, ver)
-    elif ver.msgname == MM_util.TAG and entity == 'mod':
-        processtag(msg, ver)
-    elif ver.msgname == MM_util.OFFER and entity != 'vendor':
-        processoffer(msg, ver)
-    elif ver.msgname == MM_util.ORDER and entity == 'vendor':
-        processorder(msg, ver)
-    elif ver.msgname == MM_util.CONF and entity == 'buyer':
-        processconf(msg, ver)
-    elif ver.msgname == MM_util.PAY and entity == 'vendor':
-        processpay(msg, ver)
-    elif ver.msgname == MM_util.REC and entity == 'buyer':
-        processrec(msg, ver)
-    elif ver.msgname == MM_util.FINAL and entity == 'vendor':
-        processfinal(msg, ver)
-    elif ver.msgname == MM_util.FEEDBACK and entity == 'mod':
-        processfeedback(msg, ver)
-    elif ver.msgname == MM_util.SYNC and entity == 'mod':
-        processsync(msg, ver)
-    elif ver.msgname == MM_util.CAST and entity != 'mod':
-        processcast(msg, ver)
-    elif ver.msgname == MM_util.CANCEL and entity != 'mod':
-        processcancel(msg, ver)
+    if ver.msgname == IDENT and entity == 'mod':
+        do_processident(msg, ver)
+    elif ver.msgname == REG and entity == 'mod':
+        do_processreg(msg, ver)
+    elif ver.msgname == BURN and entity == 'mod':
+        do_processburn(msg, ver)
+    elif ver.msgname == TAG and entity == 'mod':
+        do_processtag(msg, ver)
+    elif ver.msgname == OFFER and entity != 'vendor':
+        do_processoffer(msg, ver)
+    elif ver.msgname == ORDER and entity == 'vendor':
+        do_processorder(msg, ver)
+    elif ver.msgname == CONF and entity == 'buyer':
+        do_processconf(msg, ver)
+    elif ver.msgname == PAY and entity == 'vendor':
+        do_processpay(msg, ver)
+    elif ver.msgname == REC and entity == 'buyer':
+        do_processrec(msg, ver)
+    elif ver.msgname == FINAL and entity == 'vendor':
+        do_processfinal(msg, ver)
+    elif ver.msgname == FEEDBACK and entity == 'mod':
+        do_processfeedback(msg, ver)
+    elif ver.msgname == SYNC and entity == 'mod':
+        do_processsync(msg, ver)
+    elif ver.msgname == CAST and entity != 'mod':
+        do_processcast(msg, ver)
+    elif ver.msgname == CANCEL and entity != 'mod':
+        do_processcancel(msg, ver)
     else:
         print "Someone sent us the wrong type of Msg."
     return ver
     
 def processmultimsg(mmsg):
-    mmsgobj = MM_util.MultiMsg(**json.loads(mmsg))
+    mmsgobj = MultiMsg(**json.loads(mmsg))
     fname = "multimsg.dat"
     if os.path.exists(fname):
         mmsgfile = open(fname, 'r')
@@ -1012,11 +693,11 @@ def processmultimsg(mmsg):
     if mmsgobj.hash in mmsgdict:
         msglist = mmsgdict[mmsgobj.hash]
         for i in range( len(msglist) ):
-            msglist[i] = MM_util.MultiMsg(**msglist[i])
+            msglist[i] = MultiMsg(**msglist[i])
         msglist.append(mmsgobj)
         
         if len(msglist) == mmsgobj.total:
-            origmsg = MM_util.reconstructmsg(msglist)
+            origmsg = reconstructmsg(msglist)
             msginfo = processmsg(origmsg)
             del(mmsgdict[mmsgobj.hash])
     else:
@@ -1057,83 +738,83 @@ def createmsg(msgtype):
         raise Exception( "msgtype MUST be in %s" % str(types) )
         
     if msgtype == 'reg' and entity != 'mod':
-        createreg()
+        do_createreg()
     elif msgtype == 'burn' and entity != 'mod':
-        createburn()
+        do_createburn()
     elif msgtype == 'sync' and entity != 'mod':
-        createsync()
+        do_createsync()
     elif msgtype == 'tag' and entity != 'buyer':
-        createtag()
+        do_createtag()
     elif msgtype == 'market':
-        createmarket()
+        do_createmarket()
     elif msgtype == 'offer' and entity == 'vendor':
-        createoffer()
+        do_createoffer()
     elif msgtype == 'order' and entity == 'buyer':
-        createorder()
+        do_createorder()
     elif msgtype == 'conf' and entity == 'vendor':
-        createconf()
+        do_createconf()
     elif msgtype == 'pay' and entity == 'buyer':
-        createpay()
+        do_createpay()
     elif msgtype == 'rec' and entity == 'vendor':
-        createrec()
+        do_createrec()
     elif msgtype == 'final' and entity == 'buyer':
-        createfinal()
+        do_createfinal()
     elif msgtype == 'feedback' and entity != 'mod':
-        createfeedback()
+        do_createfeedback()
     elif msgtype == 'cancel' and entity != 'mod':
-        createcancel()
+        do_createcancel()
     else:
         raise Exception("Incorrect Entity or Msg type.")
         
 def sendmsg(msgid, prompt=True):
     print "Sending Msg: %s" % msgid
     
-    identlist = MM_util.loadlist('ident')
-    marketlist = MM_util.loadlist('market')
+    identlist = loadlist('ident')
+    marketlist = loadlist('market')
     msgstr = open( os.path.join(msgdir, msgid + '.dat'), 'r' ).read()
-    ver = MM_util.readmsg(msgstr)
+    ver = readmsg(msgstr)
     
-    if ver.msgname == MM_util.IDENT:
+    if ver.msgname == IDENT:
         marketid = raw_input("Enter a Market ID to sync your Identity with: ")
-        market = MM_util.searchlistbyhash(marketlist, marketid)
+        market = searchlistbyhash(marketlist, marketid)
         ident = market.obj['modid']
-    elif ver.msgname == MM_util.BURN:
+    elif ver.msgname == BURN:
         marketid = raw_input("Enter a Market ID to register your Proof-of-Burn at: ")
-        market = MM_util.searchlistbyhash(marketlist, marketid)
+        market = searchlistbyhash(marketlist, marketid)
         ident = market.obj['modid']
-    elif ver.msgname == MM_util.REG:
+    elif ver.msgname == REG:
         ident = ver.obj['modid']
-    elif ver.msgname == MM_util.SYNC:
+    elif ver.msgname == SYNC:
         ident = ver.obj['modid']
-    elif ver.msgname == MM_util.CANCEL:
+    elif ver.msgname == CANCEL:
         ident = ver.obj['toid']
-    elif ver.msgname == MM_util.TAG and entity == "vendor":
+    elif ver.msgname == TAG and entity == "vendor":
         marketid = raw_input("Enter a Market ID to register the Tag at: ")
-        market = MM_util.searchlistbyhash(marketlist, marketid)
+        market = searchlistbyhash(marketlist, marketid)
         ident = market.obj['modid']
-    elif ver.msgname == MM_util.OFFER and entity == "vendor":
-        marketid = MM_util.MM_extract('markethash', msgstr)        
-        market = MM_util.searchlistbyhash(marketlist, marketid)
+    elif ver.msgname == OFFER and entity == "vendor":
+        marketid = MM_extract('markethash', msgstr)        
+        market = searchlistbyhash(marketlist, marketid)
         ident = market.obj['modid']
-    elif ver.msgname == MM_util.ORDER and entity == "buyer":
-        ident = MM_util.MM_extract('vendorid', msgstr)        
-    elif ver.msgname == MM_util.CONF and entity == "vendor":
-        ident = MM_util.MM_extract('buyerid', msgstr)        
-    elif ver.msgname == MM_util.PAY and entity == "buyer":
-        ident = MM_util.MM_extract('vendorid', msgstr)        
-    elif ver.msgname == MM_util.REC and entity == "vendor":
-        ident = MM_util.MM_extract('buyerid', msgstr)        
-    elif ver.msgname == MM_util.FINAL and entity == "buyer":
-        ident = MM_util.MM_extract('vendorid', msgstr)        
-    elif ver.msgname == MM_util.FEEDBACK and entity != "mod":
-        marketid = MM_util.MM_extract('markethash', msgstr)        
-        market = MM_util.searchlistbyhash(marketlist, marketid)
+    elif ver.msgname == ORDER and entity == "buyer":
+        ident = MM_extract('vendorid', msgstr)        
+    elif ver.msgname == CONF and entity == "vendor":
+        ident = MM_extract('buyerid', msgstr)        
+    elif ver.msgname == PAY and entity == "buyer":
+        ident = MM_extract('vendorid', msgstr)        
+    elif ver.msgname == REC and entity == "vendor":
+        ident = MM_extract('buyerid', msgstr)        
+    elif ver.msgname == FINAL and entity == "buyer":
+        ident = MM_extract('vendorid', msgstr)        
+    elif ver.msgname == FEEDBACK and entity != "mod":
+        marketid = MM_extract('markethash', msgstr)        
+        market = searchlistbyhash(marketlist, marketid)
         ident = market.obj['modid']
     else:
         raise Exception("Bad Msg type.")
         
-    tobm = MM_util.searchlistbyhash( identlist, ident ).obj['bmaddr']
-    MM_util.sendmsgviabm(tobm, bmaddr, msgstr, prompt)
+    tobm = searchlistbyhash( identlist, ident ).obj['bmaddr']
+    do_sendmsgviabm(tobm, bmaddr, msgstr, prompt)
     
     
 def showchan( channame ):
@@ -1165,16 +846,16 @@ def showmsglist(msgtype):
     if msgtype not in types:
         raise Exception( "msgtype MUST be in %s" % str(types) )
     
-    mkt = None
     if msgtype == 'ident':
         mkt = raw_input("Enter a Market ID : ")
-    list = MM_util.loadlist(msgtype)
-    showanylist(list, mkt)
+        mkts = loadlist('market')
+    list = loadlist(msgtype)
+    showanylist(list, mktid=mkt, marketlist=mkts)
     
 def showmsg(hash):
     print "Showing Msg: %s" % hash
     msgstr = open( os.path.join(msgdir, hash + '.dat'), 'r' ).read()
-    ver = MM_util.readmsg(msgstr)
+    ver = readmsg(msgstr)
     print pretty_json(ver)
     
 def sendmarketoffer(channame):
@@ -1190,7 +871,7 @@ def sendmarketoffer(channame):
     info = {    "market": mymarket,
                 "modid": myid }
     mktoffer = pretty_json(info)
-    MM_util.sendmsgviabm( chan_addr, bmaddr, mktoffer, False, 'Mkt' )
+    do_sendmsgviabm( chan_addr, bmaddr, mktoffer, False, 'Mkt' )
     
 
 def parseargs():
@@ -1254,7 +935,7 @@ def parseargs():
                         'showmsglist', help='Show your current list of some type of MM Messages.')
     show_msglist_parser.add_argument(   '-t',
                                         '--msgtype',
-                                        default=MM_util.IDENT,
+                                        default=IDENT,
                                         action='store',
                                         dest='msgtype',
                                         help='Show a list of MM Messages, given a specific type.' )
@@ -1278,13 +959,13 @@ def parseargs():
                                     help='Create a new MM Message of some type.' )
                                     
     send_msg_parser = subparsers.add_parser( \
-                        'sendmsg', help='Send any MM Message over BM.')
+                        'sendmsg', help='Send any MM Message over MM_util.bm.')
     send_msg_parser.add_argument(   '-m',
                                     '--msgid',
                                     required=True,
                                     action='store',
                                     dest='msgid',
-                                    help='Send a MM Message, given its ID; to its recipient via BM.' )
+                                    help='Send a MM Message, given its ID; to its recipient via MM_util.bm.' )
                                     
     send_market_parser = subparsers.add_parser( \
                         'sendmarketoffer', help='As a Moderator, send your Market offer to the chan.' )
@@ -1306,11 +987,11 @@ def main():
         processinbox()
         MM_util.btcd.walletlock()
     elif args.mode == "modbanuser":
-        modbanuser()
+        do_modbanuser()
     elif args.mode == "modbantag":
-        modbantag()
+        do_modbantag()
     elif args.mode == "modremoveoffer":
-        modremoveoffer()
+        do_modremoveoffer()
     elif args.mode == "showchan":
         showchan(args.channame)
     elif args.mode == "showchanmsg":
@@ -1356,7 +1037,7 @@ default_chain = config.get(section, 'chain')
 default_entity = config.get(section, 'entity')
 default_channame = config.get(section, 'channame')
 
-default_fee = MM_util.truncate( decimal.Decimal( config.get(section, 'fee') ) )
+default_fee = truncate( decimal.Decimal( config.get(section, 'fee') ) )
 minconf = config.getint(section, 'minconf')
 if default_entity == 'mod':
     allownewregs = config.getboolean(section, 'allownewregs')
