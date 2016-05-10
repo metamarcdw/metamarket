@@ -101,7 +101,7 @@ def synccast( ):
     
 # creates a "CAST Msg" from current lists and broadcasts over BM
 def modbroadcast( ):
-    MM_util.bm.sendBroadcast(bmaddr, base64.b64encode('Msg'), base64.b64encode(synccast()))
+    bm.sendBroadcast(bmaddr, base64.b64encode('Msg'), base64.b64encode(synccast()))
 
 # creates a "CAST Msg" from current lists and sends to new user
 def modsync( bm_addr ):

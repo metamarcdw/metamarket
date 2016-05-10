@@ -35,10 +35,10 @@ def MM_dumps(btc_addr, msgname, obj):
 def MM_loads(btc_addr, str, checksig=True):
     msg = Msg(**json.loads(str))
     if msg.hash != hashlib.sha256(msg.obj).hexdigest():
-        print "Hash failed to verify..."
+        raise Exception("Hash failed to verify...")
         return None
     if checksig and not btcd.verifymessage(btc_addr, msg.sig, msg.obj):
-        print "BTC Signature failed to verify..."
+        raise Exception("BTC Signature failed to verify...")
         return None
     r = json.loads( base64.b64decode(msg.obj) )
     return Msg( r, msg.sig, msg.hash, msg.msgname )
@@ -307,9 +307,7 @@ def sendtx(tx):
     try:
         return btcd.sendrawtransaction(tx)
     except bitcoin.rpc.JSONRPCException as jre:
-        print "TX NOT SENT.", jre
-        time.sleep(1)
-        sys.exit()
+        raise Exception("TX NOT SENT.", jre)
         
 def gettx(txid):
     while True:
