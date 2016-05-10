@@ -345,6 +345,170 @@ def searchtxops(tx, address, amount=None):
         raise Exception("No vout found matching address/amount.")
 
 
+def processreg(msg, ver):
+    reg_tx = gettx(ver.obj['txid'])
+    waitforconf(ver.obj['txid'])
+    fee = decimal.Decimal(mymarket.obj['fee'])
+    searchtxops(reg_tx, btcaddr, fee)
+    
+    MM_writefile(msg)
+    appendindex('reg', ver.hash)
+
+def processident(msg, ver, reglist):
+    for reg in reglist:
+        if reg.obj['userid'] == ver.hash:
+            MM_writefile(msg)
+            appendindex('ident', ver.hash)
+            return True
+    else:
+        return False
+
+def processburn(msg, ver, identlist):
+    user = searchlistbyhash(identlist, ver.obj['userid'])
+    burntxid = ver.obj['txid']
+    burn_tx = gettx(burntxid)
+    ag_tx = gettx( burn_tx['vin'][0]['txid'] )
+    
+    searchtxops(ag_tx, user.obj['btcaddr'])
+    searchtxops(burn_tx, pob_address)
+    
+    if user:
+        waitforconf(burntxid)
+        
+        MM_writefile(msg)
+        appendindex('burn', ver.hash)
+        return True
+    else:
+        return False
+
+def processtag(msg, ver, identlist):
+    if searchlistbyhash(identlist, ver.obj['vendorid']):
+        MM_writefile(msg)
+        appendindex('tags', ver.hash)
+        return True
+    else:
+        return False
+
+def processoffer(msg, ver, identlist):
+    if searchlistbyhash(identlist, ver.obj['vendorid']):
+        MM_writefile(msg)
+        appendindex('offer', ver.hash)
+        return True
+    else:
+        return False
+
+def processorder(msg, ver, identlist, marketlist):
+    offer = do_offerfromordermsg(ver)
+    buyer = searchlistbyhash(identlist, ver.obj['buyerid'])
+    market = searchlistbyhash(marketlist, offer.obj['markethash'])
+    
+    mult = decimal.Decimal(market.obj['multiplier'])
+    minrep = offer.obj['minrep']
+    buyer_rep = do_getrep(buyer.hash, mult)
+    
+    if buyer and offer and buyer_rep >= minrep:
+        MM_writefile(msg)
+        appendindex('order', ver.hash)
+        return True
+    else:
+        return False
+
+def processconf(msg, ver, identlist, orderlist):
+    if searchlistbyhash(identlist, ver.obj['vendorid']) and \
+       searchlistbyhash(orderlist, ver.obj['orderhash']):
+        MM_writefile(msg)
+        appendindex('conf', ver.hash)
+        return True
+    else:
+        return False
+
+def processpay(msg, ver, identlist, conflist):
+    if searchlistbyhash(identlist, ver.obj['buyerid']) and \
+       searchlistbyhash(conflist, ver.obj['confhash']):
+        MM_writefile(msg)
+        appendindex('pay', ver.hash)
+        return True
+    else:
+        return False
+
+def processrec(msg, ver, identlist, paylist):
+    if searchlistbyhash(identlist, ver.obj['vendorid']) and \
+       searchlistbyhash(paylist, ver.obj['payhash']):
+        MM_writefile(msg)
+        appendindex('rec', ver.hash)
+        return True
+    else:
+        return False
+
+def processfinal(msg, ver, identlist, reclist):
+    if searchlistbyhash(identlist, ver.obj['buyerid']) and \
+       searchlistbyhash(reclist, ver.obj['rechash']):
+        MM_writefile(msg)
+        appendindex('final', ver.hash)
+        return True
+    else:
+        return False
+
+def processfeedback(msg, ver, identlist):
+    fromuser = searchlistbyhash(identlist, ver.obj['fromid'])
+    touser = searchlistbyhash(identlist, ver.obj['toid'])
+    
+    finaltx = gettx(txid)
+    prevtxid = finaltx['vin'][0]['txid']
+    prevtx = gettx(prevtxid)
+    msaddr = prevtx['vout'][0]['addresses'][0]
+    
+    redeemscript = MM_util.btcd.decodescript(ver.obj['redeemscript'])
+    
+    if fromuser and touser and \
+       redeemscript['p2sh'] == msaddr and \
+       fromuser.obj['btcaddr'] in redeemscript['addresses'] and \
+       touser.obj['btcaddr'] in redeemscript['addresses']:
+    
+        MM_writefile(msg)
+        appendindex('feedback', ver.hash)
+        return True
+    else:
+        return False
+
+def processsync(msg, ver, identlist):
+    user = searchlistbyhash(identlist, ver.obj['userid'])
+    if user:
+        modsync(user.obj['bmaddr'])
+        MM_writefile(msg)
+        appendindex('sync', ver.hash)
+        return True
+    else:
+        return False
+
+def processcast(msg, ver, identlist):
+    if searchlistbyhash(identlist, ver.obj['modid']):
+        unpackcastlist(ver.obj['identlist'], 'ident')
+        unpackcastlist(ver.obj['burnlist'], 'burn')
+        unpackcastlist(ver.obj['taglist'], 'tags')
+        unpackcastlist(ver.obj['offerlist'], 'offer')
+        unpackcastlist(ver.obj['feedbacklist'], 'feedback')
+        return True
+    else:
+        return False
+
+def processcancel(msg, ver, identlist, orderlist, conflist):
+    if searchlistbyhash(identlist, ver.obj['fromid']) and \
+       searchlistbyhash(orderlist, ver.obj['orderhash']):
+        MM_backupfile('order', ver.obj['orderhash'])
+        
+        if entity == 'vendor':
+            for conf in conflist:
+                if conf.obj['orderhash'] == ver.obj['orderhash']:
+                    MM_backupfile('conf', conf.hash)
+                    
+        MM_writefile(msg)
+        appendindex('sync', ver.hash)
+        return True
+    else:
+        return False
+
+
 def createreg(myidhash, mybtc, amount, mod, default_fee):
     modbtc = mod.obj['btcaddr']
     change_addr = MM_util.btcd.getrawchangeaddress()

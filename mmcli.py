@@ -513,8 +513,6 @@ def do_createcancel():
     
     print "Cancel ID: %s" % hash
     
-########################### LEFT OFF REFACTORING HERE ##############################
-    
     
 def checkinbox( ):
     print "Checking Inbox."
@@ -536,249 +534,153 @@ def checkinbox( ):
     return num > 0
     
     
-def processreg(msg, ver):
+def do_processreg(msg, ver):
     if not allownewregs:
         return
-        
-    reg_tx = gettx(ver.obj['txid'])
-    waitforconf(ver.obj['txid'])
-    fee = decimal.Decimal(mymarket.obj['fee'])
-    searchtxops(reg_tx, btcaddr, fee)
-    
-    MM_writefile(msg)
-    appendindex('reg', ver.hash)
+    processreg(msg, ver)
     print "REG Msg accepted:\n%s" % pretty_json(ver)
     
-def processident(msg, ver):
+def do_processident(msg, ver):
     reglist = loadlist('reg')
-    
-    for reg in reglist:
-        if reg.obj['userid'] == ver.hash:
-            MM_writefile(msg)
-            appendindex('ident', ver.hash)
-            print "IDENT Msg accepted:\n%s" % pretty_json(ver)
-            return
+    if processident(msg, ver, reglist):
+        print "IDENT Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("IDENT Msg rejected.")
         
-def processburn(msg, ver):
+def do_processburn(msg, ver):
     identlist = loadlist("ident")
-    user = searchlistbyhash(identlist, ver.obj['userid'])
-    burntxid = ver.obj['txid']
-    burn_tx = gettx(burntxid)
-    ag_tx = gettx( burn_tx['vin'][0]['txid'] )
-    
-    searchtxops(ag_tx, user.obj['btcaddr'])
-    searchtxops(burn_tx, pob_address)
-    
-    if user:
-        waitforconf(burntxid)
-        
-        MM_writefile(msg)
-        appendindex('burn', ver.hash)
+    if processburn(msg, ver, identlist):
         print "BURN Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("BURN Msg rejected.")
         
-def processtag(msg, ver):
+def do_processtag(msg, ver):
     identlist = loadlist("ident")
-    
-    if allownewtags and \
-       ver.hash not in bannedtags and \
-       searchlistbyhash(identlist, ver.obj['vendorid']):
-        MM_writefile(msg)
-        appendindex('tags', ver.hash)
-        print "TAG Msg accepted:\n%s" % pretty_json(ver)
-    else:
-        print("TAG Msg rejected.")
+    if allownewtags and ver.hash not in bannedtags:
+        if processtag(msg, ver, identlist):
+            print "TAG Msg accepted:\n%s" % pretty_json(ver)
+        else:
+            print("TAG Msg rejected.")
         
-def processoffer(msg, ver):
+def do_processoffer(msg, ver):
     identlist = loadlist("ident")
-    
-    if allownewoffers and \
-      searchlistbyhash(identlist, ver.obj['vendorid']):
-        for tag in ver.obj['tags']:
-            if tag in bannedtags:
-                return
-        MM_writefile(msg)
-        appendindex('offer', ver.hash)
-        print "OFFER Msg accepted:\n%s" % pretty_json(ver)
-    else:
-        print("OFFER Msg rejected.")
+    for tag in ver.obj['tags']:
+        if tag in bannedtags:
+            return
+    if allownewoffers:
+        if processoffer(msg, ver, identlist):
+            print "OFFER Msg accepted:\n%s" % pretty_json(ver)
+        else:
+            print("OFFER Msg rejected.")
           
-def processorder(msg, ver):
+def do_processorder(msg, ver):
     identlist = loadlist("ident")
     marketlist = loadlist('market')
-    offer = do_offerfromordermsg(ver)
-    buyer = searchlistbyhash(identlist, ver.obj['buyerid'])
-    market = searchlistbyhash(marketlist, offer.obj['markethash'])
-    
-    mult = decimal.Decimal(market.obj['multiplier'])
-    minrep = offer.obj['minrep']
-    buyer_rep = do_getrep(buyer.hash, mult)
-    
-    if buyer and offer and buyer_rep >= minrep:
-        MM_writefile(msg)
-        appendindex('order', ver.hash)
+    if processorder(msg, ver, identlist, marketlist):
         print "ORDER Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("ORDER Msg rejected.")
-          
-def processconf(msg, ver):
+        
+def do_processconf(msg, ver):
     identlist = loadlist("ident")
     orderlist = loadlist("order")
-    
-    if searchlistbyhash(identlist, ver.obj['vendorid']) and \
-       searchlistbyhash(orderlist, ver.obj['orderhash']):
-        MM_writefile(msg)
-        appendindex('conf', ver.hash)
+    if processconf(msg, ver, identlist, orderlist):
         print "CONF Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("CONF Msg rejected.")
-          
-def processpay(msg, ver):
+        
+def do_processpay(msg, ver):
     identlist = loadlist("ident")
     conflist = loadlist("conf")
-    
-    if searchlistbyhash(identlist, ver.obj['buyerid']) and \
-       searchlistbyhash(conflist, ver.obj['confhash']):
-        MM_writefile(msg)
-        appendindex('pay', ver.hash)
+    if processpay(msg, ver, identlist, conflist):
         print "PAY Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("PAY Msg rejected.")
         
-def processrec(msg, ver):
+def do_processrec(msg, ver):
     identlist = loadlist("ident")
     paylist = loadlist("pay")
-    
-    if searchlistbyhash(identlist, ver.obj['vendorid']) and \
-       searchlistbyhash(paylist, ver.obj['payhash']):
-        MM_writefile(msg)
-        appendindex('rec', ver.hash)
+    if processrec(msg, ver, identlist, paylist):
         print "REC Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("REC Msg rejected.")
-        
-def processfinal(msg, ver):
+    
+def do_processfinal(msg, ver):
     identlist = loadlist("ident")
     reclist = loadlist("rec")
-    
-    if searchlistbyhash(identlist, ver.obj['buyerid']) and \
-       searchlistbyhash(reclist, ver.obj['rechash']):
-        MM_writefile(msg)
-        appendindex('final', ver.hash)
+    if processfinal(msg, ver, identlist, reclist):
         print "FINAL Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("FINAL Msg rejected.")
-        
-def processfeedback(msg, ver):
+    
+def do_processfeedback(msg, ver):
     identlist = loadlist("ident")
-    finallist = loadlist("final")
-    
-    fromuser = searchlistbyhash(identlist, ver.obj['fromid'])
-    touser = searchlistbyhash(identlist, ver.obj['toid'])
-    
-    finaltx = gettx(txid)
-    prevtxid = finaltx['vin'][0]['txid']
-    prevtx = gettx(prevtxid)
-    msaddr = prevtx['vout'][0]['addresses'][0]
-    
-    redeemscript = MM_util.btcd.decodescript(ver.obj['redeemscript'])
-    
-    if fromuser and touser and \
-       redeemscript['p2sh'] == msaddr and \
-       fromuser.obj['btcaddr'] in redeemscript['addresses'] and \
-       touser.obj['btcaddr'] in redeemscript['addresses']:
-    
-        MM_writefile(msg)
-        appendindex('feedback', ver.hash)
+    if processfeedback(msg, ver, identlist):
         print "FEEDBACK Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("FEEDBACK Msg rejected.")
-
-def processsync(msg, ver):
-    identlist = loadlist("ident")
-    user = searchlistbyhash(identlist, ver.obj['userid'])
     
-    if user:
-        modsync(user.obj['bmaddr'])
-        MM_writefile(msg)
-        appendindex('sync', ver.hash)
+
+def do_processsync(msg, ver):
+    identlist = loadlist("ident")
+    if processsync(msg, ver, identlist):
         print "SYNC Msg accepted:\n%s" % pretty_json(ver)
-        print "SYNCing up with user:\n%s" % user.hash
     else:
         print("SYNC Msg rejected.")
-        
-def processcast(msg, ver):
-    identlist = loadlist("ident")
     
-    if searchlistbyhash(identlist, ver.obj['modid']):
-        unpackcastlist(ver.obj['identlist'], 'ident')
-        unpackcastlist(ver.obj['burnlist'], 'burn')
-        unpackcastlist(ver.obj['taglist'], 'tags')
-        unpackcastlist(ver.obj['offerlist'], 'offer')
-        unpackcastlist(ver.obj['feedbacklist'], 'feedback')
+def do_processcast(msg, ver):
+    identlist = loadlist("ident")
+    if processcast(msg, ver, identlist):
         print "CAST Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("CAST Msg rejected.")
-        
-def processcancel(msg, ver):
+    
+def do_processcancel(msg, ver):
     identlist = loadlist('ident')
     orderlist = loadlist('order')
     conflist = loadlist('conf')
-    
-    if searchlistbyhash(identlist, ver.obj['fromid']) and \
-       searchlistbyhash(orderlist, ver.obj['orderhash']):
-        MM_backupfile('order', ver.obj['orderhash'])
-        
-        if entity == 'vendor':
-            for conf in conflist:
-                if conf.obj['orderhash'] == ver.obj['orderhash']:
-                    MM_backupfile('conf', conf.hash)
-                    
-        MM_writefile(msg)
-        appendindex('sync', ver.hash)
+    if processcancel(msg, ver, identlist, orderlist, conflist):
         print "CANCEL Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("CANCEL Msg rejected.")
-        
-        
+    
 
 def processmsg(msg):
     ver = readmsg(msg) # Verifies sig/hash
     
     if ver.msgname == IDENT and entity == 'mod':
-        processident(msg, ver)
+        do_processident(msg, ver)
     elif ver.msgname == REG and entity == 'mod':
-        processreg(msg, ver)
+        do_processreg(msg, ver)
     elif ver.msgname == BURN and entity == 'mod':
-        processburn(msg, ver)
+        do_processburn(msg, ver)
     elif ver.msgname == TAG and entity == 'mod':
-        processtag(msg, ver)
+        do_processtag(msg, ver)
     elif ver.msgname == OFFER and entity != 'vendor':
-        processoffer(msg, ver)
+        do_processoffer(msg, ver)
     elif ver.msgname == ORDER and entity == 'vendor':
-        processorder(msg, ver)
+        do_processorder(msg, ver)
     elif ver.msgname == CONF and entity == 'buyer':
-        processconf(msg, ver)
+        do_processconf(msg, ver)
     elif ver.msgname == PAY and entity == 'vendor':
-        processpay(msg, ver)
+        do_processpay(msg, ver)
     elif ver.msgname == REC and entity == 'buyer':
-        processrec(msg, ver)
+        do_processrec(msg, ver)
     elif ver.msgname == FINAL and entity == 'vendor':
-        processfinal(msg, ver)
+        do_processfinal(msg, ver)
     elif ver.msgname == FEEDBACK and entity == 'mod':
-        processfeedback(msg, ver)
+        do_processfeedback(msg, ver)
     elif ver.msgname == SYNC and entity == 'mod':
-        processsync(msg, ver)
+        do_processsync(msg, ver)
     elif ver.msgname == CAST and entity != 'mod':
-        processcast(msg, ver)
+        do_processcast(msg, ver)
     elif ver.msgname == CANCEL and entity != 'mod':
-        processcancel(msg, ver)
+        do_processcancel(msg, ver)
     else:
         print "Someone sent us the wrong type of Msg."
     return ver
+    
+########################### LEFT OFF REFACTORING HERE ##############################
     
 def processmultimsg(mmsg):
     mmsgobj = MultiMsg(**json.loads(mmsg))
