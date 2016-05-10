@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Mon May  9 02:23:10 2016
+# Created: Tue May 10 02:43:11 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -33,6 +33,7 @@ class Ui_MainWindow(object):
         self.gridLayout = QtGui.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.tabWidget = QtGui.QTabWidget(self.centralwidget)
+        self.tabWidget.setEnabled(False)
         self.tabWidget.setObjectName(_fromUtf8("tabWidget"))
         self.chanTab = QtGui.QWidget()
         self.chanTab.setObjectName(_fromUtf8("chanTab"))
@@ -45,6 +46,7 @@ class Ui_MainWindow(object):
         self.verticalLayout = QtGui.QVBoxLayout()
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.chanTableWidget = QtGui.QTableWidget(self.chanGroupBox)
+        self.chanTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.chanTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.chanTableWidget.setObjectName(_fromUtf8("chanTableWidget"))
         self.chanTableWidget.setColumnCount(2)
@@ -83,6 +85,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_3 = QtGui.QVBoxLayout()
         self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
         self.marketTableWidget = QtGui.QTableWidget(self.marketGroupBox)
+        self.marketTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.marketTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.marketTableWidget.setObjectName(_fromUtf8("marketTableWidget"))
         self.marketTableWidget.setColumnCount(2)
@@ -130,6 +133,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addWidget(self.offerSearchLineEdit)
         self.verticalLayout_7.addLayout(self.horizontalLayout_6)
         self.offerTableWidget = QtGui.QTableWidget(self.offerGroupBox)
+        self.offerTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.offerTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.offerTableWidget.setObjectName(_fromUtf8("offerTableWidget"))
         self.offerTableWidget.setColumnCount(4)
@@ -172,6 +176,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2 = QtGui.QVBoxLayout()
         self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.orderTableWidget = QtGui.QTableWidget(self.orderGroupBox)
+        self.orderTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.orderTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.orderTableWidget.setObjectName(_fromUtf8("orderTableWidget"))
         self.orderTableWidget.setColumnCount(5)
@@ -244,6 +249,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.addWidget(self.identSearchLineEdit)
         self.verticalLayout_4.addLayout(self.horizontalLayout_5)
         self.identTableWidget = QtGui.QTableWidget(self.identGroupBox)
+        self.identTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.identTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.identTableWidget.setObjectName(_fromUtf8("identTableWidget"))
         self.identTableWidget.setColumnCount(3)

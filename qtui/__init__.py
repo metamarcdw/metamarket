@@ -75,6 +75,7 @@ class MyForm(QtGui.QMainWindow,
         #UPDATE MAINWINDOW UI WITH DATA FROM ALL DATA STRUCTURES
         if not self.loggedIn:
             return
+        self.tabWidget.setEnabled(True)
         
         # Update 'Channel' Tab:
         self.inbox = json.loads( MM_util.bm.getAllInboxMessages() )['inboxMessages']
