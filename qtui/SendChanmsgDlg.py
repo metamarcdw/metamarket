@@ -28,7 +28,7 @@ class SendChanmsgDlg(QDialog,
         self.updateUi()
     
     def result(self):
-        chanMsg = self.plainTextEdit.toPlainText()
+        chanMsg = str( self.plainTextEdit.toPlainText() )
         return chanMsg
     
 

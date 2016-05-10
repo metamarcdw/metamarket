@@ -34,10 +34,39 @@ class MyForm(QtGui.QMainWindow,
         
         #INIT ALL DATA STRUCTURES
         
-        self.netcode = 'XTN'
-        self.chain = "testnet"
-        self.btc_port = 18332
-        self.bm_url = "http://username:password@localhost:8442"
+        section = 'metamarket'
+        defaults = {    'chain':        'mainnet',
+                        'channame':     'METAMARKET',
+                        'fee':          '0.0001',
+                        'minconf':      '6',
+                        'bmuser':       'username',
+                        'bmpswd':       'password',
+                        'bmhost':       'localhost',
+                        'bmport':       '8442',
+                        'btcport':      '8332'    }
+        self.config = ConfigParser.RawConfigParser(defaults)
+        self.config.read('mm.cfg')
+        
+        self.chain = self.config.get(section, 'chain')
+        self.channame = self.config.get(section, 'channame')
+        
+        self.default_fee = MM_util.truncate( decimal.Decimal( self.config.get(section, 'fee') ) )
+        self.minconf = self.config.getint(section, 'minconf')
+        
+        self.bm_url = "http://%s:%s@%s:%d" % ( self.config.get(section, 'bmuser'),
+                                                self.config.get(section, 'bmpswd'),
+                                                self.config.get(section, 'bmhost'),
+                                                self.config.getint(section, 'bmport') )                                
+        self.btc_port = self.config.getint(section, 'btcport')
+        
+        if self.chain == 'testnet':
+            self.netcode = 'XTN'
+            self.pob_address = "msj42CCGruhRsFrGATiUuh25dtxYtnpbTx"
+        elif self.chain == 'mainnet':
+            self.netcode = 'BTC'
+            self.pob_address = "1METAMARKETxxxxxxxxxxxxxxxxx4TPjws"
+        else:
+            raise Exception("Config: chain must be either testnet or mainnet.")
         
         bitcoin.SelectParams(self.chain)
         MM_util.btcd = bitcoin.rpc.RawProxy(service_port=self.btc_port)
@@ -55,6 +84,9 @@ class MyForm(QtGui.QMainWindow,
         self.inbox = None
         
         try:
+            self.chan_v3 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 3,1 )
+            self.chan_v4 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 4,1 )
+            
             self.marketlist = MM_util.loadlist('market')
             self.identlist = MM_util.loadlist('ident')
             self.offerlist = MM_util.loadlist('offer')
@@ -67,8 +99,6 @@ class MyForm(QtGui.QMainWindow,
         except socket.error:
             self.sockErr()
 
-        self.bannedtags = MM_util.loadindex('bannedtags')
-        
         self.updateUi()
     
     def updateUi(self):
@@ -95,11 +125,10 @@ class MyForm(QtGui.QMainWindow,
             self.chanTableWidget.setItem( i, 1, QTableWidgetItem(msgid) )
         
         # Update 'Identities' Tab:
-        if self.loggedIn:
-            self.setWindowTitle("METAmarket-Qt [%s]" % self.username)
-            self.identMyidLabel.setText("ID Hash: %s" % self.myid.hash)
-            self.identBtcaddrLabel.setText("BTC Address: %s" % self.btcaddr)
-            self.identBmaddrLabel.setText("BM Address: %s" % self.bmaddr)
+        self.setWindowTitle("METAmarket-Qt [%s]" % self.username)
+        self.identMyidLabel.setText("ID Hash: %s" % self.myid.hash)
+        self.identBtcaddrLabel.setText("BTC Address: %s" % self.btcaddr)
+        self.identBmaddrLabel.setText("BM Address: %s" % self.bmaddr)
     
     
     def showLoginDlg(self):
@@ -199,7 +228,8 @@ class MyForm(QtGui.QMainWindow,
     @pyqtSignature("")
     def on_chanSendButton_clicked(self):
         message = self.showSendChanmsgDlg()
-        # MM_util.sendmsgviabm(...)
+        MM_util.sendmsgviabm(self.chan_v4, self.chan_v4, message, 'BALLS')
+        self.info("Message Sent!")
     
     
     def showViewChanmsgDlg(self, message):
