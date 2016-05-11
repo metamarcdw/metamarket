@@ -3,8 +3,8 @@
 
 # Form implementation generated from reading ui file 'view_chanmsg_dialog.ui'
 #
-# Created: Sat Apr 23 19:44:38 2016
-#      by: PyQt4 UI code generator 4.11.3
+# Created: Wed May 11 02:04:51 2016
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -40,7 +40,11 @@ class Ui_view_chanmsg_dialog(object):
         self.plainTextEdit.setLineWrapMode(QtGui.QPlainTextEdit.WidgetWidth)
         self.plainTextEdit.setReadOnly(True)
         self.plainTextEdit.setObjectName(_fromUtf8("plainTextEdit"))
-        self.gridLayout_2.addWidget(self.plainTextEdit, 0, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.plainTextEdit, 1, 0, 1, 1)
+        self.subjectLineEdit = QtGui.QLineEdit(self.groupBox)
+        self.subjectLineEdit.setReadOnly(True)
+        self.subjectLineEdit.setObjectName(_fromUtf8("subjectLineEdit"))
+        self.gridLayout_2.addWidget(self.subjectLineEdit, 0, 0, 1, 1)
         self.verticalLayout.addWidget(self.groupBox)
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
 
@@ -50,6 +54,7 @@ class Ui_view_chanmsg_dialog(object):
     def retranslateUi(self, view_chanmsg_dialog):
         view_chanmsg_dialog.setWindowTitle(_translate("view_chanmsg_dialog", "View Channel Message", None))
         self.groupBox.setTitle(_translate("view_chanmsg_dialog", "Message:", None))
+        self.subjectLineEdit.setPlaceholderText(_translate("view_chanmsg_dialog", "Subject", None))
 
 
 if __name__ == "__main__":

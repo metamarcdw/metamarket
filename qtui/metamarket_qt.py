@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Tue May 10 02:43:11 2016
+# Created: Wed May 11 01:59:16 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -308,7 +308,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "METAmarket-Qt", None))
-        self.chanGroupBox.setTitle(_translate("MainWindow", "Channel: METAMARKET", None))
+        self.chanGroupBox.setTitle(_translate("MainWindow", "Channel:", None))
         self.chanTableWidget.setSortingEnabled(True)
         item = self.chanTableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Subject", None))

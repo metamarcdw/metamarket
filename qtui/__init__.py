@@ -108,6 +108,7 @@ class MyForm(QtGui.QMainWindow,
         self.tabWidget.setEnabled(True)
         
         # Update 'Channel' Tab:
+        self.chanGroupBox.setTitle("Channel: %s" % self.channame)
         self.inbox = json.loads( MM_util.bm.getAllInboxMessages() )['inboxMessages']
         
         chanMsgs = []
@@ -233,14 +234,18 @@ class MyForm(QtGui.QMainWindow,
     
     @pyqtSignature("")
     def on_chanSendButton_clicked(self):
-        subject, message = self.showSendChanmsgDlg()
+        result = self.showSendChanmsgDlg()
+        if not result:
+            return
+            
+        subject, message = result
         MM_util.sendmsgviabm(self.chan_v4, self.bmaddr, message, subject)
         self.info("Message Sent!")
         self.updateUi()
     
     
-    def showViewChanmsgDlg(self, message):
-        viewChanmsgDlg = ViewChanmsgDlg(message, self)
+    def showViewChanmsgDlg(self, subject, message):
+        viewChanmsgDlg = ViewChanmsgDlg(subject, message, self)
         viewChanmsgDlg.show()
     
     @pyqtSignature("")
@@ -251,8 +256,9 @@ class MyForm(QtGui.QMainWindow,
         
         msgid = str( selection[1].text() )
         bmmsg = json.loads( MM_util.bm.getInboxMessageByID(msgid) )['inboxMessage'][0]
+        subject = base64.b64decode( bmmsg['subject'] )
         message = base64.b64decode( bmmsg['message'] )
-        self.showViewChanmsgDlg(message)
+        self.showViewChanmsgDlg(subject, message)
         self.updateUi()
     
     
