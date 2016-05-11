@@ -130,6 +130,10 @@ class MyForm(QtGui.QMainWindow,
         self.identBtcaddrLabel.setText("BTC Address: %s" % self.btcaddr)
         self.identBmaddrLabel.setText("BM Address: %s" % self.bmaddr)
     
+    @pyqtSignature("int")
+    def on_tabWidget_currentChanged(self):
+        self.updateUi()
+    
     
     def showLoginDlg(self):
         loginDlg = LoginDlg(self)
@@ -209,6 +213,7 @@ class MyForm(QtGui.QMainWindow,
             self.info("You are already logged in!")
         else:
             self.login()
+        self.updateUi()
     
     
     def showAboutDlg(self):
@@ -218,6 +223,7 @@ class MyForm(QtGui.QMainWindow,
     @pyqtSignature("")
     def on_actionAbout_triggered(self):
         self.showAboutDlg()
+        self.updateUi()
     
     
     def showSendChanmsgDlg(self):
@@ -227,9 +233,10 @@ class MyForm(QtGui.QMainWindow,
     
     @pyqtSignature("")
     def on_chanSendButton_clicked(self):
-        message = self.showSendChanmsgDlg()
-        MM_util.sendmsgviabm(self.chan_v4, self.chan_v4, message, 'BALLS')
+        subject, message = self.showSendChanmsgDlg()
+        MM_util.sendmsgviabm(self.chan_v4, self.bmaddr, message, subject)
         self.info("Message Sent!")
+        self.updateUi()
     
     
     def showViewChanmsgDlg(self, message):
@@ -246,6 +253,7 @@ class MyForm(QtGui.QMainWindow,
         bmmsg = json.loads( MM_util.bm.getInboxMessageByID(msgid) )['inboxMessage'][0]
         message = base64.b64decode( bmmsg['message'] )
         self.showViewChanmsgDlg(message)
+        self.updateUi()
     
     
     def input(self, prompt, password=False):

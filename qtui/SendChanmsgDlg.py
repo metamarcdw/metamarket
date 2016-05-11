@@ -17,19 +17,25 @@ class SendChanmsgDlg(QDialog,
         self.updateUi()
     
     def updateUi(self):
-        blank = self.plainTextEdit.toPlainText().isEmpty()
-        if blank:
+        subjectBlank = self.subjectLineEdit.text().isEmpty()
+        msgBlank = self.plainTextEdit.toPlainText().isEmpty()
+        if subjectBlank or msgBlank:
             self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         else:
             self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
+    
+    @pyqtSignature("QString")
+    def on_subjectLineEdit_textEdited(self):
+        self.updateUi()
     
     @pyqtSignature("")
     def on_plainTextEdit_textChanged(self):
         self.updateUi()
     
     def result(self):
+        subject = str( self.subjectLineEdit.text() )
         chanMsg = str( self.plainTextEdit.toPlainText() )
-        return chanMsg
+        return ( subject, chanMsg )
     
 
 if __name__ == "__main__":

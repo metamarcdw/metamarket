@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'send_chanmsg_dialog.ui'
 #
-# Created: Sat Apr 23 19:42:45 2016
+# Created: Wed May 11 01:26:04 2016
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -39,7 +39,10 @@ class Ui_send_chanmsg_dialog(object):
         self.plainTextEdit = QtGui.QPlainTextEdit(self.groupBox)
         self.plainTextEdit.setLineWrapMode(QtGui.QPlainTextEdit.WidgetWidth)
         self.plainTextEdit.setObjectName(_fromUtf8("plainTextEdit"))
-        self.gridLayout_2.addWidget(self.plainTextEdit, 0, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.plainTextEdit, 1, 0, 1, 1)
+        self.subjectLineEdit = QtGui.QLineEdit(self.groupBox)
+        self.subjectLineEdit.setObjectName(_fromUtf8("subjectLineEdit"))
+        self.gridLayout_2.addWidget(self.subjectLineEdit, 0, 0, 1, 1)
         self.verticalLayout.addWidget(self.groupBox)
         self.buttonBox = QtGui.QDialogButtonBox(send_chanmsg_dialog)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
@@ -53,10 +56,13 @@ class Ui_send_chanmsg_dialog(object):
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), send_chanmsg_dialog.accept)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), send_chanmsg_dialog.reject)
         QtCore.QMetaObject.connectSlotsByName(send_chanmsg_dialog)
+        send_chanmsg_dialog.setTabOrder(self.plainTextEdit, self.subjectLineEdit)
+        send_chanmsg_dialog.setTabOrder(self.subjectLineEdit, self.buttonBox)
 
     def retranslateUi(self, send_chanmsg_dialog):
         send_chanmsg_dialog.setWindowTitle(_translate("send_chanmsg_dialog", "Send Channel Message", None))
         self.groupBox.setTitle(_translate("send_chanmsg_dialog", "Enter Message:", None))
+        self.subjectLineEdit.setPlaceholderText(_translate("send_chanmsg_dialog", "Subject", None))
 
 
 if __name__ == "__main__":

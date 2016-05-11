@@ -22,10 +22,17 @@
         <string>Enter Message:</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0">
+        <item row="1" column="0">
          <widget class="QPlainTextEdit" name="plainTextEdit">
           <property name="lineWrapMode">
            <enum>QPlainTextEdit::WidgetWidth</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLineEdit" name="subjectLineEdit">
+          <property name="placeholderText">
+           <string>Subject</string>
           </property>
          </widget>
         </item>
@@ -49,6 +56,11 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>plainTextEdit</tabstop>
+  <tabstop>subjectLineEdit</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
