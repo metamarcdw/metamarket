@@ -262,6 +262,17 @@ class MyForm(QtGui.QMainWindow,
         self.updateUi()
     
     
+    @pyqtSignature("")
+    def on_chanDeleteButton_clicked(self):
+        selection = self.chanTableWidget.selectedItems()
+        if not selection:
+            return
+        
+        msgid = str( selection[1].text() )
+        MM_util.bm.trashMessage(msgid)
+        self.updateUi()
+    
+    
     def input(self, prompt, password=False):
         if password:
             mode = QLineEdit.Password
