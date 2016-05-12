@@ -93,9 +93,9 @@ class MyForm(QtGui.QMainWindow,
         self.indexNames = ('market', 'ident', 'offer', 'order', 'conf', \
                                 'pay', 'rec', 'final', 'feedback')
         self.listDict = {}
-        self.listLastModified = {}
+        self.listLastLoaded = {}
         for index in self.indexNames:
-            self.listLastModified[index] = 0
+            self.listLastLoaded[index] = 0
         
         self.updateUi()
     
@@ -103,16 +103,15 @@ class MyForm(QtGui.QMainWindow,
     def loadListIfModified(self, index):
         MM_util.loadindex(index)
         mtime = os.path.getmtime("%s.dat" % index)
-        lastTime = self.listLastModified[index]
+        lastTime = self.listLastLoaded[index]
         if mtime > lastTime:
-            self.listLastModified[index] = mtime
+            self.listLastLoaded[index] = time.time()
             return MM_util.loadlist(index)
-        return None
     
     def loadLists(self):
         for index in self.indexNames:
             list = self.loadListIfModified(index)
-            if list:
+            if list is not None:
                 self.listDict[index] = list
     
     
@@ -138,7 +137,6 @@ class MyForm(QtGui.QMainWindow,
             if subject not in ('Msg', 'MultiMsg') and \
                     msg['toAddress'] in ( self.chan_v3, self.chan_v4 ):
                 chanMsgs.append(msg)
-                self.inbox.remove(msg)
         
         self.processInbox()
         self.loadLists()
@@ -209,6 +207,10 @@ class MyForm(QtGui.QMainWindow,
             
             wp = self.input("Please enter your Bitcoin Core wallet encryption passphrase:", password=True)
             MM_util.unlockwallet(wp)
+        except bitcoin.rpc.JSONRPCException as jre:
+            if jre.error['code'] == -14:
+                self.info("The passphrase was not correct. Please try logging in again.")
+                return
         except socket.error:
             self.sockErr()
         
