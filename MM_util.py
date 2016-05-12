@@ -10,7 +10,7 @@
 # LICENSE file.
 
 import simplejson as json
-import base64, hashlib, os, sys, time
+import base64, hashlib, httplib, os, sys, time
 import decimal, math, getpass, operator, random
 from collections import namedtuple
 
@@ -19,7 +19,9 @@ IDENT, TAG, MARKET, OFFER, ORDER, CONF, PAY, REC, FINAL, FEEDBACK, CAST, SYNC, B
 Msg = namedtuple('Msg', 'obj sig hash msgname')
 MultiMsg = namedtuple('MultiMsg', 'msg hash msgnum total')
 
-btcd = bm = None
+btcd = None
+bm = None
+minconf = None
 
 # Returns a packed, signed and hashed MM msgstr given any
 # dict, msgname, and BTC addr. Requires bitcoind to create BTC sig.
@@ -37,9 +39,11 @@ def MM_loads(btc_addr, str, checksig=True):
     if msg.hash != hashlib.sha256(msg.obj).hexdigest():
         raise Exception("Hash failed to verify...")
         return None
-    if checksig and not btcd.verifymessage(btc_addr, msg.sig, msg.obj):
-        raise Exception("BTC Signature failed to verify...")
-        return None
+    if checksig:
+        sigver = btcd.verifymessage(btc_addr, msg.sig, msg.obj)
+        if not sigver:
+            raise Exception("BTC Signature failed to verify...")
+            return None
     r = json.loads( base64.b64decode(msg.obj) )
     return Msg( r, msg.sig, msg.hash, msg.msgname )
 
@@ -352,12 +356,16 @@ def processreg(msg, ver):
     MM_writefile(msg)
     appendindex('reg', ver.hash)
 
-def processident(msg, ver, reglist):
-    for reg in reglist:
-        if reg.obj['userid'] == ver.hash:
-            MM_writefile(msg)
-            appendindex('ident', ver.hash)
-            return True
+def processident(msg, ver, mod=False, *reglist):
+    if mod:
+        for reg in reglist:
+            if reg.obj['userid'] == ver.hash:
+                registered = True
+    
+    if not mod or registered:
+        MM_writefile(msg)
+        appendindex('ident', ver.hash)
+        return True
     else:
         return False
 

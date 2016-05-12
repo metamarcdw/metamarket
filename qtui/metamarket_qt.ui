@@ -185,7 +185,7 @@
         <item row="0" column="0">
          <widget class="QGroupBox" name="offerGroupBox">
           <property name="title">
-           <string>Available Offers: Market Name</string>
+           <string>Available Offers:</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_11">
            <item row="0" column="0">

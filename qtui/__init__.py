@@ -44,20 +44,20 @@ class MyForm(QtGui.QMainWindow,
                         'bmhost':       'localhost',
                         'bmport':       '8442',
                         'btcport':      '8332'    }
-        self.config = ConfigParser.RawConfigParser(defaults)
-        self.config.read('mm.cfg')
+        config = ConfigParser.RawConfigParser(defaults)
+        config.read('mm.cfg')
         
-        self.chain = self.config.get(section, 'chain')
-        self.channame = self.config.get(section, 'channame')
+        self.chain = config.get(section, 'chain')
+        self.channame = config.get(section, 'channame')
         
-        self.default_fee = MM_util.truncate( decimal.Decimal( self.config.get(section, 'fee') ) )
-        self.minconf = self.config.getint(section, 'minconf')
+        self.default_fee = MM_util.truncate( decimal.Decimal( config.get(section, 'fee') ) )
+        self.minconf = config.getint(section, 'minconf')
         
-        self.bm_url = "http://%s:%s@%s:%d" % ( self.config.get(section, 'bmuser'),
-                                                self.config.get(section, 'bmpswd'),
-                                                self.config.get(section, 'bmhost'),
-                                                self.config.getint(section, 'bmport') )                                
-        self.btc_port = self.config.getint(section, 'btcport')
+        self.bm_url = "http://%s:%s@%s:%d" % ( config.get(section, 'bmuser'),
+                                            config.get(section, 'bmpswd'),
+                                            config.get(section, 'bmhost'),
+                                            config.getint(section, 'bmport') )                                
+        self.btc_port = config.getint(section, 'btcport')
         
         if self.chain == 'testnet':
             self.netcode = 'XTN'
@@ -71,6 +71,13 @@ class MyForm(QtGui.QMainWindow,
         bitcoin.SelectParams(self.chain)
         MM_util.btcd = bitcoin.rpc.RawProxy(service_port=self.btc_port)
         MM_util.bm = xmlrpclib.ServerProxy(self.bm_url)
+        MM_util.minconf = self.minconf
+        
+        try:
+            self.chan_v3 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 3,1 )
+            self.chan_v4 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 4,1 )
+        except socket.error:
+            self.sockErr()
         
         self.loggedIn = False
         self.username = None
@@ -80,56 +87,83 @@ class MyForm(QtGui.QMainWindow,
         self.btcaddr = None
         self.bmaddr = None
         self.myid = None
-        self.mymarket = None
+        self.currentMarket = None
         self.inbox = None
         
-        try:
-            self.chan_v3 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 3,1 )
-            self.chan_v4 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 4,1 )
-            
-            self.marketlist = MM_util.loadlist('market')
-            self.identlist = MM_util.loadlist('ident')
-            self.offerlist = MM_util.loadlist('offer')
-            self.orderlist = MM_util.loadlist('order')
-            self.conflist = MM_util.loadlist('conf')
-            self.paylist = MM_util.loadlist('pay')
-            self.reclist = MM_util.loadlist('rec')
-            self.finallist = MM_util.loadlist('final')
-            self.feedbacklist = MM_util.loadlist('feedback')
-        except socket.error:
-            self.sockErr()
-
         self.updateUi()
+    
+    
+    def loadLists(self):
+        self.marketlist = MM_util.loadlist('market')
+        self.identlist = MM_util.loadlist('ident')
+        self.offerlist = MM_util.loadlist('offer')
+        self.orderlist = MM_util.loadlist('order')
+        self.conflist = MM_util.loadlist('conf')
+        self.paylist = MM_util.loadlist('pay')
+        self.reclist = MM_util.loadlist('rec')
+        self.finallist = MM_util.loadlist('final')
+        self.feedbacklist = MM_util.loadlist('feedback')
+    
+    def populateMktBox(self, mktBox, search=None):
+        mktBox.clear()
+        for mkt in self.marketlist:
+            mktname = mkt.obj['marketname']
+            if not search or search not in mktname:
+                continue
+            mktBox.addItem(mktname)
     
     def updateUi(self):
         #UPDATE MAINWINDOW UI WITH DATA FROM ALL DATA STRUCTURES
         if not self.loggedIn:
             return
-        self.tabWidget.setEnabled(True)
         
-        # Update 'Channel' Tab:
-        self.chanGroupBox.setTitle("Channel: %s" % self.channame)
+        self.tabWidget.setEnabled(True)
         self.inbox = json.loads( MM_util.bm.getAllInboxMessages() )['inboxMessages']
         
         chanMsgs = []
         for msg in self.inbox:
             subject = base64.b64decode( msg['subject'] )
-            if subject not in ('Mkt', 'Msg', 'MultiMsg'):
+            if subject not in ('Msg', 'MultiMsg'):
                 chanMsgs.append(msg)
+                self.inbox.remove(msg)
         
+        self.processInbox()
+        self.loadLists()
+        
+        # Update 'Channel' Tab:
+        self.chanGroupBox.setTitle("Channel: %s" % self.channame)
         numChanMsgs = len(chanMsgs)
         self.chanTableWidget.setRowCount(numChanMsgs)
+        
         for i in range(numChanMsgs):
             subject = base64.b64decode( chanMsgs[i]['subject'] )
             msgid = chanMsgs[i]['msgid']
             self.chanTableWidget.setItem( i, 0, QTableWidgetItem(subject) )
             self.chanTableWidget.setItem( i, 1, QTableWidgetItem(msgid) )
         
+        # Update 'Markets' Tab:
+        numMarkets = len(self.marketlist)
+        self.marketTableWidget.setRowCount(numMarkets)
+        
+        for i in range(numMarkets):
+            self.marketTableWidget.setItem( i, 0, QTableWidgetItem(marketlist[i].obj['marketname']) )
+            self.marketTableWidget.setItem( i, 1, QTableWidgetItem(marketlist[i].obj['description']) )
+        
+        # Update 'Offers' Tab:
+        search = self.offerSearchLineEdit.text()
+        self.populateMktBox(self.offerMktComboBox, search)
+        
+        # Update 'Orders' Tab:
+        # TODO
+        
         # Update 'Identities' Tab:
         self.setWindowTitle("METAmarket-Qt [%s]" % self.username)
         self.identMyidLabel.setText("ID Hash: %s" % self.myid.hash)
         self.identBtcaddrLabel.setText("BTC Address: %s" % self.btcaddr)
         self.identBmaddrLabel.setText("BM Address: %s" % self.bmaddr)
+        
+        search = self.identSearchLineEdit.text()
+        self.populateMktBox(self.identMktComboBox)
     
     @pyqtSignature("int")
     def on_tabWidget_currentChanged(self):
@@ -163,8 +197,6 @@ class MyForm(QtGui.QMainWindow,
             MM_util.unlockwallet(wp)
         except socket.error:
             self.sockErr()
-        except httplib.BadStatusLine:
-            pass
         
         if MM_util.bm.createDeterministicAddresses(base64.b64encode(self.pkstr)) == [] or \
             not MM_util.btcd.validateaddress(self.btcaddr)['ismine']:
@@ -174,6 +206,7 @@ class MyForm(QtGui.QMainWindow,
         myidstr = MM_util.createidentmsgstr(self.btcaddr, self.bmaddr, self.username)
         self.myid = MM_util.MM_loads( self.btcaddr, myidstr )
         
+        self.identlist = MM_util.loadlist('ident')
         if not MM_util.searchlistbyhash(self.identlist, self.myid.hash):
             if not self.register(myidstr):
                 return
@@ -214,7 +247,6 @@ class MyForm(QtGui.QMainWindow,
             self.info("You are already logged in!")
         else:
             self.login()
-        self.updateUi()
     
     
     def showAboutDlg(self):
@@ -224,9 +256,9 @@ class MyForm(QtGui.QMainWindow,
     @pyqtSignature("")
     def on_actionAbout_triggered(self):
         self.showAboutDlg()
-        self.updateUi()
     
     
+    ##### BEGIN CHAN BUTTONS #####
     def showSendChanmsgDlg(self):
         sendChanmsgDlg = SendChanmsgDlg(self)
         if sendChanmsgDlg.exec_():
@@ -241,7 +273,6 @@ class MyForm(QtGui.QMainWindow,
         subject, message = result
         MM_util.sendmsgviabm(self.chan_v4, self.bmaddr, message, subject)
         self.info("Message Sent!")
-        self.updateUi()
     
     
     def showViewChanmsgDlg(self, subject, message):
@@ -259,7 +290,6 @@ class MyForm(QtGui.QMainWindow,
         subject = base64.b64decode( bmmsg['subject'] )
         message = base64.b64decode( bmmsg['message'] )
         self.showViewChanmsgDlg(subject, message)
-        self.updateUi()
     
     
     @pyqtSignature("")
@@ -268,9 +298,88 @@ class MyForm(QtGui.QMainWindow,
         if not selection:
             return
         
+        if not self.yorn("Are you sure?"):
+            return
+        
         msgid = str( selection[1].text() )
         MM_util.bm.trashMessage(msgid)
         self.updateUi()
+    ##### END CHAN BUTTONS #####
+    
+    
+    def processMsg(self, msg):
+        ver = MM_util.readmsg(msg) # Verifies sig/hash
+        
+        if ver.msgname == MM_util.IDENT:
+            MM_util.processident(msg, ver)
+        elif ver.msgname == MM_util.TAG:
+            MM_util.processtag(msg, ver)
+        elif ver.msgname == MM_util.OFFER:
+            MM_util.processoffer(msg, ver)
+        elif ver.msgname == MM_util.CONF:
+            MM_util.processconf(msg, ver)
+        elif ver.msgname == MM_util.REC:
+            MM_util.processrec(msg, ver)
+        elif ver.msgname == MM_util.FEEDBACK:
+            MM_util.processfeedback(msg, ver)
+        elif ver.msgname == MM_util.CAST:
+            MM_util.processcast(msg, ver)
+        else:
+            raise Exception("Someone sent us the wrong type of Msg.")
+            
+        return ver
+        
+    def processMultiMsg(self, mmsg):
+        mmsgobj = MM_util.MultiMsg(**json.loads(mmsg))
+        fname = "multimsg.dat"
+        if os.path.exists(fname):
+            mmsgfile = open(fname, 'r')
+            mmsgdict = json.load(mmsgfile)
+            mmsgfile.close()
+        else:
+            mmsgdict = {}
+        msginfo = None
+        
+        if mmsgobj.hash in mmsgdict:
+            msglist = mmsgdict[mmsgobj.hash]
+            for i in range( len(msglist) ):
+                msglist[i] = MM_util.MultiMsg(**msglist[i])
+            msglist.append(mmsgobj)
+            
+            if len(msglist) == mmsgobj.total:
+                origmsg = MM_util.reconstructmsg(msglist)
+                msginfo = processMsg(origmsg)
+                del(mmsgdict[mmsgobj.hash])
+        else:
+            mmsgdict[mmsgobj.hash] = [mmsgobj]
+            
+        mmsgfile = open(fname, 'w')
+        json.dump(mmsgdict, mmsgfile)
+        mmsgfile.close()
+        
+        return msginfo
+        
+    # Gets BM inbox from API, processes all new 'Msg's
+    def processInbox(self):
+        msginfolist = []
+        for i in self.inbox:
+            subject = base64.b64decode( i['subject'] )
+            bmmsg = base64.b64decode( i['message'] )
+            
+            msginfo = None
+            if i['toAddress'] == self.bmaddr and subject == 'Msg':
+                msginfo = processMsg(bmmsg)
+            elif i['toAddress'] == self.bmaddr and subject == 'MultiMsg':
+                msginfo = processMultiMsg(bmmsg)
+            else:
+                continue
+                
+            if msginfo:
+                msginfolist.append(msginfo)
+                
+            MM_util.bm.trashMessage( i['msgid'] )
+            self.inbox.remove(i)
+        return msginfolist
     
     
     def input(self, prompt, password=False):
@@ -299,7 +408,6 @@ class MyForm(QtGui.QMainWindow,
     
     
     def quit(self):
-        #TODO: Save all data to flat files
         self.close()
         sys.exit(0) # <-- Not sure if needed
     

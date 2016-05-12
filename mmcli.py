@@ -540,9 +540,14 @@ def do_processreg(msg, ver):
     processreg(msg, ver)
     print "REG Msg accepted:\n%s" % pretty_json(ver)
     
-def do_processident(msg, ver):
+def do_processident(msg, ver, mod=False):
     reglist = loadlist('reg')
-    if processident(msg, ver, reglist):
+    if mod:
+        result = processident(msg, ver, mod, reglist)
+    else:
+        result = processident(msg, ver)
+    
+    if result:
         print "IDENT Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("IDENT Msg rejected.")
@@ -648,7 +653,9 @@ def processmsg(msg):
     ver = readmsg(msg) # Verifies sig/hash
     
     if ver.msgname == IDENT and entity == 'mod':
-        do_processident(msg, ver)
+        do_processident(msg, ver, mod=True)
+    elif ver.msgname == IDENT and entity != 'mod':
+        do_processident(msg, ver, mod=False)
     elif ver.msgname == REG and entity == 'mod':
         do_processreg(msg, ver)
     elif ver.msgname == BURN and entity == 'mod':
@@ -1077,6 +1084,7 @@ if entity not in ('buyer', 'vendor', 'mod'):
 bitcoin.SelectParams(chain)
 MM_util.btcd = bitcoin.rpc.RawProxy(service_port=btc_port)
 MM_util.bm = xmlrpclib.ServerProxy(bm_url)
+MM_util.minconf = minconf
 
 default_chan_v3 = MM_util.bm.getDeterministicAddress( base64.b64encode(default_channame), 3,1 )
 default_chan_v4 = MM_util.bm.getDeterministicAddress( base64.b64encode(default_channame), 4,1 )

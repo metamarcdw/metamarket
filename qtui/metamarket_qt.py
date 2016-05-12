@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Wed May 11 01:59:16 2016
+# Created: Thu May 12 03:14:51 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -328,7 +328,7 @@ class Ui_MainWindow(object):
         self.marketViewButton.setText(_translate("MainWindow", "View Market", None))
         self.marketDeleteButton.setText(_translate("MainWindow", "Delete Market", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.marketTab), _translate("MainWindow", "Markets", None))
-        self.offerGroupBox.setTitle(_translate("MainWindow", "Available Offers: Market Name", None))
+        self.offerGroupBox.setTitle(_translate("MainWindow", "Available Offers:", None))
         self.offerSearchLineEdit.setText(_translate("MainWindow", "Search", None))
         self.offerTableWidget.setSortingEnabled(True)
         item = self.offerTableWidget.horizontalHeaderItem(0)
