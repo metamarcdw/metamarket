@@ -90,23 +90,35 @@ class MyForm(QtGui.QMainWindow,
         self.currentMarket = None
         self.inbox = None
         
+        self.indexNames = ('market', 'ident', 'offer', 'order', 'conf', \
+                                'pay', 'rec', 'final', 'feedback')
+        self.listDict = {}
+        self.listLastModified = {}
+        for index in self.indexNames:
+            self.listLastModified[index] = 0
+        
         self.updateUi()
     
     
+    def loadListIfModified(self, index):
+        MM_util.loadindex(index)
+        mtime = os.path.getmtime("%s.dat" % index)
+        lastTime = self.listLastModified[index]
+        if mtime > lastTime:
+            self.listLastModified[index] = mtime
+            return MM_util.loadlist(index)
+        return None
+    
     def loadLists(self):
-        self.marketlist = MM_util.loadlist('market')
-        self.identlist = MM_util.loadlist('ident')
-        self.offerlist = MM_util.loadlist('offer')
-        self.orderlist = MM_util.loadlist('order')
-        self.conflist = MM_util.loadlist('conf')
-        self.paylist = MM_util.loadlist('pay')
-        self.reclist = MM_util.loadlist('rec')
-        self.finallist = MM_util.loadlist('final')
-        self.feedbacklist = MM_util.loadlist('feedback')
+        for index in self.indexNames:
+            list = self.loadListIfModified(index)
+            if list:
+                self.listDict[index] = list
+    
     
     def populateMktBox(self, mktBox, search=None):
         mktBox.clear()
-        for mkt in self.marketlist:
+        for mkt in self.listDict['market']:
             mktname = mkt.obj['marketname']
             if not search or search not in mktname:
                 continue
@@ -123,7 +135,8 @@ class MyForm(QtGui.QMainWindow,
         chanMsgs = []
         for msg in self.inbox:
             subject = base64.b64decode( msg['subject'] )
-            if subject not in ('Msg', 'MultiMsg'):
+            if subject not in ('Msg', 'MultiMsg') and \
+                    msg['toAddress'] in ( self.chan_v3, self.chan_v4 ):
                 chanMsgs.append(msg)
                 self.inbox.remove(msg)
         
@@ -142,7 +155,8 @@ class MyForm(QtGui.QMainWindow,
             self.chanTableWidget.setItem( i, 1, QTableWidgetItem(msgid) )
         
         # Update 'Markets' Tab:
-        numMarkets = len(self.marketlist)
+        marketlist = self.listDict['market']
+        numMarkets = len(marketlist)
         self.marketTableWidget.setRowCount(numMarkets)
         
         for i in range(numMarkets):
@@ -206,8 +220,8 @@ class MyForm(QtGui.QMainWindow,
         myidstr = MM_util.createidentmsgstr(self.btcaddr, self.bmaddr, self.username)
         self.myid = MM_util.MM_loads( self.btcaddr, myidstr )
         
-        self.identlist = MM_util.loadlist('ident')
-        if not MM_util.searchlistbyhash(self.identlist, self.myid.hash):
+        identlist = self.listDict['ident'] = MM_util.loadlist('ident')
+        if not MM_util.searchlistbyhash(identlist, self.myid.hash):
             if not self.register(myidstr):
                 return
         
