@@ -162,7 +162,7 @@ class MyForm(QtGui.QMainWindow,
             self.marketTableWidget.setItem( i, 1, QTableWidgetItem(marketlist[i].obj['description']) )
         
         # Update 'Offers' Tab:
-        search = self.offerSearchLineEdit.text()
+        search = str( self.offerSearchLineEdit.text() )
         self.populateMktBox(self.offerMktComboBox, search)
         
         # Update 'Orders' Tab:
@@ -174,8 +174,8 @@ class MyForm(QtGui.QMainWindow,
         self.identBtcaddrLabel.setText("BTC Address: %s" % self.btcaddr)
         self.identBmaddrLabel.setText("BM Address: %s" % self.bmaddr)
         
-        search = self.identSearchLineEdit.text()
-        self.populateMktBox(self.identMktComboBox)
+        search = str( self.identSearchLineEdit.text() )
+        self.populateMktBox(self.identMktComboBox, search)
     
     @pyqtSignature("int")
     def on_tabWidget_currentChanged(self):
