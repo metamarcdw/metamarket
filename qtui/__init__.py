@@ -336,14 +336,37 @@ class MyForm(QtGui.QMainWindow,
             return
         
         try:
-            ver = MM_util.readmsg(result)
+            self.importMarket(result)
         except json.scanner.JSONDecodeError:
-            self.info("Input was not a valid JSON encoded string.")
-            return
+            self.info("Input was not a JSON encoded string")
         
-        MM_util.writefile(result)
-        MM_util.appendindex("market", ver.hash)
+        self.info("Congratulations, you may now Register with a new Metamarket!")
+        self.updateUi()
     
+    def importMarket(self, msgstr):
+        info = json.loads(msgstr)
+        mod = info['modid']
+        market = info['market']
+        
+        idb64 = base64.b64encode( json.dumps(mod['obj'], sort_keys=True) )
+        idmsg = MM_util.Msg( idb64, mod['sig'], mod['hash'], mod['msgname'] )
+        idmsgstr = json.dumps(idmsg)
+        
+        if not MM_util.readmsg(idmsgstr): # Verifies sig/hash
+            raise Exception("New Market creation failed..")
+        MM_util.MM_writefile(idmsgstr)
+        MM_util.appendindex('ident', idmsg.hash)
+        
+        mktb64 = base64.b64encode( json.dumps(market['obj'], sort_keys=True) )
+        mktmsg = MM_util.Msg( mktb64, market['sig'], market['hash'], market['msgname'] )
+        mktmsgstr = json.dumps(mktmsg)
+        
+        if not MM_util.readmsg(mktmsgstr): # Verifies sig/hash
+            raise Exception("New Market creation failed..")
+        MM_util.MM_writefile(mktmsgstr)
+        MM_util.appendindex('market', mktmsg.hash)
+        
+        MM_util.bm.addSubscription(mod['obj']['bmaddr'])
     
     ##### END MARKET SLOTS #####
     
