@@ -193,11 +193,21 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
-                <widget class="QComboBox" name="offerMktComboBox"/>
+                <widget class="QComboBox" name="offerMktComboBox">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                </widget>
                </item>
                <item>
                 <widget class="QLineEdit" name="offerSearchLineEdit">
                  <property name="text">
+                  <string/>
+                 </property>
+                 <property name="placeholderText">
                   <string>Search</string>
                  </property>
                 </widget>
@@ -422,11 +432,21 @@
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_5">
                  <item>
-                  <widget class="QComboBox" name="identMktComboBox"/>
+                  <widget class="QComboBox" name="identMktComboBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                  </widget>
                  </item>
                  <item>
                   <widget class="QLineEdit" name="identSearchLineEdit">
                    <property name="text">
+                    <string/>
+                   </property>
+                   <property name="placeholderText">
                     <string>Search</string>
                    </property>
                   </widget>

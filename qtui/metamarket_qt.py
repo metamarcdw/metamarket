@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Thu May 12 03:14:51 2016
+# Created: Fri May 13 22:42:51 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -126,9 +126,15 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6 = QtGui.QHBoxLayout()
         self.horizontalLayout_6.setObjectName(_fromUtf8("horizontalLayout_6"))
         self.offerMktComboBox = QtGui.QComboBox(self.offerGroupBox)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.offerMktComboBox.sizePolicy().hasHeightForWidth())
+        self.offerMktComboBox.setSizePolicy(sizePolicy)
         self.offerMktComboBox.setObjectName(_fromUtf8("offerMktComboBox"))
         self.horizontalLayout_6.addWidget(self.offerMktComboBox)
         self.offerSearchLineEdit = QtGui.QLineEdit(self.offerGroupBox)
+        self.offerSearchLineEdit.setText(_fromUtf8(""))
         self.offerSearchLineEdit.setObjectName(_fromUtf8("offerSearchLineEdit"))
         self.horizontalLayout_6.addWidget(self.offerSearchLineEdit)
         self.verticalLayout_7.addLayout(self.horizontalLayout_6)
@@ -242,9 +248,15 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5 = QtGui.QHBoxLayout()
         self.horizontalLayout_5.setObjectName(_fromUtf8("horizontalLayout_5"))
         self.identMktComboBox = QtGui.QComboBox(self.identGroupBox)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.identMktComboBox.sizePolicy().hasHeightForWidth())
+        self.identMktComboBox.setSizePolicy(sizePolicy)
         self.identMktComboBox.setObjectName(_fromUtf8("identMktComboBox"))
         self.horizontalLayout_5.addWidget(self.identMktComboBox)
         self.identSearchLineEdit = QtGui.QLineEdit(self.identGroupBox)
+        self.identSearchLineEdit.setText(_fromUtf8(""))
         self.identSearchLineEdit.setObjectName(_fromUtf8("identSearchLineEdit"))
         self.horizontalLayout_5.addWidget(self.identSearchLineEdit)
         self.verticalLayout_4.addLayout(self.horizontalLayout_5)
@@ -329,7 +341,7 @@ class Ui_MainWindow(object):
         self.marketDeleteButton.setText(_translate("MainWindow", "Delete Market", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.marketTab), _translate("MainWindow", "Markets", None))
         self.offerGroupBox.setTitle(_translate("MainWindow", "Available Offers:", None))
-        self.offerSearchLineEdit.setText(_translate("MainWindow", "Search", None))
+        self.offerSearchLineEdit.setPlaceholderText(_translate("MainWindow", "Search", None))
         self.offerTableWidget.setSortingEnabled(True)
         item = self.offerTableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Name", None))
@@ -364,7 +376,7 @@ class Ui_MainWindow(object):
         self.identBtcaddrLabel.setText(_translate("MainWindow", "BTC Address: ", None))
         self.identBmaddrLabel.setText(_translate("MainWindow", "BM Address: ", None))
         self.identGroupBox.setTitle(_translate("MainWindow", "Known Identities:", None))
-        self.identSearchLineEdit.setText(_translate("MainWindow", "Search", None))
+        self.identSearchLineEdit.setPlaceholderText(_translate("MainWindow", "Search", None))
         self.identTableWidget.setSortingEnabled(True)
         item = self.identTableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Name", None))

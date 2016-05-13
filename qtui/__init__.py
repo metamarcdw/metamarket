@@ -115,11 +115,11 @@ class MyForm(QtGui.QMainWindow,
                 self.listDict[index] = list
     
     
-    def populateMktBox(self, mktBox, search=None):
+    def populateMktBox(self, mktBox, search=''):
         mktBox.clear()
         for mkt in self.listDict['market']:
             mktname = mkt.obj['marketname']
-            if not search or search not in mktname:
+            if search not in mktname:
                 continue
             mktBox.addItem(mktname)
     
