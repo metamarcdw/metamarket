@@ -283,6 +283,9 @@ class MyForm(QtGui.QMainWindow,
     @pyqtSignature("")
     def on_chanSendButton_clicked(self):
         result = self.showSendChanmsgDlg()
+        if not result:
+            return
+        
         subject, message = result
         MM_util.sendmsgviabm(self.chan_v4, self.bmaddr, message, subject)
         self.info("Message Sent!")
@@ -321,15 +324,23 @@ class MyForm(QtGui.QMainWindow,
     
     
     ##### BEGIN MARKET SLOTS #####
-    def showMarketImportDlg(self):
-        marketImportDlg = MarketImportDlg(self)
-        if marketImportDlg.exec_():
-            return marketImportDlg.result()
+    def showImportMarketDlg(self):
+        importMarketDlg = ImportMarketDlg(self)
+        if importMarketDlg.exec_():
+            return importMarketDlg.result()
     
     @pyqtSignature("")
     def on_marketImportButton_clicked(self):
-        result = self.showMarketImportDlg()
-        ver = MM_util.readmsg(result)
+        result = self.showImportMarketDlg()
+        if not result:
+            return
+        
+        try:
+            ver = MM_util.readmsg(result)
+        except json.scanner.JSONDecodeError:
+            self.info("Input was not a valid JSON encoded string.")
+            return
+        
         MM_util.writefile(result)
         MM_util.appendindex("market", ver.hash)
     

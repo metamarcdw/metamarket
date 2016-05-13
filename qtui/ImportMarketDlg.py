@@ -28,7 +28,7 @@ class ImportMarketDlg(QDialog,
         self.updateUi()
     
     def result(self):
-        marketJSON = self.plainTextEdit.toPlainText()
+        marketJSON = str( self.plainTextEdit.toPlainText() )
         return marketJSON
     
 
