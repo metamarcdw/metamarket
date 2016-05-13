@@ -242,7 +242,7 @@ class MyForm(QtGui.QMainWindow,
                 self.info("REMEMBER TO SECURELY BACKUP YOUR wallet.dat AND keys.dat files!")
                 return True
             else:
-                self.info("Passwords did not match.")
+                self.info("Passphrase did not match.")
                 return False
         else:
             MM_util.bm.deleteAddress(self.bmaddr)
@@ -274,7 +274,7 @@ class MyForm(QtGui.QMainWindow,
         self.showAboutDlg()
     
     
-    ##### BEGIN CHAN BUTTONS #####
+    ##### BEGIN CHAN SLOTS #####
     def showSendChanmsgDlg(self):
         sendChanmsgDlg = SendChanmsgDlg(self)
         if sendChanmsgDlg.exec_():
@@ -283,9 +283,6 @@ class MyForm(QtGui.QMainWindow,
     @pyqtSignature("")
     def on_chanSendButton_clicked(self):
         result = self.showSendChanmsgDlg()
-        if not result:
-            return
-            
         subject, message = result
         MM_util.sendmsgviabm(self.chan_v4, self.bmaddr, message, subject)
         self.info("Message Sent!")
@@ -320,7 +317,39 @@ class MyForm(QtGui.QMainWindow,
         msgid = str( selection[1].text() )
         MM_util.bm.trashMessage(msgid)
         self.updateUi()
-    ##### END CHAN BUTTONS #####
+    ##### END CHAN SLOTS #####
+    
+    
+    ##### BEGIN MARKET SLOTS #####
+    def showMarketImportDlg(self):
+        marketImportDlg = MarketImportDlg(self)
+        if marketImportDlg.exec_():
+            return marketImportDlg.result()
+    
+    @pyqtSignature("")
+    def on_marketImportButton_clicked(self):
+        result = self.showMarketImportDlg()
+        ver = MM_util.readmsg(result)
+        MM_util.writefile(result)
+        MM_util.appendindex("market", ver.hash)
+    
+    
+    ##### END MARKET SLOTS #####
+    
+    
+    ##### BEGIN OFFER SLOTS #####
+    
+    ##### END OFFER SLOTS #####
+    
+    
+    ##### BEGIN ORDER SLOTS #####
+    
+    ##### END ORDER SLOTS #####
+    
+    
+    ##### BEGIN IDENT SLOTS #####
+    
+    ##### END IDENT SLOTS #####
     
     
     def processMsg(self, msg):
