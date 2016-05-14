@@ -1,5 +1,5 @@
 # METAmarket - Trustless Federated Marketplaces
-http://metamarket.biz
+http://metamarket.trade
 
 * * *
 
@@ -65,11 +65,11 @@ cd metamarket-0.1.0-alpha
 **INSTALL REGTEST SUITE (Linux):**
 ```
 cd ~/.bitcoin
-wget http://metamarket.biz/test_suite/regtest_conf.tar.gz
+wget http://metamarket.trade/test_suite/regtest_conf.tar.gz
 tar -x -f regtest_conf.tar.gz
 
 cd $install_dir
-wget http://metamarket.biz/test_suite/test_suite_scripts.tar.gz
+wget http://metamarket.trade/test_suite/test_suite_scripts.tar.gz
 tar -x -f test_suite_scripts.tar.gz
 ./copyscripts
 ```
