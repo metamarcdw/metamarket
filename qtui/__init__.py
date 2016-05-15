@@ -87,8 +87,8 @@ class MyForm(QtGui.QMainWindow,
         self.btcaddr = None
         self.bmaddr = None
         self.myid = None
-        self.currentMarket = None
         self.inbox = None
+        self.currentMarket = None
         
         self.searchText = ''
         self.indexNames = ('market', 'ident', 'offer', 'order', 'conf', \
@@ -315,11 +315,11 @@ class MyForm(QtGui.QMainWindow,
     
     @pyqtSignature("")
     def on_chanDeleteButton_clicked(self):
-        selection = self.chanTableWidget.selectedItems()
-        if not selection:
+        if not self.yorn("Are you sure?"):
             return
         
-        if not self.yorn("Are you sure?"):
+        selection = self.chanTableWidget.selectedItems()
+        if not selection:
             return
         
         msgid = str( selection[1].text() )
@@ -398,6 +398,21 @@ class MyForm(QtGui.QMainWindow,
         mktjson = json.dumps(info, indent=4, sort_keys=True)
         
         self.showViewMarketDlg(mktName, regfee, burnmult, downvotemult, desc, mktjson)
+    
+    @pyqtSignature("")
+    def on_marketDeleteButton_clicked(self):
+        if not self.yorn("Are you sure?"):
+            return
+        
+        selection = self.marketTableWidget.selectedItems()
+        if not selection:
+            return
+        
+        mktName = str( selection[0].text() )
+        market = self.searchmktlistbyname(mktName)
+        
+        MM_util.MM_backupfile("market", market.hash)
+        self.updateUi()
     
     ##### END MARKET SLOTS #####
     
