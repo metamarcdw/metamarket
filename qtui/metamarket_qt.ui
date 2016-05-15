@@ -282,9 +282,9 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="offerDeleteButton">
+                <widget class="QPushButton" name="offerFilterButton">
                  <property name="text">
-                  <string>Delete Offer</string>
+                  <string>Filter Offers</string>
                  </property>
                 </widget>
                </item>

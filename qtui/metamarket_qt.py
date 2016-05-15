@@ -3,8 +3,8 @@
 
 # Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Sun May 15 01:56:37 2016
-#      by: PyQt4 UI code generator 4.10.4
+# Created: Sun May 15 23:32:54 2016
+#      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -167,9 +167,9 @@ class Ui_MainWindow(object):
         self.offerViewButton = QtGui.QPushButton(self.offerGroupBox)
         self.offerViewButton.setObjectName(_fromUtf8("offerViewButton"))
         self.horizontalLayout_7.addWidget(self.offerViewButton)
-        self.offerDeleteButton = QtGui.QPushButton(self.offerGroupBox)
-        self.offerDeleteButton.setObjectName(_fromUtf8("offerDeleteButton"))
-        self.horizontalLayout_7.addWidget(self.offerDeleteButton)
+        self.offerFilterButton = QtGui.QPushButton(self.offerGroupBox)
+        self.offerFilterButton.setObjectName(_fromUtf8("offerFilterButton"))
+        self.horizontalLayout_7.addWidget(self.offerFilterButton)
         self.verticalLayout_7.addLayout(self.horizontalLayout_7)
         self.gridLayout_11.addLayout(self.verticalLayout_7, 0, 0, 1, 1)
         self.gridLayout_12.addWidget(self.offerGroupBox, 0, 0, 1, 1)
@@ -358,7 +358,7 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Price", None))
         self.offerOrderButton.setText(_translate("MainWindow", "Order", None))
         self.offerViewButton.setText(_translate("MainWindow", "View Offer", None))
-        self.offerDeleteButton.setText(_translate("MainWindow", "Delete Offer", None))
+        self.offerFilterButton.setText(_translate("MainWindow", "Filter Offers", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.offerTab), _translate("MainWindow", "Offers", None))
         self.orderGroupBox.setTitle(_translate("MainWindow", "My Orders:", None))
         self.orderTableWidget.setSortingEnabled(True)
