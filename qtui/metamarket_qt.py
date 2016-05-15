@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Fri May 13 22:42:51 2016
+# Created: Sun May 15 01:56:37 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -46,6 +46,7 @@ class Ui_MainWindow(object):
         self.verticalLayout = QtGui.QVBoxLayout()
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.chanTableWidget = QtGui.QTableWidget(self.chanGroupBox)
+        self.chanTableWidget.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
         self.chanTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.chanTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.chanTableWidget.setObjectName(_fromUtf8("chanTableWidget"))
@@ -85,6 +86,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_3 = QtGui.QVBoxLayout()
         self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
         self.marketTableWidget = QtGui.QTableWidget(self.marketGroupBox)
+        self.marketTableWidget.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
         self.marketTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.marketTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.marketTableWidget.setObjectName(_fromUtf8("marketTableWidget"))
@@ -139,6 +141,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addWidget(self.offerSearchLineEdit)
         self.verticalLayout_7.addLayout(self.horizontalLayout_6)
         self.offerTableWidget = QtGui.QTableWidget(self.offerGroupBox)
+        self.offerTableWidget.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
         self.offerTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.offerTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.offerTableWidget.setObjectName(_fromUtf8("offerTableWidget"))
@@ -182,6 +185,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2 = QtGui.QVBoxLayout()
         self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.orderTableWidget = QtGui.QTableWidget(self.orderGroupBox)
+        self.orderTableWidget.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
         self.orderTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.orderTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.orderTableWidget.setObjectName(_fromUtf8("orderTableWidget"))
@@ -261,6 +265,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.addWidget(self.identSearchLineEdit)
         self.verticalLayout_4.addLayout(self.horizontalLayout_5)
         self.identTableWidget = QtGui.QTableWidget(self.identGroupBox)
+        self.identTableWidget.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
         self.identTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.identTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.identTableWidget.setObjectName(_fromUtf8("identTableWidget"))

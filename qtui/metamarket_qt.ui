@@ -38,6 +38,9 @@
             <layout class="QVBoxLayout" name="verticalLayout">
              <item>
               <widget class="QTableWidget" name="chanTableWidget">
+               <property name="editTriggers">
+                <set>QAbstractItemView::NoEditTriggers</set>
+               </property>
                <property name="selectionMode">
                 <enum>QAbstractItemView::SingleSelection</enum>
                </property>
@@ -115,6 +118,9 @@
             <layout class="QVBoxLayout" name="verticalLayout_3">
              <item>
               <widget class="QTableWidget" name="marketTableWidget">
+               <property name="editTriggers">
+                <set>QAbstractItemView::NoEditTriggers</set>
+               </property>
                <property name="selectionMode">
                 <enum>QAbstractItemView::SingleSelection</enum>
                </property>
@@ -216,6 +222,9 @@
              </item>
              <item>
               <widget class="QTableWidget" name="offerTableWidget">
+               <property name="editTriggers">
+                <set>QAbstractItemView::NoEditTriggers</set>
+               </property>
                <property name="selectionMode">
                 <enum>QAbstractItemView::SingleSelection</enum>
                </property>
@@ -303,6 +312,9 @@
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
               <widget class="QTableWidget" name="orderTableWidget">
+               <property name="editTriggers">
+                <set>QAbstractItemView::NoEditTriggers</set>
+               </property>
                <property name="selectionMode">
                 <enum>QAbstractItemView::SingleSelection</enum>
                </property>
@@ -455,6 +467,9 @@
                </item>
                <item>
                 <widget class="QTableWidget" name="identTableWidget">
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::NoEditTriggers</set>
+                 </property>
                  <property name="selectionMode">
                   <enum>QAbstractItemView::SingleSelection</enum>
                  </property>
