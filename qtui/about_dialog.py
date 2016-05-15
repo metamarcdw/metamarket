@@ -3,8 +3,8 @@
 
 # Form implementation generated from reading ui file 'about_dialog.ui'
 #
-# Created: Fri May 29 23:27:52 2015
-#      by: PyQt4 UI code generator 4.11.2
+# Created: Sun May 15 20:35:11 2016
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -76,7 +76,7 @@ class Ui_about_dialog(object):
         about_dialog.setWindowTitle(_translate("about_dialog", "About", None))
         self.label.setText(_translate("about_dialog", "METAmarket-Qt", None))
         self.labelVersion.setText(_translate("about_dialog", "version v0.1.0", None))
-        self.label_2.setText(_translate("about_dialog", "<html><head/><body><p>Copyright © 2015 METAmarket Developers</p></body></html>", None))
+        self.label_2.setText(_translate("about_dialog", "<html><head/><body><p>Copyright © 2015-2016 METAmarket Developers</p></body></html>", None))
         self.label_5.setText(_translate("about_dialog", "This is Alpha software.", None))
         self.label_3.setText(_translate("about_dialog", "<html><head/><body><p>Distributed under the MIT software license; <a href=\"http://www.opensource.org/licenses/mit-license.php\"><span style=\" text-decoration: underline; color:#0000ff;\">http://www.opensource.org/licenses/mit-license.php</span></a></p></body></html>", None))
 
