@@ -90,6 +90,7 @@ class MyForm(QtGui.QMainWindow,
         self.currentMarket = None
         self.inbox = None
         
+        self.searchText = ''
         self.indexNames = ('market', 'ident', 'offer', 'order', 'conf', \
                                 'pay', 'rec', 'final', 'feedback')
         self.listDict = {}
@@ -115,13 +116,16 @@ class MyForm(QtGui.QMainWindow,
                 self.listDict[index] = list
     
     
-    def populateMktBox(self, mktBox, search=''):
+    def populateMktBox(self, mktBox, search):
+        index = mktBox.currentIndex()
         mktBox.clear()
         for mkt in self.listDict['market']:
             mktname = mkt.obj['marketname']
             if search not in mktname:
                 continue
             mktBox.addItem(mktname)
+        if not search:
+            mktBox.setCurrentIndex(index)
     
     def updateUi(self):
         #UPDATE MAINWINDOW UI WITH DATA FROM ALL DATA STRUCTURES
@@ -162,8 +166,8 @@ class MyForm(QtGui.QMainWindow,
             self.marketTableWidget.setItem( i, 1, QTableWidgetItem(marketlist[i].obj['description']) )
         
         # Update 'Offers' Tab:
-        search = str( self.offerSearchLineEdit.text() )
-        self.populateMktBox(self.offerMktComboBox, search)
+        self.populateMktBox(self.offerMktComboBox, self.searchText)
+        # TODO
         
         # Update 'Orders' Tab:
         # TODO
@@ -175,7 +179,8 @@ class MyForm(QtGui.QMainWindow,
         self.identBmaddrLabel.setText("BM Address: %s" % self.bmaddr)
         
         search = str( self.identSearchLineEdit.text() )
-        self.populateMktBox(self.identMktComboBox, search)
+        self.populateMktBox(self.identMktComboBox, self.searchText)
+        # TODO
     
     @pyqtSignature("int")
     def on_tabWidget_currentChanged(self):
@@ -372,6 +377,17 @@ class MyForm(QtGui.QMainWindow,
     
     
     ##### BEGIN OFFER SLOTS #####
+    @pyqtSignature("int")
+    def on_offerMktComboBox_activated(self, index):
+        self.identMktComboBox.setCurrentIndex( index )
+        self.currentMarket = self.offerMktComboBox.currentText()
+        print self.currentMarket
+    
+    @pyqtSignature("")
+    def on_offerSearchLineEdit_returnPressed(self):
+        self.searchText = str( self.offerSearchLineEdit.text() )
+        self.offerSearchLineEdit.setText('')
+        self.updateUi()
     
     ##### END OFFER SLOTS #####
     
@@ -382,6 +398,17 @@ class MyForm(QtGui.QMainWindow,
     
     
     ##### BEGIN IDENT SLOTS #####
+    @pyqtSignature("int")
+    def on_identMktComboBox_activated(self, index):
+        self.offerMktComboBox.setCurrentIndex( index )
+        self.currentMarket = self.identMktComboBox.currentText()
+        print self.currentMarket
+    
+    @pyqtSignature("")
+    def on_identSearchLineEdit_returnPressed(self):
+        self.searchText = str( self.identSearchLineEdit.text() )
+        self.identSearchLineEdit.setText('')
+        self.updateUi()
     
     ##### END IDENT SLOTS #####
     
