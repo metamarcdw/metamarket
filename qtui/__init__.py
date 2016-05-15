@@ -380,8 +380,7 @@ class MyForm(QtGui.QMainWindow,
     @pyqtSignature("int")
     def on_offerMktComboBox_activated(self, index):
         self.identMktComboBox.setCurrentIndex( index )
-        self.currentMarket = self.offerMktComboBox.currentText()
-        print self.currentMarket
+        self.currentMarket = str( self.offerMktComboBox.currentText() )
     
     @pyqtSignature("")
     def on_offerSearchLineEdit_returnPressed(self):
@@ -401,8 +400,7 @@ class MyForm(QtGui.QMainWindow,
     @pyqtSignature("int")
     def on_identMktComboBox_activated(self, index):
         self.offerMktComboBox.setCurrentIndex( index )
-        self.currentMarket = self.identMktComboBox.currentText()
-        print self.currentMarket
+        self.currentMarket = str( self.identMktComboBox.currentText() )
     
     @pyqtSignature("")
     def on_identSearchLineEdit_returnPressed(self):
