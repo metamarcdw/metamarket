@@ -373,6 +373,32 @@ class MyForm(QtGui.QMainWindow,
         
         MM_util.bm.addSubscription(mod['obj']['bmaddr'])
     
+    
+    def showViewMarketDlg(self, marketname, regfee, burnmult, downvotemult, desc, mktjson):
+        viewMarketDlg = ViewMarketDlg(marketname, regfee, burnmult, downvotemult, desc, mktjson, self)
+        viewMarketDlg.show()
+    
+    @pyqtSignature("")
+    def on_marketViewButton_clicked(self):
+        selection = self.marketTableWidget.selectedItems()
+        if not selection:
+            return
+        
+        mktName = str( selection[0].text() )
+        market = self.searchmktlistbyname(mktName)
+        
+        regfee = market.obj['fee']
+        burnmult = market.obj['multiplier']
+        downvotemult = 0
+        desc = market.obj['description']
+        
+        modident = MM_util.searchlistbyhash(self.listDict["ident"], market.obj['modid'])
+        info = {    "market": market,
+                    "modid": modident }
+        mktjson = json.dumps(info, indent=4, sort_keys=True)
+        
+        self.showViewMarketDlg(mktName, regfee, burnmult, downvotemult, desc, mktjson)
+    
     ##### END MARKET SLOTS #####
     
     
@@ -410,6 +436,10 @@ class MyForm(QtGui.QMainWindow,
     
     ##### END IDENT SLOTS #####
     
+    def searchmktlistbyname(self, name):
+        for mkt in self.listDict["market"]:
+            if mkt.obj['marketname'] == name:
+                return mkt
     
     def processMsg(self, msg):
         ver = MM_util.readmsg(msg) # Verifies sig/hash
