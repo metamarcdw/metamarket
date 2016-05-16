@@ -413,7 +413,6 @@ class MyForm(QtGui.QMainWindow,
         
         MM_util.MM_backupfile("market", market.hash)
         self.updateUi()
-    
     ##### END MARKET SLOTS #####
     
     
@@ -425,7 +424,7 @@ class MyForm(QtGui.QMainWindow,
         self.updateUi()
     
     @pyqtSignature("")
-    def on_offerSearchLineEdit_returnPressed(self):
+    def on_offerSearchLineEdit_editingFinished(self):
         self.searchText = str( self.offerSearchLineEdit.text() )
         self.offerSearchLineEdit.setText('')
         self.updateUi()
@@ -446,7 +445,7 @@ class MyForm(QtGui.QMainWindow,
         self.updateUi()
     
     @pyqtSignature("")
-    def on_identSearchLineEdit_returnPressed(self):
+    def on_identSearchLineEdit_editingFinished(self):
         self.searchText = str( self.identSearchLineEdit.text() )
         self.identSearchLineEdit.setText('')
         self.updateUi()
