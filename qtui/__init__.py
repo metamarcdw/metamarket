@@ -315,11 +315,11 @@ class MyForm(QtGui.QMainWindow,
     
     @pyqtSignature("")
     def on_chanDeleteButton_clicked(self):
-        if not self.yorn("Are you sure?"):
-            return
-        
         selection = self.chanTableWidget.selectedItems()
         if not selection:
+            return
+        
+        if not self.yorn("Are you sure?"):
             return
         
         msgid = str( selection[1].text() )
@@ -401,11 +401,11 @@ class MyForm(QtGui.QMainWindow,
     
     @pyqtSignature("")
     def on_marketDeleteButton_clicked(self):
-        if not self.yorn("Are you sure?"):
-            return
-        
         selection = self.marketTableWidget.selectedItems()
         if not selection:
+            return
+        
+        if not self.yorn("Are you sure?"):
             return
         
         mktName = str( selection[0].text() )
