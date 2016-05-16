@@ -167,7 +167,32 @@ class MyForm(QtGui.QMainWindow,
         
         # Update 'Offers' Tab:
         self.populateMktBox(self.offerMktComboBox, self.searchText)
-        # TODO
+        currentMarket = None
+        if self.offerMktComboBox.count() > 0:
+            currentMarket = self.searchmktlistbyname(self.currentMarket)
+        else:
+            self.currentMarket = None
+        
+        if currentMarket:
+            offerlist = self.listDict['offer']
+            currentOffers = []
+            
+            for offer in offerlist:
+                if offer.obj['markethash'] == currentMarket.hash:
+                        # and self.currentTag in offerlist[i].obj['tags']:
+                    currentOffers.append(offer)
+            
+            numOffers = len(currentOffers)
+            self.offerTableWidget.setRowCount(numOffers)
+            
+            for i in range(numOffers):
+                    self.offerTableWidget.setItem( i, 0, QTableWidgetItem(currentOffers[i].obj['name']) )
+                    self.offerTableWidget.setItem( i, 1, QTableWidgetItem(currentOffers[i].obj['locale']) )
+                    self.offerTableWidget.setItem( i, 2, QTableWidgetItem(currentOffers[i].obj['amount']) )
+                    self.offerTableWidget.setItem( i, 3, QTableWidgetItem(currentOffers[i].obj['price']) )
+        else:
+            self.offerTableWidget.clearContents()
+            self.offerTableWidget.setRowCount(0)
         
         # Update 'Orders' Tab:
         # TODO
