@@ -306,7 +306,7 @@ class MyForm(QtGui.QMainWindow,
         self.showAboutDlg()
     
     
-    def do_sendmsgviabm(to_addr, msgstr, prompt, subject='Msg'):
+    def do_sendmsgviabm(self, to_addr, msgstr, prompt, subject='Msg'):
         if not prompt or self.yorn("Are you sure you want to send this Message?"):
             MM_util.sendmsgviabm(to_addr, self.bmaddr, msgstr, subject)
             self.info("Message sent!")
@@ -325,7 +325,6 @@ class MyForm(QtGui.QMainWindow,
         
         subject, message = result
         self.do_sendmsgviabm(self.chan_v4, message, subject)
-        self.info("Message Sent!")
     
     
     def showViewChanmsgDlg(self, subject, message):
