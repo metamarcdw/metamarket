@@ -263,6 +263,11 @@
                  <string>Price</string>
                 </property>
                </column>
+               <column>
+                <property name="text">
+                 <string>ID</string>
+                </property>
+               </column>
               </widget>
              </item>
              <item>
@@ -356,6 +361,11 @@
                <column>
                 <property name="text">
                  <string>Price</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>ID</string>
                 </property>
                </column>
               </widget>

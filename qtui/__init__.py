@@ -191,6 +191,7 @@ class MyForm(QtGui.QMainWindow,
                 self.offerTableWidget.setItem( i, 1, QTableWidgetItem(currentOffers[i].obj['locale']) )
                 self.offerTableWidget.setItem( i, 2, QTableWidgetItem(currentOffers[i].obj['amount']) )
                 self.offerTableWidget.setItem( i, 3, QTableWidgetItem(currentOffers[i].obj['price']) )
+                self.offerTableWidget.setItem( i, 4, QTableWidgetItem(currentOffers[i].hash) )
         else:
             self.offerTableWidget.clearContents()
             self.offerTableWidget.setRowCount(0)

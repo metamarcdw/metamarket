@@ -3,8 +3,8 @@
 
 # Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Sun May 15 23:32:54 2016
-#      by: PyQt4 UI code generator 4.11.3
+# Created: Tue May 17 01:19:36 2016
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -145,7 +145,7 @@ class Ui_MainWindow(object):
         self.offerTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.offerTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.offerTableWidget.setObjectName(_fromUtf8("offerTableWidget"))
-        self.offerTableWidget.setColumnCount(4)
+        self.offerTableWidget.setColumnCount(5)
         self.offerTableWidget.setRowCount(0)
         item = QtGui.QTableWidgetItem()
         self.offerTableWidget.setHorizontalHeaderItem(0, item)
@@ -155,6 +155,8 @@ class Ui_MainWindow(object):
         self.offerTableWidget.setHorizontalHeaderItem(2, item)
         item = QtGui.QTableWidgetItem()
         self.offerTableWidget.setHorizontalHeaderItem(3, item)
+        item = QtGui.QTableWidgetItem()
+        self.offerTableWidget.setHorizontalHeaderItem(4, item)
         self.offerTableWidget.horizontalHeader().setSortIndicatorShown(True)
         self.offerTableWidget.horizontalHeader().setStretchLastSection(True)
         self.offerTableWidget.verticalHeader().setVisible(False)
@@ -189,7 +191,7 @@ class Ui_MainWindow(object):
         self.orderTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.orderTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.orderTableWidget.setObjectName(_fromUtf8("orderTableWidget"))
-        self.orderTableWidget.setColumnCount(5)
+        self.orderTableWidget.setColumnCount(6)
         self.orderTableWidget.setRowCount(0)
         item = QtGui.QTableWidgetItem()
         self.orderTableWidget.setHorizontalHeaderItem(0, item)
@@ -201,6 +203,8 @@ class Ui_MainWindow(object):
         self.orderTableWidget.setHorizontalHeaderItem(3, item)
         item = QtGui.QTableWidgetItem()
         self.orderTableWidget.setHorizontalHeaderItem(4, item)
+        item = QtGui.QTableWidgetItem()
+        self.orderTableWidget.setHorizontalHeaderItem(5, item)
         self.orderTableWidget.horizontalHeader().setSortIndicatorShown(True)
         self.orderTableWidget.horizontalHeader().setStretchLastSection(True)
         self.orderTableWidget.verticalHeader().setVisible(False)
@@ -356,6 +360,8 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Amount", None))
         item = self.offerTableWidget.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "Price", None))
+        item = self.offerTableWidget.horizontalHeaderItem(4)
+        item.setText(_translate("MainWindow", "ID", None))
         self.offerOrderButton.setText(_translate("MainWindow", "Order", None))
         self.offerViewButton.setText(_translate("MainWindow", "View Offer", None))
         self.offerFilterButton.setText(_translate("MainWindow", "Filter Offers", None))
@@ -372,6 +378,8 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Amount", None))
         item = self.orderTableWidget.horizontalHeaderItem(4)
         item.setText(_translate("MainWindow", "Price", None))
+        item = self.orderTableWidget.horizontalHeaderItem(5)
+        item.setText(_translate("MainWindow", "ID", None))
         self.orderProcessButton.setText(_translate("MainWindow", "Process", None))
         self.orderViewButton.setText(_translate("MainWindow", "View Offer", None))
         self.orderCancelButton.setText(_translate("MainWindow", "Cancel Order", None))
