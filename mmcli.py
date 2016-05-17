@@ -277,29 +277,8 @@ def do_createmarket():
     if entity != 'mod':
         print "Enter a Market Offer:"
         infostr = multiline()
-        info = json.loads(infostr)
-        mod = info['modid']
-        market = info['market']
+        MM_util.importMarket(infostr)
         
-        idb64 = base64.b64encode( json.dumps(mod['obj'], sort_keys=True) )
-        idmsg = Msg( idb64, mod['sig'], mod['hash'], mod['msgname'] )
-        idmsgstr = json.dumps(idmsg)
-        
-        if not readmsg(idmsgstr): # Verifies sig/hash
-            raise Exception("New Market creation failed..")
-        MM_writefile(idmsgstr)
-        appendindex('ident', idmsg.hash)
-        
-        mktb64 = base64.b64encode( json.dumps(market['obj'], sort_keys=True) )
-        mktmsg = Msg( mktb64, market['sig'], market['hash'], market['msgname'] )
-        mktmsgstr = json.dumps(mktmsg)
-        
-        if not readmsg(mktmsgstr): # Verifies sig/hash
-            raise Exception("New Market creation failed..")
-        MM_writefile(mktmsgstr)
-        appendindex('market', mktmsg.hash)
-        
-        MM_util.bm.addSubscription(mod['obj']['bmaddr'])
         print "Congratulations, you may now Register with a new Metamarket!"
         print "Market ID:", mktmsg.hash
         
@@ -686,55 +665,15 @@ def processmsg(msg):
         print "Someone sent us the wrong type of Msg."
     return ver
     
-def processmultimsg(mmsg):
-    mmsgobj = MultiMsg(**json.loads(mmsg))
-    fname = "multimsg.dat"
-    if os.path.exists(fname):
-        mmsgfile = open(fname, 'r')
-        mmsgdict = json.load(mmsgfile)
-        mmsgfile.close()
-    else:
-        mmsgdict = {}
-    msginfo = None
-    
-    if mmsgobj.hash in mmsgdict:
-        msglist = mmsgdict[mmsgobj.hash]
-        for i in range( len(msglist) ):
-            msglist[i] = MultiMsg(**msglist[i])
-        msglist.append(mmsgobj)
-        
-        if len(msglist) == mmsgobj.total:
-            origmsg = reconstructmsg(msglist)
-            msginfo = processmsg(origmsg)
-            del(mmsgdict[mmsgobj.hash])
-    else:
-        mmsgdict[mmsgobj.hash] = [mmsgobj]
-        
-    mmsgfile = open(fname, 'w')
-    json.dump(mmsgdict, mmsgfile)
-    mmsgfile.close()
+def do_processmultimsg(mmsg):
+    msginfo = processmultimsg(mmsg, processmsg)
     print "MultiMsg recieved."
     return msginfo
     
 # Gets BM inbox from API, processes all new 'Msg's
-def processinbox( ):
+def do_processinbox():
     print "Processing Inbox."
-    msginfolist = []
-    inbox = json.loads( MM_util.bm.getAllInboxMessages() )['inboxMessages']
-    for i in inbox:
-        subject = base64.b64decode( i['subject'] )
-        bmmsg = base64.b64decode( i['message'] )
-        if i['toAddress'] == bmaddr and subject == 'Msg':
-            msginfo = processmsg(bmmsg)
-            if msginfo:
-                msginfolist.append(msginfo)
-            MM_util.bm.trashMessage( i['msgid'] )
-        elif i['toAddress'] == bmaddr and subject == 'MultiMsg':
-            msginfo = processmultimsg(bmmsg)
-            if msginfo:
-                msginfolist.append(msginfo)
-            MM_util.bm.trashMessage( i['msgid'] )
-    return msginfolist
+    return processinbox(bmaddr, processmsg)
     
     
 def createmsg(msgtype):

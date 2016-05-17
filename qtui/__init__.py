@@ -142,7 +142,7 @@ class MyForm(QtGui.QMainWindow,
                     msg['toAddress'] in ( self.chan_v3, self.chan_v4 ):
                 chanMsgs.append(msg)
         
-        self.processInbox()
+        self.do_processinbox()
         self.loadLists()
         
         # Update 'Channel' Tab:
@@ -167,6 +167,7 @@ class MyForm(QtGui.QMainWindow,
         
         # Update 'Offers' Tab:
         self.populateMktBox(self.offerMktComboBox, self.searchText)
+        
         currentMarket = None
         if self.offerMktComboBox.count() > 0:
             currentMarket = self.searchmktlistbyname(self.currentMarket)
@@ -179,17 +180,17 @@ class MyForm(QtGui.QMainWindow,
             
             for offer in offerlist:
                 if offer.obj['markethash'] == currentMarket.hash:
-                        # and self.currentTag in offerlist[i].obj['tags']:
+                        # and self.currentTag in offer.obj['tags']:
                     currentOffers.append(offer)
             
             numOffers = len(currentOffers)
             self.offerTableWidget.setRowCount(numOffers)
             
             for i in range(numOffers):
-                    self.offerTableWidget.setItem( i, 0, QTableWidgetItem(currentOffers[i].obj['name']) )
-                    self.offerTableWidget.setItem( i, 1, QTableWidgetItem(currentOffers[i].obj['locale']) )
-                    self.offerTableWidget.setItem( i, 2, QTableWidgetItem(currentOffers[i].obj['amount']) )
-                    self.offerTableWidget.setItem( i, 3, QTableWidgetItem(currentOffers[i].obj['price']) )
+                self.offerTableWidget.setItem( i, 0, QTableWidgetItem(currentOffers[i].obj['name']) )
+                self.offerTableWidget.setItem( i, 1, QTableWidgetItem(currentOffers[i].obj['locale']) )
+                self.offerTableWidget.setItem( i, 2, QTableWidgetItem(currentOffers[i].obj['amount']) )
+                self.offerTableWidget.setItem( i, 3, QTableWidgetItem(currentOffers[i].obj['price']) )
         else:
             self.offerTableWidget.clearContents()
             self.offerTableWidget.setRowCount(0)
@@ -366,37 +367,12 @@ class MyForm(QtGui.QMainWindow,
             return
         
         try:
-            self.importMarket(result)
+            MM_util.importMarket(result)
         except json.scanner.JSONDecodeError:
             self.info("Input was not a JSON encoded string")
         
         self.info("Congratulations, you may now Register with a new Metamarket!")
         self.updateUi()
-    
-    def importMarket(self, msgstr):
-        info = json.loads(msgstr)
-        mod = info['modid']
-        market = info['market']
-        
-        idb64 = base64.b64encode( json.dumps(mod['obj'], sort_keys=True) )
-        idmsg = MM_util.Msg( idb64, mod['sig'], mod['hash'], mod['msgname'] )
-        idmsgstr = json.dumps(idmsg)
-        
-        if not MM_util.readmsg(idmsgstr): # Verifies sig/hash
-            raise Exception("New Market creation failed..")
-        MM_util.MM_writefile(idmsgstr)
-        MM_util.appendindex('ident', idmsg.hash)
-        
-        mktb64 = base64.b64encode( json.dumps(market['obj'], sort_keys=True) )
-        mktmsg = MM_util.Msg( mktb64, market['sig'], market['hash'], market['msgname'] )
-        mktmsgstr = json.dumps(mktmsg)
-        
-        if not MM_util.readmsg(mktmsgstr): # Verifies sig/hash
-            raise Exception("New Market creation failed..")
-        MM_util.MM_writefile(mktmsgstr)
-        MM_util.appendindex('market', mktmsg.hash)
-        
-        MM_util.bm.addSubscription(mod['obj']['bmaddr'])
     
     
     def showViewMarketDlg(self, marketname, regfee, burnmult, downvotemult, desc, mktjson):
@@ -503,58 +479,9 @@ class MyForm(QtGui.QMainWindow,
             raise Exception("Someone sent us the wrong type of Msg.")
             
         return ver
-        
-    def processMultiMsg(self, mmsg):
-        mmsgobj = MM_util.MultiMsg(**json.loads(mmsg))
-        fname = "multimsg.dat"
-        if os.path.exists(fname):
-            mmsgfile = open(fname, 'r')
-            mmsgdict = json.load(mmsgfile)
-            mmsgfile.close()
-        else:
-            mmsgdict = {}
-        msginfo = None
-        
-        if mmsgobj.hash in mmsgdict:
-            msglist = mmsgdict[mmsgobj.hash]
-            for i in range( len(msglist) ):
-                msglist[i] = MM_util.MultiMsg(**msglist[i])
-            msglist.append(mmsgobj)
-            
-            if len(msglist) == mmsgobj.total:
-                origmsg = MM_util.reconstructmsg(msglist)
-                msginfo = processMsg(origmsg)
-                del(mmsgdict[mmsgobj.hash])
-        else:
-            mmsgdict[mmsgobj.hash] = [mmsgobj]
-            
-        mmsgfile = open(fname, 'w')
-        json.dump(mmsgdict, mmsgfile)
-        mmsgfile.close()
-        
-        return msginfo
-        
-    # Gets BM inbox from API, processes all new 'Msg's
-    def processInbox(self):
-        msginfolist = []
-        for i in self.inbox:
-            subject = base64.b64decode( i['subject'] )
-            bmmsg = base64.b64decode( i['message'] )
-            
-            msginfo = None
-            if i['toAddress'] == self.bmaddr and subject == 'Msg':
-                msginfo = processMsg(bmmsg)
-            elif i['toAddress'] == self.bmaddr and subject == 'MultiMsg':
-                msginfo = processMultiMsg(bmmsg)
-            else:
-                continue
-                
-            if msginfo:
-                msginfolist.append(msginfo)
-                
-            MM_util.bm.trashMessage( i['msgid'] )
-            self.inbox.remove(i)
-        return msginfolist
+    
+    def do_processinbox(self):
+        return MM_util.processinbox(self.bmaddr, self.processMsg)
     
     
     def input(self, prompt, password=False):

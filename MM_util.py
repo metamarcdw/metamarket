@@ -464,7 +464,7 @@ def processfeedback(msg, ver, identlist):
     prevtx = gettx(prevtxid)
     msaddr = prevtx['vout'][0]['addresses'][0]
     
-    redeemscript = MM_util.btcd.decodescript(ver.obj['redeemscript'])
+    redeemscript = btcd.decodescript(ver.obj['redeemscript'])
     
     if fromuser and touser and \
        redeemscript['p2sh'] == msaddr and \
@@ -513,15 +513,41 @@ def processcancel(msg, ver, identlist, orderlist, conflist):
         return True
     else:
         return False
+    
+    
+def importMarket(self, msgstr):
+    info = json.loads(msgstr)
+    mod = info['modid']
+    market = info['market']
+    
+    idb64 = base64.b64encode( json.dumps(mod['obj'], sort_keys=True) )
+    idmsg = Msg( idb64, mod['sig'], mod['hash'], mod['msgname'] )
+    idmsgstr = json.dumps(idmsg)
+    
+    if not readmsg(idmsgstr): # Verifies sig/hash
+        raise Exception("New Market creation failed..")
+    MM_writefile(idmsgstr)
+    appendindex('ident', idmsg.hash)
+    
+    mktb64 = base64.b64encode( json.dumps(market['obj'], sort_keys=True) )
+    mktmsg = Msg( mktb64, market['sig'], market['hash'], market['msgname'] )
+    mktmsgstr = json.dumps(mktmsg)
+    
+    if not readmsg(mktmsgstr): # Verifies sig/hash
+        raise Exception("New Market creation failed..")
+    MM_writefile(mktmsgstr)
+    appendindex('market', mktmsg.hash)
+    
+    bm.addSubscription(mod['obj']['bmaddr'])
 
 
 def createreg(myidhash, mybtc, amount, mod, default_fee):
     modbtc = mod.obj['btcaddr']
-    change_addr = MM_util.btcd.getrawchangeaddress()
+    change_addr = btcd.getrawchangeaddress()
     
     def create_regtx(fee):
         regtx_hex = mktx(amount, modbtc, change_addr, fee, minconf)
-        return MM_util.btcd.signrawtransaction(regtx_hex)['hex']
+        return btcd.signrawtransaction(regtx_hex)['hex']
         
     regtx_hex_signed = create_regtx(default_fee)
     regtx_fee = calc_fee(regtx_hex_signed)
@@ -534,12 +560,12 @@ def createreg(myidhash, mybtc, amount, mod, default_fee):
 
 
 def createburn(myidhash, mybtc, amount, default_fee):
-    change_addr = MM_util.btcd.getrawchangeaddress()
+    change_addr = btcd.getrawchangeaddress()
     
     # Aggregate to main address. Includes 2 fees.
     def create_ag(fee):
         raw_agtx_hex = mktx(amount+default_fee, mybtc, change_addr, fee, minconf)
-        return MM_util.btcd.signrawtransaction(raw_agtx_hex)['hex']
+        return btcd.signrawtransaction(raw_agtx_hex)['hex']
         
     sig_agtx_hex = create_ag(default_fee)
     ag_fee = calc_fee(sig_agtx_hex)
@@ -551,15 +577,15 @@ def createburn(myidhash, mybtc, amount, default_fee):
     waitforconf(ag_txid)
 
     # Create raw burn TX.
-    sig_agtx = MM_util.btcd.decoderawtransaction(sig_agtx_hex)
+    sig_agtx = btcd.decoderawtransaction(sig_agtx_hex)
     vout = searchtxops(sig_agtx, mybtc, amount+default_fee)
     
     txs = [{    "txid": ag_txid,
                 "vout": vout }]
     addrs = {   pob_address: amount }
     
-    burntx_hex = MM_util.btcd.createrawtransaction(txs, addrs)
-    burntx_hex_signed = MM_util.btcd.signrawtransaction(burntx_hex)['hex']
+    burntx_hex = btcd.createrawtransaction(txs, addrs)
+    burntx_hex_signed = btcd.signrawtransaction(burntx_hex)['hex']
     burn_txid = sendtx(burntx_hex_signed)
     
     # print "BURN TXID:", burn_txid
@@ -568,13 +594,13 @@ def createburn(myidhash, mybtc, amount, default_fee):
     
 def createorder(myidhash, mybtc, offer, cryptkey, default_fee):
     price = decimal.Decimal(offer.obj['price'])
-    pubkey = MM_util.btcd.validateaddress(mybtc)['pubkey']
-    multisig = MM_util.btcd.createmultisig( 2, sorted([offer.obj['pubkey'], pubkey]) )
-    change_addr = MM_util.btcd.getrawchangeaddress()
+    pubkey = btcd.validateaddress(mybtc)['pubkey']
+    multisig = btcd.createmultisig( 2, sorted([offer.obj['pubkey'], pubkey]) )
+    change_addr = btcd.getrawchangeaddress()
     
     def create_funding(fee):
         rawtx_hex = mktx(price, multisig['address'], change_addr, fee)
-        return MM_util.btcd.signrawtransaction(rawtx_hex)['hex']
+        return btcd.signrawtransaction(rawtx_hex)['hex']
     
     signedtx_hex = create_funding(default_fee)
     funding_fee = calc_fee(signedtx_hex)
@@ -583,7 +609,7 @@ def createorder(myidhash, mybtc, offer, cryptkey, default_fee):
     
     crypttx = base64.b64encode( simplecrypt.encrypt(cryptkey, signedtx_hex) )
     
-    signedtx = MM_util.btcd.decoderawtransaction(signedtx_hex)
+    signedtx = btcd.decoderawtransaction(signedtx_hex)
     vout = searchtxops(signedtx, multisig['address'], price)
     
     return createordermsgstr(mybtc, offer.hash, offer.obj['vendorid'], myidhash, \
@@ -596,7 +622,7 @@ def createconf( myidhash, mybtc, order, offer, buyer, default_fee ):
     ratio = decimal.Decimal(offer.obj['ratio'])
     pubkey = offer.obj['pubkey']
 
-    ms_verify = MM_util.btcd.createmultisig( 2, sorted([order.obj['pubkey'], pubkey]) )
+    ms_verify = btcd.createmultisig( 2, sorted([order.obj['pubkey'], pubkey]) )
     if ms_verify['address'] != order.obj['multisig']['address']:
         raise Exception("Multisig did not verify!")
     
@@ -606,7 +632,7 @@ def createconf( myidhash, mybtc, order, offer, buyer, default_fee ):
     def create_refund(fee):
         refund_addr_obj = { buyer.obj['btcaddr']: b_portion - fee/2, 
                             mybtc: v_portion - fee/2 }
-        return MM_util.btcd.createrawtransaction(refund_op, refund_addr_obj)
+        return btcd.createrawtransaction(refund_op, refund_addr_obj)
         
     refund_tx_hex = create_refund(default_fee)
     refund_fee = calc_fee(refund_tx_hex)
@@ -623,7 +649,7 @@ def createconf( myidhash, mybtc, order, offer, buyer, default_fee ):
     prev_tx[0]["scriptPubKey"] = order.obj['spk']
     prev_tx[0]["redeemScript"] = order.obj['multisig']['redeemScript']
     
-    sig_refund_hex = MM_util.btcd.signrawtransaction(refund_tx_hex, prev_tx, [wif])['hex']
+    sig_refund_hex = btcd.signrawtransaction(refund_tx_hex, prev_tx, [wif])['hex']
     
     return createconfmsgstr(mybtc, order.hash, myidhash, order.obj['buyerid'], \
                                         sig_refund_hex, prev_tx )
@@ -635,9 +661,9 @@ def createpay(myidhash, mybtc, conf, order, offer):
     b_portion, v_portion = getamounts(ratio, price)
     refund_fee = calc_fee( conf.obj['refundtx'] )
     
-    refund_verify = MM_util.btcd.decoderawtransaction(conf.obj['refundtx'])
+    refund_verify = btcd.decoderawtransaction(conf.obj['refundtx'])
     searchtxops(refund_verify, btcaddr, b_portion - refund_fee/2)
-    complete_refund = MM_util.btcd.signrawtransaction( conf.obj['refundtx'], conf.obj['prevtx'], [wif])['hex']
+    complete_refund = btcd.signrawtransaction( conf.obj['refundtx'], conf.obj['prevtx'], [wif])['hex']
     
     fund_tx = simplecrypt.decrypt( pkstr, base64.b64decode(order.obj['crypt_fundingtx']) )
     sendtx(fund_tx)
@@ -654,7 +680,7 @@ def createrec( myidhash, mybtc, pay, order, price ):
     final_op = prev_tx = [ dict((key, order.obj[key]) for key in ("txid", "vout")) ]
     def create_final(fee):
         final_addr_obj = { btcaddr: price - fee }
-        return MM_util.btcd.createrawtransaction(final_op, final_addr_obj)
+        return btcd.createrawtransaction(final_op, final_addr_obj)
         
     final_tx_hex = create_final(default_fee)
     final_fee = calc_fee(final_tx_hex)
@@ -664,16 +690,16 @@ def createrec( myidhash, mybtc, pay, order, price ):
     prev_tx[0]["scriptPubKey"] = order.obj['spk']
     prev_tx[0]["redeemScript"] = order.obj['multisig']['redeemScript']
     
-    sig_final_hex = MM_util.btcd.signrawtransaction(final_tx_hex, prev_tx, [wif])['hex']
+    sig_final_hex = btcd.signrawtransaction(final_tx_hex, prev_tx, [wif])['hex']
     
     return createrecmsgstr(mybtc, pay.hash, myidhash, pay.obj['buyerid'], \
                                         sig_final_hex, prev_tx )
     
 
 def createfinal(myidhash, mybtc, finalflag, rec, vendor, offer, price):
-    final_verify = MM_util.btcd.decoderawtransaction(rec.obj['finaltx'])
+    final_verify = btcd.decoderawtransaction(rec.obj['finaltx'])
     searchtxops(final_verify, vendor.obj['btcaddr'], price - default_fee)
-    complete_final = MM_util.btcd.signrawtransaction(rec.obj['finaltx'], rec.obj['prevtx'], [wif])['hex']
+    complete_final = btcd.signrawtransaction(rec.obj['finaltx'], rec.obj['prevtx'], [wif])['hex']
     
     if finalflag:
         final_tx = complete_final
@@ -709,6 +735,54 @@ def createcancel(myidhash, mybtc, entity, conflist, order):
         toid = order.obj['buyerid']
     
     return createcancelmsgstr(mybtc, myidhash, toid, orderhash)
+
+
+def processmultimsg(mmsg, processHook):
+    mmsgobj = MultiMsg(**json.loads(mmsg))
+    fname = "multimsg.dat"
+    if os.path.exists(fname):
+        mmsgfile = open(fname, 'r')
+        mmsgdict = json.load(mmsgfile)
+        mmsgfile.close()
+    else:
+        mmsgdict = {}
+    msginfo = None
+    
+    if mmsgobj.hash in mmsgdict:
+        msglist = mmsgdict[mmsgobj.hash]
+        for i in range( len(msglist) ):
+            msglist[i] = MultiMsg(**msglist[i])
+        msglist.append(mmsgobj)
+        
+        if len(msglist) == mmsgobj.total:
+            origmsg = reconstructmsg(msglist)
+            msginfo = processHook(origmsg)
+            del(mmsgdict[mmsgobj.hash])
+    else:
+        mmsgdict[mmsgobj.hash] = [mmsgobj]
+        
+    mmsgfile = open(fname, 'w')
+    json.dump(mmsgdict, mmsgfile)
+    mmsgfile.close()
+    return msginfo
+
+def processinbox(bmaddr, processHook):
+    msginfolist = []
+    inbox = json.loads( bm.getAllInboxMessages() )['inboxMessages']
+    for i in inbox:
+        subject = base64.b64decode( i['subject'] )
+        bmmsg = base64.b64decode( i['message'] )
+        if i['toAddress'] == bmaddr and subject == 'Msg':
+            msginfo = processHook(bmmsg)
+            if msginfo:
+                msginfolist.append(msginfo)
+            bm.trashMessage( i['msgid'] )
+        elif i['toAddress'] == bmaddr and subject == 'MultiMsg':
+            msginfo = processmultimsg(bmmsg)
+            if msginfo:
+                msginfolist.append(msginfo)
+            bm.trashMessage( i['msgid'] )
+    return msginfolist
 
 
 # Creates a new Ident Msg and returns its string representation.
