@@ -306,6 +306,11 @@ class MyForm(QtGui.QMainWindow,
         self.showAboutDlg()
     
     
+    def do_sendmsgviabm(to_addr, msgstr, prompt, subject='Msg'):
+        if not prompt or self.yorn("Are you sure you want to send this Message?"):
+            MM_util.sendmsgviabm(to_addr, self.bmaddr, msgstr, subject)
+            self.info("Message sent!")
+
     ##### BEGIN CHAN SLOTS #####
     def showSendChanmsgDlg(self):
         sendChanmsgDlg = SendChanmsgDlg(self)
@@ -319,7 +324,7 @@ class MyForm(QtGui.QMainWindow,
             return
         
         subject, message = result
-        MM_util.sendmsgviabm(self.chan_v4, self.bmaddr, message, subject)
+        self.do_sendmsgviabm(self.chan_v4, message, subject)
         self.info("Message Sent!")
     
     

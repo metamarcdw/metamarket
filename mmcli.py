@@ -105,7 +105,7 @@ def modbroadcast( ):
 
 # creates a "CAST Msg" from current lists and sends to new user
 def modsync( bm_addr ):
-    do_sendmsgviabm(bm_addr, bmaddr, synccast(), False)
+    do_sendmsgviabm(bm_addr, synccast(), False)
 
 def do_modbanuser( ):
     userid = raw_input("Enter a User ID: ")
@@ -181,11 +181,11 @@ def showanylist( list, mktid=None, marketlist=None ):
 def do_backupordermsgs(finalhash):
     backupordermsgs( finalhash, loadlist('final'), loadlist('rec'), loadlist('pay'), loadlist('conf') )
     
-def do_sendmsgviabm(to_addr, from_addr, msgstr, prompt, subject='Msg'):
+def do_sendmsgviabm(to_addr, msgstr, prompt, subject='Msg'):
     if prompt:
         print "Are you sure you want to send this Message?"
     if not prompt or yorn():
-        sendmsgviabm(to_addr, from_addr, msgstr, subject)
+        sendmsgviabm(to_addr, bmaddr, msgstr, subject)
         print "Message sent!"
 
 # Asks user yes or no, returns boolean
@@ -760,7 +760,7 @@ def sendmsg(msgid, prompt=True):
         raise Exception("Bad Msg type.")
         
     tobm = searchlistbyhash( identlist, ident ).obj['bmaddr']
-    do_sendmsgviabm(tobm, bmaddr, msgstr, prompt)
+    do_sendmsgviabm(tobm, msgstr, prompt)
     
     
 def showchan( channame ):
@@ -817,7 +817,7 @@ def sendmarketoffer(channame):
     info = {    "market": mymarket,
                 "modid": myid }
     mktoffer = pretty_json(info)
-    do_sendmsgviabm( chan_addr, bmaddr, mktoffer, False, 'Mkt' )
+    do_sendmsgviabm( chan_addr, mktoffer, False, 'Mkt' )
     
 
 def parseargs():
