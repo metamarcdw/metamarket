@@ -98,6 +98,7 @@ class MyForm(QtGui.QMainWindow,
         for index in self.indexNames:
             self.listLastLoaded[index] = 0
         
+        self.setWindowIcon( QIcon("mm_logo.jpg") )
         self.updateUi()
     
     
@@ -324,7 +325,7 @@ class MyForm(QtGui.QMainWindow,
             return
         
         subject, message = result
-        self.do_sendmsgviabm(self.chan_v4, message, subject)
+        self.do_sendmsgviabm(self.chan_v4, message, True, subject)
     
     
     def showViewChanmsgDlg(self, subject, message):
