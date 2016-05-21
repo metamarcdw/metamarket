@@ -110,8 +110,8 @@ class MyForm(QtGui.QMainWindow,
             self.listLastLoaded[index] = time.time()
             list = MM_util.loadlist(index)
             
-            if index = "ident":
-                MM_util.identlist = list
+            if index == "ident":
+                MM_util.idList = list
             return list
     
     def loadLists(self):
