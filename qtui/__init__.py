@@ -92,7 +92,7 @@ class MyForm(QtGui.QMainWindow,
         
         self.searchText = ''
         self.indexNames = ('market', 'ident', 'offer', 'order', 'conf', \
-                                'pay', 'rec', 'final', 'feedback')
+                                'pay', 'rec', 'final', 'feedback', 'tags')
         self.listDict = {}
         self.listLastLoaded = {}
         for index in self.indexNames:
@@ -474,6 +474,7 @@ class MyForm(QtGui.QMainWindow,
         
         offerlist = self.listDict["offer"]
         identlist = self.listDict["ident"]
+        taglist = self.listDict["tags"]
         offer = MM_util.searchlistbyhash( offerlist, str(selection[4].text()) )
         vendor = MM_util.searchlistbyhash(identlist, offer.obj['vendorid'])
         
@@ -482,7 +483,10 @@ class MyForm(QtGui.QMainWindow,
         locktime = time.asctime( time.localtime(offer.obj['locktime']) )
         minrep = offer.obj['minrep']
         desc = offer.obj['description']
-        tags = offer.obj['tags']
+        tags = []
+        for tag in offer.obj['tags']:
+            tags.append( MM_util.searchlistbyhash(taglist, tag) )
+        print tags
         
         self.showViewOfferDlg(offername, vendor, ratio, locktime, minrep, desc, tags)
     

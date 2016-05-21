@@ -3,8 +3,8 @@
 
 # Form implementation generated from reading ui file 'view_offer_dialog.ui'
 #
-# Created: Sat Apr 23 21:15:44 2016
-#      by: PyQt4 UI code generator 4.11.3
+# Created: Sat May 21 22:49:59 2016
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -65,6 +65,9 @@ class Ui_view_offer_dialog(object):
         self.gridLayout = QtGui.QGridLayout(self.tagsGroupBox)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.tagsTableWidget = QtGui.QTableWidget(self.tagsGroupBox)
+        self.tagsTableWidget.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        self.tagsTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.tagsTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.tagsTableWidget.setObjectName(_fromUtf8("tagsTableWidget"))
         self.tagsTableWidget.setColumnCount(2)
         self.tagsTableWidget.setRowCount(0)
@@ -73,6 +76,7 @@ class Ui_view_offer_dialog(object):
         item = QtGui.QTableWidgetItem()
         self.tagsTableWidget.setHorizontalHeaderItem(1, item)
         self.tagsTableWidget.horizontalHeader().setStretchLastSection(True)
+        self.tagsTableWidget.verticalHeader().setVisible(False)
         self.gridLayout.addWidget(self.tagsTableWidget, 0, 0, 1, 1)
         self.verticalLayout_2.addWidget(self.tagsGroupBox)
         self.gridLayout_3.addLayout(self.verticalLayout_2, 0, 0, 1, 1)
@@ -89,6 +93,7 @@ class Ui_view_offer_dialog(object):
         self.minRepLabel.setText(_translate("view_offer_dialog", "Min. Reputation Score: ", None))
         self.descLabel.setText(_translate("view_offer_dialog", "Description:", None))
         self.tagsGroupBox.setTitle(_translate("view_offer_dialog", "Offer tags:", None))
+        self.tagsTableWidget.setSortingEnabled(True)
         item = self.tagsTableWidget.horizontalHeaderItem(0)
         item.setText(_translate("view_offer_dialog", "Name", None))
         item = self.tagsTableWidget.horizontalHeaderItem(1)

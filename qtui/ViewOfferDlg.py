@@ -21,8 +21,8 @@ class ViewOfferDlg(QDialog,
         numtags = len(tags)
         self.tagsTableWidget.setRowCount(numtags)
         for i in range(numtags):
-            self.tagsTableWidget.setItem(i, 0, QTableWidgetItem(tags[i][0]) )
-            self.tagsTableWidget.setItem(i, 1, QTableWidgetItem(tags[i][1]) )
+            self.tagsTableWidget.setItem(i, 0, QTableWidgetItem(tags[i].obj['tagname']) )
+            self.tagsTableWidget.setItem(i, 1, QTableWidgetItem(tags[i].obj['description']) )
     
 
 if __name__ == "__main__":
