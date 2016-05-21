@@ -13,7 +13,7 @@
 from MM_util import *
 import MM_util
 import bitcoin, bitcoin.rpc, bitcoin.core, pycoin.key.Key
-import scrypt, simplecrypt
+import scrypt
 import simplejson as json
 import argparse, ConfigParser
 import sys, os, hashlib, getpass, time, decimal

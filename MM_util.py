@@ -10,6 +10,7 @@
 # LICENSE file.
 
 import simplejson as json
+import simplecrypt
 import base64, hashlib, httplib, os, sys, time
 import decimal, math, getpass, operator, random
 from collections import namedtuple
@@ -22,6 +23,7 @@ MultiMsg = namedtuple('MultiMsg', 'msg hash msgnum total')
 btcd = None
 bm = None
 minconf = None
+idList = None
 
 # Returns a packed, signed and hashed MM msgstr given any
 # dict, msgname, and BTC addr. Requires bitcoind to create BTC sig.
@@ -84,7 +86,10 @@ def MM_backupfile(name, hash):
 # BTC address associated with said Ident.
 def btcfrommsg(entity, msgstr):
     idhash = MM_extract(entity, msgstr)
-    ids = loadlist('ident')
+    if idList:
+        ids = idList
+    else:
+        ids = loadlist('ident')
     return searchlistbyhash( ids, idhash ).obj['btcaddr']
 
 def offerfromordermsg( msg, offerlist, orderlist, conflist, paylist, reclist, getorder=False ):

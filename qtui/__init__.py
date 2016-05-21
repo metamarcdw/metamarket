@@ -105,9 +105,14 @@ class MyForm(QtGui.QMainWindow,
         MM_util.loadindex(index)
         mtime = os.path.getmtime("%s.dat" % index)
         lastTime = self.listLastLoaded[index]
+        
         if mtime > lastTime:
             self.listLastLoaded[index] = time.time()
-            return MM_util.loadlist(index)
+            list = MM_util.loadlist(index)
+            
+            if index = "ident":
+                MM_util.identlist = list
+            return list
     
     def loadLists(self):
         for index in self.indexNames:
@@ -304,7 +309,7 @@ class MyForm(QtGui.QMainWindow,
         self.showAboutDlg()
     
     
-    def do_sendmsgviabm(self, to_addr, msgstr, prompt, subject='Msg'):
+    def do_sendmsgviabm(self, to_addr, msgstr, prompt=False, subject='Msg'):
         if not prompt or self.yorn("Are you sure you want to send this Message?"):
             MM_util.sendmsgviabm(to_addr, self.bmaddr, msgstr, subject)
             self.info("Message sent!")
@@ -322,7 +327,7 @@ class MyForm(QtGui.QMainWindow,
             return
         
         subject, message = result
-        self.do_sendmsgviabm(self.chan_v4, message, True, subject)
+        self.do_sendmsgviabm(self.chan_v4, message, prompt=True, subject=subject)
     
     
     def showViewChanmsgDlg(self, subject, message):
@@ -434,6 +439,28 @@ class MyForm(QtGui.QMainWindow,
         self.searchText = str( self.offerSearchLineEdit.text() )
         self.offerSearchLineEdit.setText('')
         self.updateUi()
+    
+    @pyqtSignature("")
+    def on_offerOrderButton_clicked(self):
+        selection = self.offerTableWidget.selectedItems()
+        if not selection:
+            return
+        
+        if not self.yorn("Are you sure?"):
+            return
+        
+        offerlist = self.listDict["offer"]
+        identlist = self.listDict["ident"]
+        offer = MM_util.searchlistbyhash( offerlist, str(selection[4].text()) )
+        vendor = MM_util.searchlistbyhash(identlist, offer.obj['vendorid'])
+        
+        msgstr = MM_util.createorder( \
+                    self.myid.hash, self.btcaddr, offer, self.pkstr, self.default_fee)
+        hash = MM_util.MM_writefile(msgstr)
+        MM_util.appendindex('order', hash)
+        
+        self.do_sendmsgviabm(vendor.obj['bmaddr'], msgstr)
+        self.info("Order placed!")
     
     ##### END OFFER SLOTS #####
     
