@@ -169,18 +169,15 @@ class MyForm(QtGui.QMainWindow,
         # Update 'Offers' Tab:
         self.populateMktBox(self.offerMktComboBox, self.searchText)
         
-        currentMarket = None
-        if self.offerMktComboBox.count() > 0:
-            currentMarket = self.searchmktlistbyname(self.currentMarket)
-        else:
+        if self.offerMktComboBox.count() <= 0:
             self.currentMarket = None
         
-        if currentMarket:
+        if self.currentMarket:
             offerlist = self.listDict['offer']
             currentOffers = []
             
             for offer in offerlist:
-                if offer.obj['markethash'] == currentMarket.hash:
+                if offer.obj['markethash'] == self.currentMarket.hash:
                         # and self.currentTag in offer.obj['tags']:
                     currentOffers.append(offer)
             
@@ -391,9 +388,10 @@ class MyForm(QtGui.QMainWindow,
         if not selection:
             return
         
-        mktName = str( selection[0].text() )
-        market = self.searchmktlistbyname(mktName)
+        mktHash = str( selection[2].text() )
+        market = MM_util.searchlistbyhash(self.listDict["market"], mktHash)
         
+        mktName = market.obj['marketname']
         regfee = market.obj['fee']
         burnmult = market.obj['multiplier']
         downvotemult = 0
@@ -415,8 +413,8 @@ class MyForm(QtGui.QMainWindow,
         if not self.yorn("Are you sure?"):
             return
         
-        mktName = str( selection[0].text() )
-        market = self.searchmktlistbyname(mktName)
+        mktHash = str( selection[2].text() )
+        market = self.searchlistbyhash(listDict["market"], mktHash)
         
         MM_util.MM_backupfile("market", market.hash)
         self.updateUi()
@@ -427,7 +425,8 @@ class MyForm(QtGui.QMainWindow,
     @pyqtSignature("int")
     def on_offerMktComboBox_activated(self, index):
         self.identMktComboBox.setCurrentIndex( index )
-        self.currentMarket = str( self.offerMktComboBox.currentText() )
+        mktName = str( self.offerMktComboBox.currentText() )
+        self.currentMarket = self.searchmktlistbyname(mktName)
         self.updateUi()
     
     @pyqtSignature("")
@@ -448,7 +447,8 @@ class MyForm(QtGui.QMainWindow,
     @pyqtSignature("int")
     def on_identMktComboBox_activated(self, index):
         self.offerMktComboBox.setCurrentIndex( index )
-        self.currentMarket = str( self.identMktComboBox.currentText() )
+        mktName = str( self.offerMktComboBox.currentText() )
+        self.currentMarket = self.searchmktlistbyname(mktName)
         self.updateUi()
     
     @pyqtSignature("")
