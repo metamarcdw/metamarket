@@ -462,6 +462,30 @@ class MyForm(QtGui.QMainWindow,
         self.do_sendmsgviabm(vendor.obj['bmaddr'], msgstr)
         self.info("Order placed!")
     
+    def showViewOfferDlg(self, offername, vendor, ratio, locktime, minrep, desc, tags):
+        viewOfferDlg = ViewOfferDlg(offername, vendor, ratio, locktime, minrep, desc, tags, self)
+        viewOfferDlg.show()
+    
+    @pyqtSignature("")
+    def on_offerViewButton_clicked(self):
+        selection = self.offerTableWidget.selectedItems()
+        if not selection:
+            return
+        
+        offerlist = self.listDict["offer"]
+        identlist = self.listDict["ident"]
+        offer = MM_util.searchlistbyhash( offerlist, str(selection[4].text()) )
+        vendor = MM_util.searchlistbyhash(identlist, offer.obj['vendorid'])
+        
+        offername = offer.obj['name']
+        ratio = offer.obj['ratio']
+        locktime = time.asctime( time.localtime(offer.obj['locktime']) )
+        minrep = offer.obj['minrep']
+        desc = offer.obj['description']
+        tags = offer.obj['tags']
+        
+        self.showViewOfferDlg(offername, vendor, ratio, locktime, minrep, desc, tags)
+    
     ##### END OFFER SLOTS #####
     
     

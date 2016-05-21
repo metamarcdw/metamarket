@@ -8,11 +8,11 @@ import view_offer_dialog
 class ViewOfferDlg(QDialog,
         view_offer_dialog.Ui_view_offer_dialog):
     
-    def __init__(self, offername, vendorname, ratio, locktime, minrep, desc, tags, parent=None):
+    def __init__(self, offername, vendor, ratio, locktime, minrep, desc, tags, parent=None):
         super(ViewOfferDlg, self).__init__(parent)
         self.setupUi(self)
         self.viewOfferGroupBox.setTitle("View Offer: %s" % offername)
-        self.vendorNameLabel.setText("Vendor: %s" % vendorname)
+        self.vendorNameLabel.setText("Vendor: %s" % vendor.obj['name'])
         self.ratioLabel.setText("Refund Ratio: %s" % ratio)
         self.locktimeLabel.setText("Locktime: %s" % locktime)
         self.minRepLabel.setText("Min. Reputation Score: %s" % minrep)
