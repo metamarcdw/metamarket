@@ -164,6 +164,7 @@ class MyForm(QtGui.QMainWindow,
         for i in range(numMarkets):
             self.marketTableWidget.setItem( i, 0, QTableWidgetItem(marketlist[i].obj['marketname']) )
             self.marketTableWidget.setItem( i, 1, QTableWidgetItem(marketlist[i].obj['description']) )
+            self.marketTableWidget.setItem( i, 2, QTableWidgetItem(marketlist[i].hash) )
         
         # Update 'Offers' Tab:
         self.populateMktBox(self.offerMktComboBox, self.searchText)
