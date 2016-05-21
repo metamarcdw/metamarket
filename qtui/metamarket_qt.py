@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Tue May 17 01:19:36 2016
+# Created: Sat May 21 17:44:14 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -90,12 +90,14 @@ class Ui_MainWindow(object):
         self.marketTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.marketTableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.marketTableWidget.setObjectName(_fromUtf8("marketTableWidget"))
-        self.marketTableWidget.setColumnCount(2)
+        self.marketTableWidget.setColumnCount(3)
         self.marketTableWidget.setRowCount(0)
         item = QtGui.QTableWidgetItem()
         self.marketTableWidget.setHorizontalHeaderItem(0, item)
         item = QtGui.QTableWidgetItem()
         self.marketTableWidget.setHorizontalHeaderItem(1, item)
+        item = QtGui.QTableWidgetItem()
+        self.marketTableWidget.setHorizontalHeaderItem(2, item)
         self.marketTableWidget.horizontalHeader().setSortIndicatorShown(True)
         self.marketTableWidget.horizontalHeader().setStretchLastSection(True)
         self.marketTableWidget.verticalHeader().setVisible(False)
@@ -345,6 +347,8 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Name", None))
         item = self.marketTableWidget.horizontalHeaderItem(1)
         item.setText(_translate("MainWindow", "Description", None))
+        item = self.marketTableWidget.horizontalHeaderItem(2)
+        item.setText(_translate("MainWindow", "ID", None))
         self.marketImportButton.setText(_translate("MainWindow", "Import Market", None))
         self.marketViewButton.setText(_translate("MainWindow", "View Market", None))
         self.marketDeleteButton.setText(_translate("MainWindow", "Delete Market", None))

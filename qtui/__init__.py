@@ -99,7 +99,6 @@ class MyForm(QtGui.QMainWindow,
             self.listLastLoaded[index] = 0
         
         self.setWindowIcon( QIcon("mm_logo.jpg") )
-        self.updateUi()
     
     
     def loadListIfModified(self, index):
