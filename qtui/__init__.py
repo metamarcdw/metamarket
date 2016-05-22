@@ -89,6 +89,7 @@ class MyForm(QtGui.QMainWindow,
         self.myid = None
         self.inbox = None
         self.currentMarket = None
+        self.currentTag = None
         
         self.searchText = ''
         self.indexNames = ('market', 'ident', 'offer', 'order', 'conf', \
@@ -172,6 +173,11 @@ class MyForm(QtGui.QMainWindow,
             self.marketTableWidget.setItem( i, 2, QTableWidgetItem(marketlist[i].hash) )
         
         # Update 'Offers' Tab:
+        if self.currentTag:
+            self.offerGroupBox.setTitle( \
+                    "Available Offers: Filtered for '%s'" % self.currentTag.obj['tagname'])
+        else:
+            self.offerGroupBox.setTitle("Available Offers:")
         self.populateMktBox(self.offerMktComboBox, self.searchText)
         
         if self.offerMktComboBox.count() <= 0:
@@ -183,8 +189,8 @@ class MyForm(QtGui.QMainWindow,
             
             for offer in offerlist:
                 if offer.obj['markethash'] == self.currentMarket.hash:
-                        # and self.currentTag in offer.obj['tags']:
-                    currentOffers.append(offer)
+                    if not self.currentTag or self.currentTag.hash in offer.obj['tags']:
+                        currentOffers.append(offer)
             
             numOffers = len(currentOffers)
             self.offerTableWidget.setRowCount(numOffers)
@@ -431,7 +437,7 @@ class MyForm(QtGui.QMainWindow,
     def on_offerMktComboBox_activated(self, index):
         self.identMktComboBox.setCurrentIndex( index )
         mktName = str( self.offerMktComboBox.currentText() )
-        self.currentMarket = self.searchmktlistbyname(mktName)
+        self.currentMarket = self.searchlistbyname(self.listDict["market"], "marketname", mktName)
         self.updateUi()
     
     @pyqtSignature("")
@@ -486,9 +492,21 @@ class MyForm(QtGui.QMainWindow,
         tags = []
         for tag in offer.obj['tags']:
             tags.append( MM_util.searchlistbyhash(taglist, tag) )
-        print tags
         
         self.showViewOfferDlg(offername, vendor, ratio, locktime, minrep, desc, tags)
+    
+    @pyqtSignature("")
+    def on_offerFilterButton_clicked(self):
+        taglist = self.listDict["tags"]
+        key = "tagname"
+        
+        tagnames = [""]
+        for tag in taglist:
+            tagnames.append(tag.obj[key])
+            
+        tagName = self.select("Tags", tagnames)
+        self.currentTag = self.searchlistbyname(taglist, key, tagName)
+        self.updateUi()
     
     ##### END OFFER SLOTS #####
     
@@ -503,7 +521,7 @@ class MyForm(QtGui.QMainWindow,
     def on_identMktComboBox_activated(self, index):
         self.offerMktComboBox.setCurrentIndex( index )
         mktName = str( self.offerMktComboBox.currentText() )
-        self.currentMarket = self.searchmktlistbyname(mktName)
+        self.currentMarket = self.searchlistbyname(self.listDict["market"], "marketname", mktName)
         self.updateUi()
     
     @pyqtSignature("")
@@ -514,10 +532,10 @@ class MyForm(QtGui.QMainWindow,
     
     ##### END IDENT SLOTS #####
     
-    def searchmktlistbyname(self, name):
-        for mkt in self.listDict["market"]:
-            if mkt.obj['marketname'] == name:
-                return mkt
+    def searchlistbyname(self, list, key, name):
+        for obj in list:
+            if obj.obj[key] == name:
+                return obj
     
     def processMsg(self, msg):
         ver = MM_util.readmsg(msg) # Verifies sig/hash
@@ -544,6 +562,11 @@ class MyForm(QtGui.QMainWindow,
     def do_processinbox(self):
         return MM_util.processinbox(self.bmaddr, self.processMsg)
     
+    
+    def select(self, groupname, selections):
+        text, ok = QInputDialog.getItem(self, "Select", groupname, selections)
+        if ok:
+            return str(text)
     
     def input(self, prompt, password=False):
         if password:
