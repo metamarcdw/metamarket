@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>384</width>
+    <height>393</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Configuration:</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+             <widget class="QLabel" name="chainLabel">
+              <property name="text">
+               <string>Bitcoin Chain:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="buddy">
+               <cstring>chainComboBox</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="channameLabel">
+              <property name="text">
+               <string>Chan Name:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="buddy">
+               <cstring>channameLineEdit</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="feeLabel">
+              <property name="text">
+               <string>Default Fee:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="buddy">
+               <cstring>feeDoubleSpinBox</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="minconfLabel">
+              <property name="text">
+               <string>Minimum Confirms:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="buddy">
+               <cstring>minconfSpinBox</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="bmuserLabel">
+              <property name="text">
+               <string>Bitmessage RPC User:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="buddy">
+               <cstring>bmuserLineEdit</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="bmpswdLabel">
+              <property name="text">
+               <string>Bitmessage RPC Password:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="buddy">
+               <cstring>bmpswdLineEdit</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="bmhostLabel">
+              <property name="text">
+               <string>Bitmessage RPC Host:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="buddy">
+               <cstring>bmhostLineEdit</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="bmportLabel">
+              <property name="text">
+               <string>Bitmessage RPC Port:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="buddy">
+               <cstring>bmportSpinBox</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="btcportLabel">
+              <property name="text">
+               <string>Bitcoin Core RPC Port:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="buddy">
+               <cstring>btcportSpinBox</cstring>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <widget class="QComboBox" name="chainComboBox">
+              <item>
+               <property name="text">
+                <string>testnet</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>mainnet</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="channameLineEdit"/>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="feeDoubleSpinBox">
+              <property name="decimals">
+               <number>8</number>
+              </property>
+              <property name="singleStep">
+               <double>0.000001000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="minconfSpinBox"/>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="bmuserLineEdit"/>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="bmpswdLineEdit"/>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="bmhostLineEdit"/>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="bmportSpinBox">
+              <property name="maximum">
+               <number>99999</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="btcportSpinBox">
+              <property name="maximum">
+               <number>99999</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>chainComboBox</tabstop>
+  <tabstop>channameLineEdit</tabstop>
+  <tabstop>feeDoubleSpinBox</tabstop>
+  <tabstop>minconfSpinBox</tabstop>
+  <tabstop>bmuserLineEdit</tabstop>
+  <tabstop>bmpswdLineEdit</tabstop>
+  <tabstop>bmhostLineEdit</tabstop>
+  <tabstop>bmportSpinBox</tabstop>
+  <tabstop>btcportSpinBox</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>Dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>Dialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

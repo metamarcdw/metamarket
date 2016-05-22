@@ -504,10 +504,9 @@ class MyForm(QtGui.QMainWindow,
         for tag in taglist:
             tagnames.append(tag.obj[key])
             
-        tagName = self.select("Tags", tagnames)
+        tagName = self.select("Known tags:", tagnames)
         self.currentTag = self.searchlistbyname(taglist, key, tagName)
         self.updateUi()
-    
     ##### END OFFER SLOTS #####
     
     
