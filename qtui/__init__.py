@@ -33,51 +33,8 @@ class MyForm(QtGui.QMainWindow,
         self.setupUi(self)
         
         #INIT ALL DATA STRUCTURES
-        
-        section = 'metamarket'
-        defaults = {    'chain':        'mainnet',
-                        'channame':     'METAMARKET',
-                        'fee':          '0.0001',
-                        'minconf':      '6',
-                        'bmuser':       'username',
-                        'bmpswd':       'password',
-                        'bmhost':       'localhost',
-                        'bmport':       '8442',
-                        'btcport':      '8332'    }
-        config = ConfigParser.RawConfigParser(defaults)
-        config.read('mm.cfg')
-        
-        self.chain = config.get(section, 'chain')
-        self.channame = config.get(section, 'channame')
-        
-        self.default_fee = MM_util.truncate( decimal.Decimal( config.get(section, 'fee') ) )
-        self.minconf = config.getint(section, 'minconf')
-        
-        self.bm_url = "http://%s:%s@%s:%d" % ( config.get(section, 'bmuser'),
-                                            config.get(section, 'bmpswd'),
-                                            config.get(section, 'bmhost'),
-                                            config.getint(section, 'bmport') )                                
-        self.btc_port = config.getint(section, 'btcport')
-        
-        if self.chain == 'testnet':
-            self.netcode = 'XTN'
-            self.pob_address = "msj42CCGruhRsFrGATiUuh25dtxYtnpbTx"
-        elif self.chain == 'mainnet':
-            self.netcode = 'BTC'
-            self.pob_address = "1METAMARKETxxxxxxxxxxxxxxxxx4TPjws"
-        else:
-            raise Exception("Config: chain must be either testnet or mainnet.")
-        
-        bitcoin.SelectParams(self.chain)
-        MM_util.btcd = bitcoin.rpc.RawProxy(service_port=self.btc_port)
-        MM_util.bm = xmlrpclib.ServerProxy(self.bm_url)
-        MM_util.minconf = self.minconf
-        
-        try:
-            self.chan_v3 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 3,1 )
-            self.chan_v4 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 4,1 )
-        except socket.error:
-            self.sockErr()
+        config = self.loadConfig()
+        self.setConfig( self.importConfig(config) )
         
         self.loggedIn = False
         self.username = None
@@ -100,6 +57,68 @@ class MyForm(QtGui.QMainWindow,
             self.listLastLoaded[index] = 0
         
         self.setWindowIcon( QIcon("mm_logo.jpg") )
+    
+    
+    def loadConfig(self):
+        defaults = {    'chain':        'mainnet',
+                        'channame':     'METAMARKET',
+                        'fee':          '0.0001',
+                        'minconf':      '6',
+                        'bmuser':       'username',
+                        'bmpswd':       'password',
+                        'bmhost':       'localhost',
+                        'bmport':       '8442',
+                        'btcport':      '8332'    }
+        config = ConfigParser.RawConfigParser(defaults)
+        config.read('mm.cfg')
+        return config
+    
+    def importConfig(self, config):
+        section = 'metamarket'
+        
+        chain = config.get(section, 'chain')
+        channame = config.get(section, 'channame')
+        
+        fee = MM_util.truncate( decimal.Decimal( config.get(section, 'fee') ) )
+        minconf = config.getint(section, 'minconf')
+        
+        bmuser = config.get(section, 'bmuser')
+        bmpswd = config.get(section, 'bmpswd')
+        bmhost = config.get(section, 'bmhost')
+        bmport = config.getint(section, 'bmport')
+        
+        btcport = config.getint(section, 'btcport')
+        return ( chain, channame, fee, minconf, bmuser, bmpswd, bmhost, bmport, btcport )
+    
+    def getConfig(self):
+        return ( self.chain, self.channame, self.default_fee, self.minconf, \
+                    self.bmuser, self.bmpswd, self.bmhost, self.bmport, self.btc_port )
+    
+    def setConfig(self, confTuple):
+        self.chain, self.channame, self.default_fee, self.minconf, \
+            self.bmuser, self.bmpswd, self.bmhost, self.bmport, self.btc_port = confTuple
+        
+        if self.chain == 'testnet':
+            self.netcode = 'XTN'
+            self.pob_address = "msj42CCGruhRsFrGATiUuh25dtxYtnpbTx"
+        elif self.chain == 'mainnet':
+            self.netcode = 'BTC'
+            self.pob_address = "1METAMARKETxxxxxxxxxxxxxxxxx4TPjws"
+        else:
+            raise Exception("Config: chain must be either testnet or mainnet.")
+        
+        bm_url = "http://%s:%s@%s:%d" % ( self.bmuser, self.bmpswd, self.bmhost, self.bmport )
+        
+        bitcoin.SelectParams(self.chain)
+        MM_util.btcd = bitcoin.rpc.RawProxy(service_port=self.btc_port)
+        MM_util.bm = xmlrpclib.ServerProxy(bm_url)
+        MM_util.minconf = self.minconf
+        
+        try:
+            self.chan_v3 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 3,1 )
+            self.chan_v4 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 4,1 )
+        except socket.error:
+            self.sockErr()
     
     
     def loadListIfModified(self, index):
