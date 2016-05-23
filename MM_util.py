@@ -9,6 +9,7 @@
 # propagated, or distributed except according to the terms contained in the
 # LICENSE file.
 
+import bitcoin
 import simplejson as json
 import simplecrypt
 import base64, hashlib, httplib, os, sys, time
@@ -408,14 +409,13 @@ def processoffer(msg, ver, identlist):
     else:
         return False
 
-def processorder(msg, ver, identlist, marketlist):
-    offer = do_offerfromordermsg(ver)
+def processorder(msg, ver, offer, identlist, marketlist, feedbacklist, burnlist):
     buyer = searchlistbyhash(identlist, ver.obj['buyerid'])
     market = searchlistbyhash(marketlist, offer.obj['markethash'])
     
     mult = decimal.Decimal(market.obj['multiplier'])
     minrep = offer.obj['minrep']
-    buyer_rep = do_getrep(buyer.hash, mult)
+    buyer_rep = getrep(buyer.hash, mult, feedbacklist, burnlist)
     
     if buyer and offer and buyer_rep >= minrep:
         MM_writefile(msg)
@@ -742,7 +742,7 @@ def createcancel(myidhash, mybtc, entity, conflist, order):
     return createcancelmsgstr(mybtc, myidhash, toid, orderhash)
 
 
-def processmultimsg(mmsg, processHook):
+def processmultimsg(mmsg, callback):
     mmsgobj = MultiMsg(**json.loads(mmsg))
     fname = "multimsg.dat"
     if os.path.exists(fname):
@@ -761,7 +761,7 @@ def processmultimsg(mmsg, processHook):
         
         if len(msglist) == mmsgobj.total:
             origmsg = reconstructmsg(msglist)
-            msginfo = processHook(origmsg)
+            msginfo = callback(origmsg)
             del(mmsgdict[mmsgobj.hash])
     else:
         mmsgdict[mmsgobj.hash] = [mmsgobj]
@@ -771,22 +771,27 @@ def processmultimsg(mmsg, processHook):
     mmsgfile.close()
     return msginfo
 
-def processinbox(bmaddr, processHook):
+def processinbox(bmaddr, callback, processMkt=False):
     msginfolist = []
     inbox = json.loads( bm.getAllInboxMessages() )['inboxMessages']
     for i in inbox:
         subject = base64.b64decode( i['subject'] )
         bmmsg = base64.b64decode( i['message'] )
+        msginfo = None
+        
         if i['toAddress'] == bmaddr and subject == 'Msg':
-            msginfo = processHook(bmmsg)
-            if msginfo:
-                msginfolist.append(msginfo)
-            bm.trashMessage( i['msgid'] )
+            msginfo = callback(bmmsg)
         elif i['toAddress'] == bmaddr and subject == 'MultiMsg':
-            msginfo = processmultimsg(bmmsg)
-            if msginfo:
-                msginfolist.append(msginfo)
-            bm.trashMessage( i['msgid'] )
+            msginfo = processmultimsg(bmmsg, callback)
+        elif processMkt and i['toAddress'] == bmaddr and subject == 'Mkt':
+            msginfo = importMarket(bmmsg)
+        else:
+            continue
+        
+        if msginfo:
+            msginfolist.append(msginfo)
+        bm.trashMessage( i['msgid'] )
+        
     return msginfolist
 
 

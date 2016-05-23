@@ -40,8 +40,8 @@ def login( wp=None ):
     print "BTC Address: %s\nBM Address: %s" % ( btcaddr, bmaddr )
     
     unlockwallet(wp)
-    if not MM_util.btcd.validateaddress(btcaddr)['ismine'] or \
-        MM_util.bm.createDeterministicAddresses(base64.b64encode(pkstr)) != []:
+    if MM_util.bm.createDeterministicAddresses(base64.b64encode(pkstr)) == [] or \
+            not MM_util.btcd.validateaddress(btcaddr)['ismine']:
         importkeys()
     
     identlist = loadlist('ident')
@@ -560,7 +560,10 @@ def do_processoffer(msg, ver):
 def do_processorder(msg, ver):
     identlist = loadlist("ident")
     marketlist = loadlist('market')
-    if processorder(msg, ver, identlist, marketlist):
+    feedbacklist = loadlist('feedback')
+    burnlist = loadlist('burn')
+    offer = do_offerfromordermsg(ver)
+    if processorder(msg, ver, offer, identlist, marketlist, feedbacklist, burnlist):
         print "ORDER Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("ORDER Msg rejected.")
@@ -930,7 +933,7 @@ def main():
         checkinbox()
     elif args.mode == "processinbox":
         login()
-        processinbox()
+        do_processinbox()
         MM_util.btcd.walletlock()
     elif args.mode == "modbanuser":
         do_modbanuser()

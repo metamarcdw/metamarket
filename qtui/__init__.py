@@ -33,8 +33,9 @@ class MyForm(QtGui.QMainWindow,
         self.setupUi(self)
         
         #INIT ALL DATA STRUCTURES
-        config = self.loadConfig()
-        self.setConfig( self.importConfig(config) )
+        self.section = 'metamarket'
+        self.config = self.loadConfig()
+        self.setConfig( self.importConfig() )
         
         self.loggedIn = False
         self.username = None
@@ -73,30 +74,42 @@ class MyForm(QtGui.QMainWindow,
         config.read('mm.cfg')
         return config
     
-    def importConfig(self, config):
-        section = 'metamarket'
+    def saveConfig(self, config):
+        cfg = open('mm.cfg', 'w')
+        config.write(cfg)
+    
+    def importConfig(self):
+        chain = self.config.get(self.section, 'chain')
+        channame = self.config.get(self.section, 'channame')
         
-        chain = config.get(section, 'chain')
-        channame = config.get(section, 'channame')
+        fee = MM_util.truncate( decimal.Decimal( self.config.get(self.section, 'fee') ) )
+        minconf = self.config.getint(self.section, 'minconf')
         
-        fee = MM_util.truncate( decimal.Decimal( config.get(section, 'fee') ) )
-        minconf = config.getint(section, 'minconf')
+        bmuser = self.config.get(self.section, 'bmuser')
+        bmpswd = self.config.get(self.section, 'bmpswd')
+        bmhost = self.config.get(self.section, 'bmhost')
+        bmport = self.config.getint(self.section, 'bmport')
         
-        bmuser = config.get(section, 'bmuser')
-        bmpswd = config.get(section, 'bmpswd')
-        bmhost = config.get(section, 'bmhost')
-        bmport = config.getint(section, 'bmport')
-        
-        btcport = config.getint(section, 'btcport')
+        btcport = self.config.getint(self.section, 'btcport')
         return ( chain, channame, fee, minconf, bmuser, bmpswd, bmhost, bmport, btcport )
     
-    def getConfig(self):
-        return ( self.chain, self.channame, self.default_fee, self.minconf, \
-                    self.bmuser, self.bmpswd, self.bmhost, self.bmport, self.btc_port )
+    def exportConfig(self):
+        self.config.set(self.section, 'chain', self.chain)
+        self.config.set(self.section, 'channame', self.channame)
+        
+        self.config.set(self.section, 'fee', self.default_fee)
+        self.config.set(self.section, 'minconf', self.minconf)
+        
+        self.config.set(self.section, 'bmuser', self.bmuser)
+        self.config.set(self.section, 'bmpswd', self.bmpswd)
+        self.config.set(self.section, 'bmhost', self.bmhost)
+        self.config.set(self.section, 'bmport', self.bmport)
+        
+        self.config.set(self.section, 'btcport', self.btc_port)
     
-    def setConfig(self, confTuple):
+    def setConfig(self, configTuple):
         self.chain, self.channame, self.default_fee, self.minconf, \
-            self.bmuser, self.bmpswd, self.bmhost, self.bmport, self.btc_port = confTuple
+            self.bmuser, self.bmpswd, self.bmhost, self.bmport, self.btc_port = configTuple
         
         if self.chain == 'testnet':
             self.netcode = 'XTN'
@@ -578,7 +591,7 @@ class MyForm(QtGui.QMainWindow,
         return ver
     
     def do_processinbox(self):
-        return MM_util.processinbox(self.bmaddr, self.processMsg)
+        return MM_util.processinbox(self.bmaddr, self.processMsg, processMkt=True)
     
     
     def select(self, groupname, selections):
