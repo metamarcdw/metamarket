@@ -783,7 +783,7 @@ def processinbox(bmaddr, callback, processMkt=False):
             msginfo = callback(bmmsg)
         elif i['toAddress'] == bmaddr and subject == 'MultiMsg':
             msginfo = processmultimsg(bmmsg, callback)
-        elif processMkt and i['toAddress'] == bmaddr and subject == 'Mkt':
+        elif processMkt and subject == 'Mkt':
             msginfo = importMarket(bmmsg)
         else:
             continue
