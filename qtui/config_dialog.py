@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'config_dialog.ui'
 #
-# Created: Sun May 22 19:50:48 2016
+# Created: Mon May 23 23:44:07 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -24,15 +24,15 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_Dialog(object):
-    def setupUi(self, Dialog):
-        Dialog.setObjectName(_fromUtf8("Dialog"))
-        Dialog.resize(384, 393)
-        self.gridLayout = QtGui.QGridLayout(Dialog)
+class Ui_config_dialog(object):
+    def setupUi(self, config_dialog):
+        config_dialog.setObjectName(_fromUtf8("config_dialog"))
+        config_dialog.resize(384, 393)
+        self.gridLayout = QtGui.QGridLayout(config_dialog)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.verticalLayout_4 = QtGui.QVBoxLayout()
         self.verticalLayout_4.setObjectName(_fromUtf8("verticalLayout_4"))
-        self.groupBox = QtGui.QGroupBox(Dialog)
+        self.groupBox = QtGui.QGroupBox(config_dialog)
         self.groupBox.setObjectName(_fromUtf8("groupBox"))
         self.gridLayout_2 = QtGui.QGridLayout(self.groupBox)
         self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
@@ -115,7 +115,7 @@ class Ui_Dialog(object):
         self.horizontalLayout_2.addLayout(self.verticalLayout_2)
         self.gridLayout_2.addLayout(self.horizontalLayout_2, 0, 0, 1, 1)
         self.verticalLayout_4.addWidget(self.groupBox)
-        self.buttonBox = QtGui.QDialogButtonBox(Dialog)
+        self.buttonBox = QtGui.QDialogButtonBox(config_dialog)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
@@ -131,42 +131,42 @@ class Ui_Dialog(object):
         self.bmportLabel.setBuddy(self.bmportSpinBox)
         self.btcportLabel.setBuddy(self.btcportSpinBox)
 
-        self.retranslateUi(Dialog)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), Dialog.accept)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), Dialog.reject)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
-        Dialog.setTabOrder(self.chainComboBox, self.channameLineEdit)
-        Dialog.setTabOrder(self.channameLineEdit, self.feeDoubleSpinBox)
-        Dialog.setTabOrder(self.feeDoubleSpinBox, self.minconfSpinBox)
-        Dialog.setTabOrder(self.minconfSpinBox, self.bmuserLineEdit)
-        Dialog.setTabOrder(self.bmuserLineEdit, self.bmpswdLineEdit)
-        Dialog.setTabOrder(self.bmpswdLineEdit, self.bmhostLineEdit)
-        Dialog.setTabOrder(self.bmhostLineEdit, self.bmportSpinBox)
-        Dialog.setTabOrder(self.bmportSpinBox, self.btcportSpinBox)
-        Dialog.setTabOrder(self.btcportSpinBox, self.buttonBox)
+        self.retranslateUi(config_dialog)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), config_dialog.accept)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), config_dialog.reject)
+        QtCore.QMetaObject.connectSlotsByName(config_dialog)
+        config_dialog.setTabOrder(self.chainComboBox, self.channameLineEdit)
+        config_dialog.setTabOrder(self.channameLineEdit, self.feeDoubleSpinBox)
+        config_dialog.setTabOrder(self.feeDoubleSpinBox, self.minconfSpinBox)
+        config_dialog.setTabOrder(self.minconfSpinBox, self.bmuserLineEdit)
+        config_dialog.setTabOrder(self.bmuserLineEdit, self.bmpswdLineEdit)
+        config_dialog.setTabOrder(self.bmpswdLineEdit, self.bmhostLineEdit)
+        config_dialog.setTabOrder(self.bmhostLineEdit, self.bmportSpinBox)
+        config_dialog.setTabOrder(self.bmportSpinBox, self.btcportSpinBox)
+        config_dialog.setTabOrder(self.btcportSpinBox, self.buttonBox)
 
-    def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog", None))
-        self.groupBox.setTitle(_translate("Dialog", "Configuration:", None))
-        self.chainLabel.setText(_translate("Dialog", "Bitcoin Chain:", None))
-        self.channameLabel.setText(_translate("Dialog", "Chan Name:", None))
-        self.feeLabel.setText(_translate("Dialog", "Default Fee:", None))
-        self.minconfLabel.setText(_translate("Dialog", "Minimum Confirms:", None))
-        self.bmuserLabel.setText(_translate("Dialog", "Bitmessage RPC User:", None))
-        self.bmpswdLabel.setText(_translate("Dialog", "Bitmessage RPC Password:", None))
-        self.bmhostLabel.setText(_translate("Dialog", "Bitmessage RPC Host:", None))
-        self.bmportLabel.setText(_translate("Dialog", "Bitmessage RPC Port:", None))
-        self.btcportLabel.setText(_translate("Dialog", "Bitcoin Core RPC Port:", None))
-        self.chainComboBox.setItemText(0, _translate("Dialog", "testnet", None))
-        self.chainComboBox.setItemText(1, _translate("Dialog", "mainnet", None))
+    def retranslateUi(self, config_dialog):
+        config_dialog.setWindowTitle(_translate("config_dialog", "METAbuyer-Qt Settings", None))
+        self.groupBox.setTitle(_translate("config_dialog", "Configuration:", None))
+        self.chainLabel.setText(_translate("config_dialog", "Bitcoin Chain:", None))
+        self.channameLabel.setText(_translate("config_dialog", "Chan Name:", None))
+        self.feeLabel.setText(_translate("config_dialog", "Default Fee:", None))
+        self.minconfLabel.setText(_translate("config_dialog", "Minimum Confirms:", None))
+        self.bmuserLabel.setText(_translate("config_dialog", "Bitmessage RPC User:", None))
+        self.bmpswdLabel.setText(_translate("config_dialog", "Bitmessage RPC Password:", None))
+        self.bmhostLabel.setText(_translate("config_dialog", "Bitmessage RPC Host:", None))
+        self.bmportLabel.setText(_translate("config_dialog", "Bitmessage RPC Port:", None))
+        self.btcportLabel.setText(_translate("config_dialog", "Bitcoin Core RPC Port:", None))
+        self.chainComboBox.setItemText(0, _translate("config_dialog", "testnet", None))
+        self.chainComboBox.setItemText(1, _translate("config_dialog", "mainnet", None))
 
 
 if __name__ == "__main__":
     import sys
     app = QtGui.QApplication(sys.argv)
-    Dialog = QtGui.QDialog()
-    ui = Ui_Dialog()
-    ui.setupUi(Dialog)
-    Dialog.show()
+    config_dialog = QtGui.QDialog()
+    ui = Ui_config_dialog()
+    ui.setupUi(config_dialog)
+    config_dialog.show()
     sys.exit(app.exec_())
 

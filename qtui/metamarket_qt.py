@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Sat May 21 17:44:14 2016
+# Created: Tue May 24 00:04:42 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -312,6 +312,8 @@ class Ui_MainWindow(object):
         self.menuFile.setObjectName(_fromUtf8("menuFile"))
         self.menuHelp = QtGui.QMenu(self.menubar)
         self.menuHelp.setObjectName(_fromUtf8("menuHelp"))
+        self.menuSettings = QtGui.QMenu(self.menubar)
+        self.menuSettings.setObjectName(_fromUtf8("menuSettings"))
         MainWindow.setMenuBar(self.menubar)
         self.actionClose = QtGui.QAction(MainWindow)
         self.actionClose.setObjectName(_fromUtf8("actionClose"))
@@ -319,10 +321,14 @@ class Ui_MainWindow(object):
         self.actionAbout.setObjectName(_fromUtf8("actionAbout"))
         self.actionLogin = QtGui.QAction(MainWindow)
         self.actionLogin.setObjectName(_fromUtf8("actionLogin"))
+        self.actionPreferences = QtGui.QAction(MainWindow)
+        self.actionPreferences.setObjectName(_fromUtf8("actionPreferences"))
         self.menuFile.addAction(self.actionLogin)
         self.menuFile.addAction(self.actionClose)
         self.menuHelp.addAction(self.actionAbout)
+        self.menuSettings.addAction(self.actionPreferences)
         self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menuSettings.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -330,7 +336,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(_translate("MainWindow", "METAmarket-Qt", None))
+        MainWindow.setWindowTitle(_translate("MainWindow", "METAbuyer-Qt", None))
         self.chanGroupBox.setTitle(_translate("MainWindow", "Channel:", None))
         self.chanTableWidget.setSortingEnabled(True)
         item = self.chanTableWidget.horizontalHeaderItem(0)
@@ -407,9 +413,11 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.identTab), _translate("MainWindow", "Identities", None))
         self.menuFile.setTitle(_translate("MainWindow", "File", None))
         self.menuHelp.setTitle(_translate("MainWindow", "Help", None))
+        self.menuSettings.setTitle(_translate("MainWindow", "Settings", None))
         self.actionClose.setText(_translate("MainWindow", "Close", None))
         self.actionAbout.setText(_translate("MainWindow", "About", None))
         self.actionLogin.setText(_translate("MainWindow", "Login", None))
+        self.actionPreferences.setText(_translate("MainWindow", "Preferences", None))
 
 
 if __name__ == "__main__":

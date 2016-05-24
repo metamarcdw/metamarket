@@ -24,6 +24,7 @@ from ViewChanmsgDlg import ViewChanmsgDlg
 from ImportMarketDlg import ImportMarketDlg
 from SendChanmsgDlg import SendChanmsgDlg
 from AboutDlg import AboutDlg
+from ConfigDlg import ConfigDlg
 
 class MyForm(QtGui.QMainWindow,
         metamarket_qt.Ui_MainWindow):
@@ -72,6 +73,8 @@ class MyForm(QtGui.QMainWindow,
                         'btcport':      '8332'    }
         config = ConfigParser.RawConfigParser(defaults)
         config.read('mm.cfg')
+        if not config.has_section(self.section):
+            config.add_section(self.section)
         return config
     
     def saveConfig(self, config):
@@ -133,6 +136,10 @@ class MyForm(QtGui.QMainWindow,
         except socket.error:
             self.sockErr()
     
+    def getConfig(self):
+        return ( self.chain, self.channame, self.default_fee, self.minconf, \
+                self.bmuser, self.bmpswd, self.bmhost, self.bmport, self.btc_port )
+    
     
     def loadListIfModified(self, index):
         MM_util.loadindex(index)
@@ -185,6 +192,7 @@ class MyForm(QtGui.QMainWindow,
         
         # Update 'Channel' Tab:
         self.chanGroupBox.setTitle("Channel: %s" % self.channame)
+        # Join Chan if not already?
         numChanMsgs = len(chanMsgs)
         self.chanTableWidget.setRowCount(numChanMsgs)
         
@@ -291,7 +299,7 @@ class MyForm(QtGui.QMainWindow,
             not MM_util.btcd.validateaddress(self.btcaddr)['ismine']:
             if not self.importkeys():
                 return
-                    
+        
         myidstr = MM_util.createidentmsgstr(self.btcaddr, self.bmaddr, self.username)
         self.myid = MM_util.MM_loads( self.btcaddr, myidstr )
         
@@ -345,6 +353,22 @@ class MyForm(QtGui.QMainWindow,
     @pyqtSignature("")
     def on_actionAbout_triggered(self):
         self.showAboutDlg()
+    
+    
+    def showConfigDlg(self, configTuple):
+        configDlg = ConfigDlg(configTuple, self)
+        if configDlg.exec_():
+            return configDlg.result()
+    
+    @pyqtSignature("")
+    def on_actionPreferences_triggered(self):
+        configTuple = self.getConfig()
+        configTuple = self.showConfigDlg(configTuple)
+        if configTuple:
+            self.setConfig(configTuple)
+            self.exportConfig()
+            self.saveConfig(self.config)
+            self.updateUi()
     
     
     def do_sendmsgviabm(self, to_addr, msgstr, prompt=False, subject='Msg'):
