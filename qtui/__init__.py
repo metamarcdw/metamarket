@@ -537,11 +537,14 @@ class MyForm(QtGui.QMainWindow,
         selection = self.offerTableWidget.selectedItems()
         if not selection:
             return
-        
+        offerhash = str(selection[4].text())
+        self.showOfferByHash(offerhash)
+    
+    def showOfferByHash(self, offerhash):
         offerlist = self.listDict["offer"]
         identlist = self.listDict["ident"]
         taglist = self.listDict["tags"]
-        offer = MM_util.searchlistbyhash( offerlist, str(selection[4].text()) )
+        offer = MM_util.searchlistbyhash( offerlist, offerhash )
         vendor = MM_util.searchlistbyhash(identlist, offer.obj['vendorid'])
         
         offername = offer.obj['name']
