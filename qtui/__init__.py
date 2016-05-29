@@ -51,6 +51,11 @@ class MyForm(QtGui.QMainWindow,
         self.currentMarket = None
         self.currentTag = None
         
+        self.statusNames = ('Ordered', 'Confirmed', 'Paid', 'Payment Received', 'Finalized')
+        self.orderStatus = self.statusNames[0]
+        for status in self.statusNames:
+            self.orderStatusComboBox.addItem(status)
+        
         self.searchText = ''
         self.indexNames = ('market', 'ident', 'offer', 'order', 'conf', \
                                 'pay', 'rec', 'final', 'feedback', 'tags')
@@ -177,6 +182,19 @@ class MyForm(QtGui.QMainWindow,
         if not search:
             mktBox.setCurrentIndex(index)
     
+    def indexFromOrderStatus(self):
+            if self.orderStatus == self.statusNames[0]:
+                index = 'order'
+            elif self.orderStatus == self.statusNames[1]:
+                index = 'conf'
+            elif self.orderStatus == self.statusNames[2]:
+                index = 'pay'
+            elif self.orderStatus == self.statusNames[3]:
+                index = 'rec'
+            elif self.orderStatus == self.statusNames[4]:
+                index = 'final'
+            return index
+    
     def updateUi(self):
         #UPDATE MAINWINDOW UI WITH DATA FROM ALL DATA STRUCTURES
         if not self.loggedIn:
@@ -251,7 +269,27 @@ class MyForm(QtGui.QMainWindow,
             self.offerTableWidget.setRowCount(0)
         
         # Update 'Orders' Tab:
-        # TODO
+        index = self.indexFromOrderStatus()
+        msgList = self.listDict[index]
+        numMsgs = len(msgList)
+        self.orderTableWidget.setRowCount(numMsgs)
+        
+        for i in range(numMsgs):
+            objhash = msgList[i].hash
+            msgstr = open( os.path.join('msg', objhash + '.dat'), 'r' ).read()
+            ver = MM_util.readmsg(msgstr)
+            offer = MM_util.offerfromordermsg( ver,
+                                                self.listDict["offer"],
+                                                self.listDict["order"],
+                                                self.listDict["conf"],
+                                                self.listDict["pay"],
+                                                self.listDict["rec"] )
+            self.orderTableWidget.setItem( i, 0, QTableWidgetItem(offer.obj["name"]) )
+            self.orderTableWidget.setItem( i, 1, QTableWidgetItem(offer.obj["locale"]) )
+            self.orderTableWidget.setItem( i, 2, QTableWidgetItem(offer.obj["amount"]) )
+            self.orderTableWidget.setItem( i, 3, QTableWidgetItem(offer.obj["price"]) )
+            self.orderTableWidget.setItem( i, 4, QTableWidgetItem(objhash) )
+            self.orderTableWidget.setItem( i, 5, QTableWidgetItem(offer.hash) )
         
         # Update 'Identities' Tab:
         self.setWindowTitle("METAmarket-Qt [%s]" % self.username)
@@ -574,26 +612,23 @@ class MyForm(QtGui.QMainWindow,
     
     
     ##### BEGIN ORDER SLOTS #####
+    @pyqtSignature("int")
+    def on_orderStatusComboBox_activated(self, index):
+        self.orderStatus = str( self.orderStatusComboBox.currentText() )
+        self.updateUi()
+    
     @pyqtSignature("")
     def on_orderProcessButton_clicked(self):
         pass    #TODO
     
     @pyqtSignature("")
     def on_orderViewButton_clicked(self):
-        selection = self.offerTableWidget.selectedItems()
+        selection = self.orderTableWidget.selectedItems()
         if not selection:
             return
         
-        objhash = str(selection[6].text())
-        msgstr = open( os.path.join('msg', objhash + '.dat'), 'r' ).read()
-        offer = MM_util.offerfromordermsg( msgstr,
-                                            self.listDict["offer"],
-                                            self.listDict["order"],
-                                            self.listDict["conf"],
-                                            self.listDict["pay"],
-                                            self.listDict["rec"] )
-        
-        self.showOfferByHash(offer.hash)
+        offerhash = str(selection[5].text())
+        self.showOfferByHash(offerhash)
     
     @pyqtSignature("")
     def on_orderCancelButton_clicked(self):

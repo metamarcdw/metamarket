@@ -318,7 +318,7 @@
            <string>My Orders:</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_4">
-           <item row="0" column="0">
+           <item row="1" column="0">
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
               <widget class="QTableWidget" name="orderTableWidget">
@@ -345,11 +345,6 @@
                </attribute>
                <column>
                 <property name="text">
-                 <string>Status</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
                  <string>Name</string>
                 </property>
                </column>
@@ -371,6 +366,11 @@
                <column>
                 <property name="text">
                  <string>ID</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Offer ID</string>
                 </property>
                </column>
               </widget>
@@ -401,6 +401,9 @@
               </layout>
              </item>
             </layout>
+           </item>
+           <item row="0" column="0">
+            <widget class="QComboBox" name="orderStatusComboBox"/>
            </item>
           </layout>
          </widget>

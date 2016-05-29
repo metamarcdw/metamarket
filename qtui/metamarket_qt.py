@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Tue May 24 00:04:42 2016
+# Created: Mon May 30 00:00:15 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -223,7 +223,10 @@ class Ui_MainWindow(object):
         self.orderCancelButton.setObjectName(_fromUtf8("orderCancelButton"))
         self.horizontalLayout_2.addWidget(self.orderCancelButton)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
-        self.gridLayout_4.addLayout(self.verticalLayout_2, 0, 0, 1, 1)
+        self.gridLayout_4.addLayout(self.verticalLayout_2, 1, 0, 1, 1)
+        self.orderStatusComboBox = QtGui.QComboBox(self.orderGroupBox)
+        self.orderStatusComboBox.setObjectName(_fromUtf8("orderStatusComboBox"))
+        self.gridLayout_4.addWidget(self.orderStatusComboBox, 0, 0, 1, 1)
         self.gridLayout_5.addWidget(self.orderGroupBox, 0, 0, 1, 1)
         self.tabWidget.addTab(self.orderTab, _fromUtf8(""))
         self.identTab = QtGui.QWidget()
@@ -379,17 +382,17 @@ class Ui_MainWindow(object):
         self.orderGroupBox.setTitle(_translate("MainWindow", "My Orders:", None))
         self.orderTableWidget.setSortingEnabled(True)
         item = self.orderTableWidget.horizontalHeaderItem(0)
-        item.setText(_translate("MainWindow", "Status", None))
-        item = self.orderTableWidget.horizontalHeaderItem(1)
         item.setText(_translate("MainWindow", "Name", None))
-        item = self.orderTableWidget.horizontalHeaderItem(2)
+        item = self.orderTableWidget.horizontalHeaderItem(1)
         item.setText(_translate("MainWindow", "Locale", None))
-        item = self.orderTableWidget.horizontalHeaderItem(3)
+        item = self.orderTableWidget.horizontalHeaderItem(2)
         item.setText(_translate("MainWindow", "Amount", None))
-        item = self.orderTableWidget.horizontalHeaderItem(4)
+        item = self.orderTableWidget.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "Price", None))
-        item = self.orderTableWidget.horizontalHeaderItem(5)
+        item = self.orderTableWidget.horizontalHeaderItem(4)
         item.setText(_translate("MainWindow", "ID", None))
+        item = self.orderTableWidget.horizontalHeaderItem(5)
+        item.setText(_translate("MainWindow", "Offer ID", None))
         self.orderProcessButton.setText(_translate("MainWindow", "Process", None))
         self.orderViewButton.setText(_translate("MainWindow", "View Offer", None))
         self.orderCancelButton.setText(_translate("MainWindow", "Cancel Order", None))
