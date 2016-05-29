@@ -46,6 +46,7 @@ class MyForm(QtGui.QMainWindow,
         self.btcaddr = None
         self.bmaddr = None
         self.myid = None
+        self.feePerKB = None
         self.inbox = None
         self.currentMarket = None
         self.currentTag = None
@@ -133,8 +134,12 @@ class MyForm(QtGui.QMainWindow,
         try:
             self.chan_v3 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 3,1 )
             self.chan_v4 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 4,1 )
+            feePerKB = decimal.Decimal( MM_util.btcd.estimatefee(6) )
         except socket.error:
             self.sockErr()
+        
+        if feePerKB > 0:
+            self.feePerKB = feePerKB
     
     def getConfig(self):
         return ( self.chain, self.channame, self.default_fee, self.minconf, \
@@ -254,7 +259,6 @@ class MyForm(QtGui.QMainWindow,
         self.identBtcaddrLabel.setText("BTC Address: %s" % self.btcaddr)
         self.identBmaddrLabel.setText("BM Address: %s" % self.bmaddr)
         
-        search = str( self.identSearchLineEdit.text() )
         self.populateMktBox(self.identMktComboBox, self.searchText)
         # TODO
     
