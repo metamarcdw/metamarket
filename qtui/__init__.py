@@ -574,7 +574,30 @@ class MyForm(QtGui.QMainWindow,
     
     
     ##### BEGIN ORDER SLOTS #####
+    @pyqtSignature("")
+    def on_orderProcessButton_clicked(self):
+        pass    #TODO
     
+    @pyqtSignature("")
+    def on_orderViewButton_clicked(self):
+        selection = self.offerTableWidget.selectedItems()
+        if not selection:
+            return
+        
+        objhash = str(selection[6].text())
+        msgstr = open( os.path.join('msg', objhash + '.dat'), 'r' ).read()
+        offer = MM_util.offerfromordermsg( msgstr,
+                                            self.listDict["offer"],
+                                            self.listDict["order"],
+                                            self.listDict["conf"],
+                                            self.listDict["pay"],
+                                            self.listDict["rec"] )
+        
+        self.showOfferByHash(offer.hash)
+    
+    @pyqtSignature("")
+    def on_orderCancelButton_clicked(self):
+        pass    #TODO
     ##### END ORDER SLOTS #####
     
     
