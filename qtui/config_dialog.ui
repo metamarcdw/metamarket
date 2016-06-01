@@ -42,7 +42,7 @@
             <item>
              <widget class="QLabel" name="channameLabel">
               <property name="text">
-               <string>Chan Name:</string>
+               <string>Channel:</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

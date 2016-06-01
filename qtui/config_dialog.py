@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'config_dialog.ui'
 #
-# Created: Mon May 23 23:44:07 2016
+# Created: Wed Jun  1 23:39:41 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -149,7 +149,7 @@ class Ui_config_dialog(object):
         config_dialog.setWindowTitle(_translate("config_dialog", "METAbuyer-Qt Settings", None))
         self.groupBox.setTitle(_translate("config_dialog", "Configuration:", None))
         self.chainLabel.setText(_translate("config_dialog", "Bitcoin Chain:", None))
-        self.channameLabel.setText(_translate("config_dialog", "Chan Name:", None))
+        self.channameLabel.setText(_translate("config_dialog", "Channel:", None))
         self.feeLabel.setText(_translate("config_dialog", "Default Fee:", None))
         self.minconfLabel.setText(_translate("config_dialog", "Minimum Confirms:", None))
         self.bmuserLabel.setText(_translate("config_dialog", "Bitmessage RPC User:", None))

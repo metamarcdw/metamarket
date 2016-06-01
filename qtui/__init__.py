@@ -275,10 +275,9 @@ class MyForm(QtGui.QMainWindow,
         self.orderTableWidget.setRowCount(numMsgs)
         
         for i in range(numMsgs):
-            objhash = msgList[i].hash
-            msgstr = open( os.path.join('msg', objhash + '.dat'), 'r' ).read()
-            ver = MM_util.readmsg(msgstr)
-            offer = MM_util.offerfromordermsg( ver,
+            obj = msgList[i]
+            msgstr = open( os.path.join('msg', obj.hash + '.dat'), 'r' ).read()
+            offer = MM_util.offerfromordermsg( obj,
                                                 self.listDict["offer"],
                                                 self.listDict["order"],
                                                 self.listDict["conf"],
@@ -288,7 +287,7 @@ class MyForm(QtGui.QMainWindow,
             self.orderTableWidget.setItem( i, 1, QTableWidgetItem(offer.obj["locale"]) )
             self.orderTableWidget.setItem( i, 2, QTableWidgetItem(offer.obj["amount"]) )
             self.orderTableWidget.setItem( i, 3, QTableWidgetItem(offer.obj["price"]) )
-            self.orderTableWidget.setItem( i, 4, QTableWidgetItem(objhash) )
+            self.orderTableWidget.setItem( i, 4, QTableWidgetItem(obj.hash) )
             self.orderTableWidget.setItem( i, 5, QTableWidgetItem(offer.hash) )
         
         # Update 'Identities' Tab:
@@ -298,7 +297,12 @@ class MyForm(QtGui.QMainWindow,
         self.identBmaddrLabel.setText("BM Address: %s" % self.bmaddr)
         
         self.populateMktBox(self.identMktComboBox, self.searchText)
-        # TODO
+        
+        if self.currentMarket:
+            pass    # TODO
+        else:
+            self.identTableWidget.clearContents()
+            self.identTableWidget.setRowCount(0)
     
     @pyqtSignature("int")
     def on_tabWidget_currentChanged(self):
