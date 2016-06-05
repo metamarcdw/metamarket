@@ -158,7 +158,10 @@ class MyForm(QtGui.QMainWindow,
         
         if mtime > lastTime:
             self.listLastLoaded[index] = time.time()
-            list = MM_util.loadlist(index)
+            try:
+                list = MM_util.loadlist(index)
+            except httplib.BadStatusLine:
+                self.btcdErr()
             
             if index == "ident":
                 MM_util.idList = list
@@ -338,6 +341,8 @@ class MyForm(QtGui.QMainWindow,
             if jre.error['code'] == -14:
                 self.info("The passphrase was not correct. Please try logging in again.")
                 return
+        except httplib.BadStatusLine:
+            self.btcdErr()
         except socket.error:
             self.sockErr()
         
@@ -654,6 +659,7 @@ class MyForm(QtGui.QMainWindow,
         self.identSearchLineEdit.setText('')
         self.updateUi()
     
+    #TODO
     ##### END IDENT SLOTS #####
     
     def searchlistbyname(self, list, key, name):
@@ -662,7 +668,10 @@ class MyForm(QtGui.QMainWindow,
                 return obj
     
     def processMsg(self, msg):
-        ver = MM_util.readmsg(msg) # Verifies sig/hash
+        try:
+            ver = MM_util.readmsg(msg) # Verifies sig/hash
+        except httplib.BadStatusLine:
+            self.btcdErr()
         
         if ver.msgname == MM_util.IDENT:
             MM_util.processident(msg, ver)
@@ -714,6 +723,11 @@ class MyForm(QtGui.QMainWindow,
     def sockErr(self):
         self.info("Please make sure Bitcoin Core and Bitmessage "+\
                 "are up and running before launching METAmarket.")
+        self.quit()
+    
+    def btcdErr(self):
+        self.info("We're having trouble with the connection to Bitcoin Core, "+\
+                "try restarting Bitcoin before launching METAmarket.")
         self.quit()
     
     
