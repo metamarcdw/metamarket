@@ -58,7 +58,7 @@ class MyForm(QtGui.QMainWindow,
         
         self.searchText = ''
         self.indexNames = ('market', 'ident', 'offer', 'order', 'conf', \
-                                'pay', 'rec', 'final', 'feedback', 'tags')
+                                'pay', 'rec', 'final', 'feedback', 'tags', 'burn')
         self.listDict = {}
         self.listLastLoaded = {}
         for index in self.indexNames:
@@ -302,7 +302,18 @@ class MyForm(QtGui.QMainWindow,
         self.populateMktBox(self.identMktComboBox, self.searchText)
         
         if self.currentMarket:
-            pass    # TODO
+            identlist = self.listDict['ident']
+            numIdents = len(identlist)
+            self.identTableWidget.setRowCount(numIdents)
+            
+            for i in range(numIdents):
+                id = identlist[i]
+                rep = MM_util.getrep(id.hash, self.currentMarket.obj['multiplier'], \
+                                        self.listDict['feedback'], self.listDict['burn'])
+                
+                self.identTableWidget.setItem( i, 0, QTableWidgetItem(id.obj['name']) )
+                self.identTableWidget.setItem( i, 1, QTableWidgetItem("%d" % rep) )
+                self.identTableWidget.setItem( i, 2, QTableWidgetItem(id.hash) )
         else:
             self.identTableWidget.clearContents()
             self.identTableWidget.setRowCount(0)
