@@ -57,7 +57,7 @@ class MyForm(QtGui.QMainWindow,
             self.orderStatusComboBox.addItem(status)
         
         self.searchText = ''
-        self.indexNames = ('market', 'ident', 'offer', 'order', 'conf', \
+        self.indexNames = ('market', 'reg', 'ident', 'offer', 'order', 'conf', \
                                 'pay', 'rec', 'final', 'feedback', 'tags', 'burn')
         self.listDict = {}
         self.listLastLoaded = {}
@@ -294,7 +294,7 @@ class MyForm(QtGui.QMainWindow,
             self.orderTableWidget.setItem( i, 5, QTableWidgetItem(offer.hash) )
         
         # Update 'Identities' Tab:
-        self.setWindowTitle("METAmarket-Qt [%s]" % self.username)
+        self.setWindowTitle("METAbuyer-Qt [%s]" % self.username)
         self.identMyidLabel.setText("ID Hash: %s" % self.myid.hash)
         self.identBtcaddrLabel.setText("BTC Address: %s" % self.btcaddr)
         self.identBmaddrLabel.setText("BM Address: %s" % self.bmaddr)
@@ -302,14 +302,27 @@ class MyForm(QtGui.QMainWindow,
         self.populateMktBox(self.identMktComboBox, self.searchText)
         
         if self.currentMarket:
+            reglist = self.listDict['reg']
+            registered = False
+            for reg in reglist:
+                if reg.obj['modid'] == self.currentMarket.obj['modid'] and \
+                        reg.obj['userid'] == self.myid.hash:
+                    registered = True
+                    break
+            self.identRegButton.setEnabled(not registered)
+            self.identBurnButton.setEnabled(True)
+            
             identlist = self.listDict['ident']
             numIdents = len(identlist)
             self.identTableWidget.setRowCount(numIdents)
             
             for i in range(numIdents):
                 id = identlist[i]
-                rep = MM_util.getrep(id.hash, self.currentMarket.obj['multiplier'], \
-                                        self.listDict['feedback'], self.listDict['burn'])
+                try:
+                    rep = MM_util.getrep(id.hash, self.currentMarket.obj['multiplier'], \
+                                            self.listDict['feedback'], self.listDict['burn'])
+                except httplib.BadStatusLine:
+                    self.btcdErr()
                 
                 self.identTableWidget.setItem( i, 0, QTableWidgetItem(id.obj['name']) )
                 self.identTableWidget.setItem( i, 1, QTableWidgetItem("%d" % rep) )
@@ -317,6 +330,8 @@ class MyForm(QtGui.QMainWindow,
         else:
             self.identTableWidget.clearContents()
             self.identTableWidget.setRowCount(0)
+            self.identRegButton.setEnabled(False)
+            self.identBurnButton.setEnabled(False)
     
     @pyqtSignature("int")
     def on_tabWidget_currentChanged(self):
@@ -347,6 +362,8 @@ class MyForm(QtGui.QMainWindow,
             self.bmaddr = MM_util.bm.getDeterministicAddress( base64.b64encode(self.pkstr), 4, 1 )
             
             wp = self.input("Please enter your Bitcoin Core wallet encryption passphrase:", password=True)
+            if not wp:
+                return
             MM_util.unlockwallet(wp)
         except bitcoin.rpc.JSONRPCException as jre:
             if jre.error['code'] == -14:
@@ -670,7 +687,58 @@ class MyForm(QtGui.QMainWindow,
         self.identSearchLineEdit.setText('')
         self.updateUi()
     
-    #TODO
+    @pyqtSignature("")
+    def on_identRegButton_clicked(self):
+        if not self.yorn("Are you sure you would like to register your identity at %s?" \
+                            % self.currentMarket.obj['markename']):
+            return
+        
+        identlist = self.listDict['ident']
+        mod = MM_util.searchlistbyhash(identlist, self.currentMarket.obj['modid'])
+        amount = self.currentMarket.obj['fee']
+        
+        msgstr = MM_util.createreg( \
+                    self.myid.hash, self.btcaddr, amount, mod, self.default_fee)
+        hash = MM_util.MM_writefile(msgstr)
+        MM_util.appendindex('reg', hash)
+        
+        self.do_sendmsgviabm(mod.obj['bmaddr'], msgstr)
+        self.info("Registered!")
+    
+    def showViewIdentDlg(self, name, hash, btcaddr, bmaddr):
+        viewIdentDlg = ViewIdentDlg(name, hash, btcaddr, bmaddr, self)
+        viewIdentDlg.show()
+    
+    @pyqtSignature("")
+    def on_identViewButton_clicked(self):
+        selection = self.identTableWidget.selectedItems()
+        if not selection:
+            return
+        
+        identlist = self.listDict["ident"]
+        identhash = str(selection[2].text())
+        ident = MM_util.searchlistbyhash(identlist, identhash)
+        
+        self.showViewIdentDlg( ident.obj['name'],
+                                identhash,
+                                ident.obj['btcaddr'],
+                                ident.obj['bmaddr'] )
+    
+    @pyqtSignature("")
+    def on_identBurnButton_clicked(self):
+        amount = self.value_input("How much BTC would you like to BURN?")
+        
+        if not amount or not self.yorn("Are you sure?"):
+            return
+        
+        msgstr = MM_util.createburn( \
+                    self.myid.hash, self.btcaddr, amount, self.default_fee)
+        hash = MM_util.MM_writefile(msgstr)
+        MM_util.appendindex('burn', hash)
+        
+        self.do_sendmsgviabm(mod.obj['bmaddr'], msgstr)
+        self.info("Proof of BURN sent!")
+    
     ##### END IDENT SLOTS #####
     
     def searchlistbyname(self, list, key, name):
@@ -720,6 +788,12 @@ class MyForm(QtGui.QMainWindow,
         text, ok = QInputDialog.getText(self, "Input", prompt, mode)
         if ok:
             return str(text)
+    
+    def value_input(self, prompt):
+        double, ok = QInputDialog.getDouble( \
+                self, "Input Amount", prompt, decimals=8, min=0.00000001)
+        if ok:
+            return MM_util.truncate( decimal.Decimal(double) )
     
     def yorn(self, prompt):
         reply = QMessageBox.question(self, "Question", prompt, QMessageBox.Yes|QMessageBox.No)
