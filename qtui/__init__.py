@@ -122,10 +122,10 @@ class MyForm(QtGui.QMainWindow,
         
         if self.chain == 'testnet':
             self.netcode = 'XTN'
-            self.pob_address = "msj42CCGruhRsFrGATiUuh25dtxYtnpbTx"
+            pob_address = "msj42CCGruhRsFrGATiUuh25dtxYtnpbTx"
         elif self.chain == 'mainnet':
             self.netcode = 'BTC'
-            self.pob_address = "1METAMARKETxxxxxxxxxxxxxxxxx4TPjws"
+            pob_address = "1METAMARKETxxxxxxxxxxxxxxxxx4TPjws"
         else:
             raise Exception("Config: chain must be either testnet or mainnet.")
         
@@ -135,6 +135,7 @@ class MyForm(QtGui.QMainWindow,
         MM_util.btcd = bitcoin.rpc.RawProxy(service_port=self.btc_port)
         MM_util.bm = xmlrpclib.ServerProxy(bm_url)
         MM_util.minconf = self.minconf
+        MM_util.pob_address = pob_address
         
         try:
             self.chan_v3 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 3,1 )
@@ -277,15 +278,14 @@ class MyForm(QtGui.QMainWindow,
         numMsgs = len(msgList)
         self.orderTableWidget.setRowCount(numMsgs)
         
+        isCancelable = index in ('order', 'conf')
+        self.orderCancelButton.setEnabled(isCancelable)
+        
         for i in range(numMsgs):
             obj = msgList[i]
             msgstr = open( os.path.join('msg', obj.hash + '.dat'), 'r' ).read()
-            offer = MM_util.offerfromordermsg( obj,
-                                                self.listDict["offer"],
-                                                self.listDict["order"],
-                                                self.listDict["conf"],
-                                                self.listDict["pay"],
-                                                self.listDict["rec"] )
+            offer = self.do_offerfromordermsg(obj)
+            
             self.orderTableWidget.setItem( i, 0, QTableWidgetItem(offer.obj["name"]) )
             self.orderTableWidget.setItem( i, 1, QTableWidgetItem(offer.obj["locale"]) )
             self.orderTableWidget.setItem( i, 2, QTableWidgetItem(offer.obj["amount"]) )
@@ -453,7 +453,6 @@ class MyForm(QtGui.QMainWindow,
     def do_sendmsgviabm(self, to_addr, msgstr, prompt=False, subject='Msg'):
         if not prompt or self.yorn("Are you sure you want to send this Message?"):
             MM_util.sendmsgviabm(to_addr, self.bmaddr, msgstr, subject)
-            self.info("Message sent!")
 
     ##### BEGIN CHAN SLOTS #####
     def showSendChanmsgDlg(self):
@@ -469,6 +468,7 @@ class MyForm(QtGui.QMainWindow,
         
         subject, message = result
         self.do_sendmsgviabm(self.chan_v4, message, prompt=True, subject=subject)
+        self.info("Message sent!")
     
     
     def showViewChanmsgDlg(self, subject, message):
@@ -654,9 +654,87 @@ class MyForm(QtGui.QMainWindow,
         self.orderStatus = str( self.orderStatusComboBox.currentText() )
         self.updateUi()
     
+    def do_offerfromordermsg(self, obj):
+        return MM_util.offerfromordermsg( obj,
+                                            self.listDict["offer"],
+                                            self.listDict["order"],
+                                            self.listDict["conf"],
+                                            self.listDict["pay"],
+                                            self.listDict["rec"] )
+    
     @pyqtSignature("")
     def on_orderProcessButton_clicked(self):
-        pass    #TODO
+        selection = self.orderTableWidget.selectedItems()
+        if not selection:
+            return
+        
+        index = self.indexFromOrderStatus()
+        prevmsg = MM_util.searchlistbyhash( self.listDict[index], str(selection[4].text()) )
+        offer = self.do_offerfromordermsg(prevmsg)
+        vendor = MM_util.searchlistbyhash( self.listDict['ident'], prevmsg.obj['vendorid'] )
+        
+        if index == 'conf':
+            # Send pay based on this conf
+            replyindex = 'pay'
+            if not self.yorn("Are you sure?"):
+                return
+            
+            for ver in self.listDict['pay']:
+                if ver.obj['confhash'] == prevmsg.hash:
+                    self.info("This Order is already Paid.")
+                    return
+            
+            order = MM_util.searchlistbyhash( self.listDict['order'], prevmsg.obj['orderhash'] )
+            msgstr = MM_util.createpay(self.myid.hash, self.btcaddr, prevmsg, order, offer)
+            
+        elif index == 'rec':
+            # Send final based on this rec
+            replyindex = 'final'
+            flag = self.yorn("Click Yes to Finalize this purchase, " + \
+                                "or click No to collect the refund.")
+            if not self.yorn("Are you sure?"):
+                return
+            
+            for ver in self.listDict['final']:
+                if ver.obj['rechash'] == prevmsg.hash:
+                    self.info("This Order has already been Finalized.")
+                    return
+            
+            price = decimal.Decimal( offer.obj['price'] )
+            msgstr = MM_util.createfinal(self.myid.hash, self.btcaddr, \
+                                    flag, prevmsg, vendor, offer, price)
+            
+        elif index == 'final':
+            # Send feedback based on this final
+            replyindex = 'feedback'
+            flag = self.yorn("Click Yes to give positive feedback on this purchase, " + \
+                                "or click No to give negative feedback.")
+            if not self.yorn("Are you sure?"):
+                return
+            
+            for ver in self.listDict['feedback']:
+                if ver.obj['finalhash'] == prevmsg.hash:
+                    self.info("You've already given feedback on this Order.")
+                    return
+            
+            message = self.input("Leave a message with your feedback.")
+            order = None
+            for ver in self.listDict['order']:
+                if ver.obj['offerhash'] == offer.hash:
+                    order = ver
+                    break
+            msgstr = MM_util.createfeedback(self.btcaddr, \
+                                    "buyer", flag, message, prevmsg, offer, order)
+            
+        else:
+            self.info("Buyers cannot process this type of message.")
+            return
+        
+        hash = MM_util.MM_writefile(msgstr)
+        MM_util.appendindex(replyindex, hash)
+        
+        self.do_sendmsgviabm(vendor.obj['bmaddr'], msgstr)
+        self.info("Message sent to Vendor!")
     
     @pyqtSignature("")
     def on_orderViewButton_clicked(self):
@@ -669,7 +747,42 @@ class MyForm(QtGui.QMainWindow,
     
     @pyqtSignature("")
     def on_orderCancelButton_clicked(self):
-        pass    #TODO
+        selection = self.orderTableWidget.selectedItems()
+        if not selection:
+            return
+        
+        index = self.indexFromOrderStatus()
+        prevmsg = MM_util.searchlistbyhash( self.listDict[index], str(selection[4].text()) )
+        
+        conf = None
+        order = None
+        if index == 'order':
+            order = prevmsg
+            for ver in self.listDict['conf']:
+                if ver.obj['orderhash'] == order.hash:
+                    conf = ver
+        elif index == 'conf':
+            conf = prevmsg
+            order = MM_util.searchlistbyhash( self.listDict['order'], conf.obj['orderhash'] )
+        
+        if conf:
+            for ver in self.listDict['pay']:
+                if ver.obj['confhash'] == conf.hash:
+                    self.info("We cannot cancel this Order, " + \
+                                "as a Payment has already been sent.")
+                    return
+        
+        if not self.yorn("Are you sure?"):
+            return
+        
+        msgstr = MM_util.createcancel(self.myid.hash, self.btcaddr, \
+                                    "buyer", self.listDict['conf'], order)
+            
+        hash = MM_util.MM_writefile(msgstr)
+        MM_util.appendindex('cancel', hash)
+        
+        self.do_sendmsgviabm(vendor.obj['bmaddr'], msgstr)
+        self.info("Order cancellation message sent to Vendor!")
     ##### END ORDER SLOTS #####
     
     
@@ -738,7 +851,6 @@ class MyForm(QtGui.QMainWindow,
         
         self.do_sendmsgviabm(mod.obj['bmaddr'], msgstr)
         self.info("Proof of BURN sent!")
-    
     ##### END IDENT SLOTS #####
     
     def searchlistbyname(self, list, key, name):

@@ -25,6 +25,7 @@ btcd = None
 bm = None
 minconf = None
 idList = None
+pob_address = None
 
 # Returns a packed, signed and hashed MM msgstr given any
 # dict, msgname, and BTC addr. Requires bitcoind to create BTC sig.
