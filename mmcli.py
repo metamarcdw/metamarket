@@ -12,7 +12,7 @@
 
 from MM_util import *
 import MM_util
-import bitcoin, bitcoin.rpc, bitcoin.core, pycoin.key.Key
+import bitcoin, bitcoin.rpc, pycoin.serialize, pycoin.key.Key
 import scrypt
 import simplejson as json
 import argparse, ConfigParser
@@ -29,7 +29,7 @@ def login( wp=None ):
     
     hash = hashlib.sha256(passphrase).hexdigest()
     pkbytes = scrypt.hash(hash, username, N=2**18, buflen=32)
-    pkstr = bitcoin.core.b2x(pkbytes)
+    pkstr = pycoin.serialize.b2h(pkbytes)
     se = long(pkstr, 16)
     pk = pycoin.key.Key(secret_exponent=se, netcode=netcode)
     

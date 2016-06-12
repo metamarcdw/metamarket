@@ -4,7 +4,7 @@ sys.path.append(    # Make sure we can access MM_util in the parent directory
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
 import MM_util
-import bitcoin, bitcoin.rpc, bitcoin.core, pycoin.key.Key
+import bitcoin, bitcoin.rpc, pycoin.serialize, pycoin.key.Key
 import scrypt, simplecrypt
 import simplejson as json
 import ConfigParser
@@ -352,7 +352,7 @@ class MyForm(QtGui.QMainWindow,
         
         hash = hashlib.sha256(self.passphrase).hexdigest()
         pkbytes = scrypt.hash(hash, self.username, N=2**18, buflen=32)
-        self.pkstr = bitcoin.core.b2x(pkbytes)
+        self.pkstr = pycoin.serialize.b2h(pkbytes)
         se = long(self.pkstr, 16)
         pk = pycoin.key.Key(secret_exponent=se, netcode=self.netcode)
         

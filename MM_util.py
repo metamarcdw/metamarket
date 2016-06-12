@@ -10,6 +10,7 @@
 # LICENSE file.
 
 import bitcoin
+import pycoin.serialize
 import simplejson as json
 import simplecrypt
 import base64, hashlib, httplib, os, sys, time
@@ -651,7 +652,7 @@ def createconf( myidhash, mybtc, order, offer, buyer, default_fee ):
     refund_tx_hex = refund_tx_hex[:84] + "00000000" + refund_tx_hex[92:]
     #do nlocktime edit
     locktime = offer.obj['locktime']
-    locktime_hex = bitcoin.core.b2lx( bytearray.fromhex(hex(locktime)[2:].rjust(8,'0')) )
+    locktime_hex = pycoin.serialize.b2h_rev( bytearray.fromhex(hex(locktime)[2:].rjust(8,'0')) )
     refund_tx_hex = refund_tx_hex[:-8] + locktime_hex
     
     prev_tx[0]["scriptPubKey"] = order.obj['spk']

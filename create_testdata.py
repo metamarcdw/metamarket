@@ -12,7 +12,7 @@
 
 import MM_util
 import pycoin.key.Key
-import bitcoin, bitcoin.rpc, bitcoin.core
+import bitcoin, bitcoin.rpc, pycoin.serialize
 import xmlrpclib, base64, hashlib, decimal, time
 import scrypt, simplecrypt
 
@@ -31,7 +31,7 @@ bm = xmlrpclib.ServerProxy(BMURL)
 def pkstr( username, pswd ):
     hash = hashlib.sha256(pswd).hexdigest()
     pkbytes = scrypt.hash(hash, username, N=2**18, buflen=32)
-    return bitcoin.core.b2x(pkbytes)
+    return pycoin.serialize.b2h(pkbytes)
 
 def btcaddr( pkstr ):
     se = long(pkstr, 16)
