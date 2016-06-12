@@ -399,7 +399,7 @@ class MyForm(QtGui.QMainWindow,
             if pass2 == self.passphrase:
                 MM_util.btcd.importprivkey(self.wif, self.username, False)
                 
-                self.info("REMEMBER TO SECURELY BACKUP YOUR wallet.dat AND keys.dat files!")
+                self.info("REMEMBER TO SECURELY BACKUP YOUR wallet.dat file!")
                 return True
             else:
                 self.info("Passphrase did not match.")
@@ -837,6 +837,13 @@ class MyForm(QtGui.QMainWindow,
                                 ident.obj['btcaddr'],
                                 ident.obj['bmaddr'] )
     
+    def conf_wait(self, confs, minconf):
+        self.tabWidget.setEnabled(False)
+        self.info( "Please wait for confirmations... (%d/%d)" % (confs, minconf) )
+    
+    def conf_end(self):
+        self.tabWidget.setEnabled(True)
+    
     @pyqtSignature("")
     def on_identBurnButton_clicked(self):
         amount = self.value_input("How much BTC would you like to BURN?")
@@ -844,8 +851,12 @@ class MyForm(QtGui.QMainWindow,
         if not amount or not self.yorn("Are you sure?"):
             return
         
-        msgstr = MM_util.createburn( \
-                    self.myid.hash, self.btcaddr, amount, self.default_fee)
+        try:
+            msgstr = MM_util.createburn( self.myid.hash, self.btcaddr, \
+                                amount, self.default_fee, self.conf_wait, self.conf_end )
+        except httplib.BadStatusLine:
+            self.btcdErr()
+        
         hash = MM_util.MM_writefile(msgstr)
         MM_util.appendindex('burn', hash)
         

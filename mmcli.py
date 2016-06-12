@@ -253,7 +253,7 @@ def do_createburn():
     if not yorn():
         sys.exit()
 
-    msgstr = createburn(myid.hash, btcddr, amount, default_fee)
+    msgstr = createburn(myid.hash, btcddr, amount, default_fee, conf_wait)
     hash = MM_writefile(msgstr)
     appendindex('burn', hash)
     
@@ -414,7 +414,7 @@ def do_createrec( payhash=None ):
     offer = do_offerfromordermsg(pay)
     price = decimal.Decimal(offer.obj['price'])
     
-    msgstr = createrec(myid.hash, btcaddr, pay, order, price)
+    msgstr = createrec(myid.hash, btcaddr, pay, order, price, gettx_wait, conf_wait)
     print "FUNDS SUCCESSFULLY ESCROWED. SHIP PRODUCT NOW."
     hash = MM_writefile(msgstr)
     appendindex('rec', hash)
@@ -513,10 +513,16 @@ def checkinbox( ):
     return num > 0
     
     
+def gettx_wait():
+    print "Waiting for broadcast of TX..."
+
+def conf_wait(confs, minconf):
+    print "Waiting for confirmation. %d/%d so far..." % ( confs, minconf )
+
 def do_processreg(msg, ver):
     if not allownewregs:
         return
-    processreg(msg, ver)
+    processreg(msg, ver, gettx_wait, conf_wait)
     print "REG Msg accepted:\n%s" % pretty_json(ver)
     
 def do_processident(msg, ver, mod=False):
@@ -533,7 +539,7 @@ def do_processident(msg, ver, mod=False):
         
 def do_processburn(msg, ver):
     identlist = loadlist("ident")
-    if processburn(msg, ver, identlist):
+    if processburn(msg, ver, identlist, gettx_wait, conf_wait):
         print "BURN Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("BURN Msg rejected.")
@@ -602,7 +608,7 @@ def do_processfinal(msg, ver):
     
 def do_processfeedback(msg, ver):
     identlist = loadlist("ident")
-    if processfeedback(msg, ver, identlist):
+    if processfeedback(msg, ver, identlist, gettx_wait):
         print "FEEDBACK Msg accepted:\n%s" % pretty_json(ver)
     else:
         print("FEEDBACK Msg rejected.")

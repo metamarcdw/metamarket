@@ -320,7 +320,7 @@ def sendtx(tx):
     except bitcoin.rpc.JSONRPCException as jre:
         raise Exception("TX NOT SENT.", jre)
         
-def gettx(txid):
+def gettx(txid, callback):
     while True:
         tx = None
         try:
@@ -330,19 +330,21 @@ def gettx(txid):
         if tx:
             return tx
         else:
-            print "Waiting for broadcast of TX..."
+            callback()
             time.sleep(5)
             
-def waitforconf(txid):
+def waitforconf(txid, callback, endcb=None):
     while True:
         confirms = 0
         tx = btcd.getrawtransaction(txid, 1)
         if 'confirmations' in tx:
             confirms = tx['confirmations']
         if confirms >= minconf:
+            if endcb:
+                endcb()
             break
         else:
-            print "Waiting for confirmation. %d/%d so far..." % ( confirms, minconf )
+            callback( confirms, minconf )
             time.sleep(5)
 
 def searchtxops(tx, address, amount=None):
@@ -354,9 +356,9 @@ def searchtxops(tx, address, amount=None):
         raise Exception("No vout found matching address/amount.")
 
 
-def processreg(msg, ver):
-    reg_tx = gettx(ver.obj['txid'])
-    waitforconf(ver.obj['txid'])
+def processreg(msg, ver, gettx_wait, conf_wait):
+    reg_tx = gettx(ver.obj['txid'], gettx_wait)
+    waitforconf(ver.obj['txid'], conf_wait)
     fee = decimal.Decimal(mymarket.obj['fee'])
     searchtxops(reg_tx, btcaddr, fee)
     
@@ -376,17 +378,17 @@ def processident(msg, ver, mod=False, *reglist):
     else:
         return False
 
-def processburn(msg, ver, identlist):
+def processburn(msg, ver, identlist, gettx_wait, conf_wait):
     user = searchlistbyhash(identlist, ver.obj['userid'])
     burntxid = ver.obj['txid']
-    burn_tx = gettx(burntxid)
-    ag_tx = gettx( burn_tx['vin'][0]['txid'] )
+    burn_tx = gettx(burntxid, gettx_wait)
+    ag_tx = gettx( burn_tx['vin'][0]['txid'], gettx_wait )
     
     searchtxops(ag_tx, user.obj['btcaddr'])
     searchtxops(burn_tx, pob_address)
     
     if user:
-        waitforconf(burntxid)
+        waitforconf(burntxid, conf_wait)
         
         MM_writefile(msg)
         appendindex('burn', ver.hash)
@@ -461,13 +463,13 @@ def processfinal(msg, ver, identlist, reclist):
     else:
         return False
 
-def processfeedback(msg, ver, identlist):
+def processfeedback(msg, ver, identlist, gettx_wait):
     fromuser = searchlistbyhash(identlist, ver.obj['fromid'])
     touser = searchlistbyhash(identlist, ver.obj['toid'])
     
-    finaltx = gettx(txid)
+    finaltx = gettx(txid, gettx_wait)
     prevtxid = finaltx['vin'][0]['txid']
-    prevtx = gettx(prevtxid)
+    prevtx = gettx(prevtxid, gettx_wait)
     msaddr = prevtx['vout'][0]['addresses'][0]
     
     redeemscript = btcd.decodescript(ver.obj['redeemscript'])
@@ -565,7 +567,7 @@ def createreg(myidhash, mybtc, amount, mod, default_fee):
     return createregmsgstr(mybtc, mod.hash, myidhash, reg_txid)
 
 
-def createburn(myidhash, mybtc, amount, default_fee):
+def createburn(myidhash, mybtc, amount, default_fee, conf_wait, conf_end=None):
     change_addr = btcd.getrawchangeaddress()
     
     # Aggregate to main address. Includes 2 fees.
@@ -580,8 +582,8 @@ def createburn(myidhash, mybtc, amount, default_fee):
     
     ag_txid = sendtx(sig_agtx_hex)
     # print "AGGREGATE TXID:", ag_txid
-    waitforconf(ag_txid)
-
+    waitforconf(ag_txid, conf_wait, conf_end)
+    
     # Create raw burn TX.
     sig_agtx = btcd.decoderawtransaction(sig_agtx_hex)
     vout = searchtxops(sig_agtx, mybtc, amount+default_fee)
@@ -678,10 +680,10 @@ def createpay(myidhash, mybtc, conf, order, offer):
                                         complete_refund, address )
 
 
-def createrec( myidhash, mybtc, pay, order, price ):
-    fund_tx = gettx(order.obj['txid'])
+def createrec( myidhash, mybtc, pay, order, price, gettx_wait, conf_wait ):
+    fund_tx = gettx(order.obj['txid'], gettx_wait)
     searchtxops(fund_tx, order.obj['multisig']['address'], price)
-    waitforconf(order.obj['txid'])
+    waitforconf(order.obj['txid'], conf_wait)
     
     final_op = prev_tx = [ dict((key, order.obj[key]) for key in ("txid", "vout")) ]
     def create_final(fee):
