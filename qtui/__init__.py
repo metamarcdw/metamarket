@@ -76,6 +76,9 @@ class MyForm(QtGui.QMainWindow,
                         'bmpswd':       'password',
                         'bmhost':       'localhost',
                         'bmport':       '8442',
+                        'btcuser':      'username',
+                        'btcpswd':      'password',
+                        'btchost':      'localhost',
                         'btcport':      '8332'    }
         config = ConfigParser.RawConfigParser(defaults)
         config.read('mm.cfg')
@@ -99,8 +102,13 @@ class MyForm(QtGui.QMainWindow,
         bmhost = self.config.get(self.section, 'bmhost')
         bmport = self.config.getint(self.section, 'bmport')
         
+        btcuser = self.config.get(self.section, 'btcuser')
+        btcpswd = self.config.get(self.section, 'btcpswd')
+        btchost = self.config.get(self.section, 'btchost')
         btcport = self.config.getint(self.section, 'btcport')
-        return ( chain, channame, fee, minconf, bmuser, bmpswd, bmhost, bmport, btcport )
+        return ( chain, channame, fee, minconf, \
+                bmuser, bmpswd, bmhost, bmport, \
+                btcuser, btcpswd, btchost, btcport )
     
     def exportConfig(self):
         self.config.set(self.section, 'chain', self.chain)
@@ -114,11 +122,15 @@ class MyForm(QtGui.QMainWindow,
         self.config.set(self.section, 'bmhost', self.bmhost)
         self.config.set(self.section, 'bmport', self.bmport)
         
-        self.config.set(self.section, 'btcport', self.btc_port)
+        self.config.set(self.section, 'btcuser', self.btcuser)
+        self.config.set(self.section, 'btcpswd', self.btcpswd)
+        self.config.set(self.section, 'btchost', self.btchost)
+        self.config.set(self.section, 'btcport', self.btcport)
     
     def setConfig(self, configTuple):
         self.chain, self.channame, self.default_fee, self.minconf, \
-            self.bmuser, self.bmpswd, self.bmhost, self.bmport, self.btc_port = configTuple
+            self.bmuser, self.bmpswd, self.bmhost, self.bmport, \
+            self.btcuser, self.btcpswd, self.btchost, self.btcport = configTuple
         
         if self.chain == 'testnet':
             self.netcode = 'XTN'
@@ -130,8 +142,7 @@ class MyForm(QtGui.QMainWindow,
             raise Exception("Config: chain must be either testnet or mainnet.")
         
         bm_url = "http://%s:%s@%s:%d" % ( self.bmuser, self.bmpswd, self.bmhost, self.bmport )
-        btcd_url = "http://user:password@localhost:%d" % self.btc_port
-        #   TODO: Create configuration options for btcd_url
+        btcd_url = "http://%s:%s@%s:%d" % ( self.btcuser, self.btcpswd, self.btchost, self.btcport )
         
         MM_util.btcd = bitcoinrpc.authproxy.AuthServiceProxy(btcd_url)
         MM_util.bm = xmlrpclib.ServerProxy(bm_url)
@@ -150,7 +161,8 @@ class MyForm(QtGui.QMainWindow,
     
     def getConfig(self):
         return ( self.chain, self.channame, self.default_fee, self.minconf, \
-                self.bmuser, self.bmpswd, self.bmhost, self.bmport, self.btc_port )
+                self.bmuser, self.bmpswd, self.bmhost, self.bmport, \
+                self.btcuser, self.btcpswd, self.btchost, self.btcport )
     
     
     def loadListIfModified(self, index):

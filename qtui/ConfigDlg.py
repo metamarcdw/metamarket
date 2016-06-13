@@ -22,7 +22,10 @@ class ConfigDlg(QDialog,
         if not MAC:
             self.buttonBox.setFocusPolicy(Qt.NoFocus)
         
-        chain, channame, fee, minconf, bmuser, bmpswd, bmhost, bmport, btcport = configTuple
+        chain, channame, fee, minconf, \
+            bmuser, bmpswd, bmhost, bmport, \
+            btcuser, btcpswd, btchost, btcport = configTuple
+        
         if chain == "testnet":
             self.chainComboBox.setCurrentIndex(0)
         else:
@@ -34,6 +37,9 @@ class ConfigDlg(QDialog,
         self.bmpswdLineEdit.setText(bmpswd)
         self.bmhostLineEdit.setText(bmhost)
         self.bmportSpinBox.setValue(bmport)
+        self.btcuserLineEdit.setText(btcuser)
+        self.btcpswdLineEdit.setText(btcpswd)
+        self.btchostLineEdit.setText(btchost)
         self.btcportSpinBox.setValue(btcport)
         
         self.updateUi()
@@ -43,8 +49,13 @@ class ConfigDlg(QDialog,
         bmuser_blank = self.bmuserLineEdit.text().isEmpty()
         bmpswd_blank = self.bmpswdLineEdit.text().isEmpty()
         bmhost_blank = self.bmhostLineEdit.text().isEmpty()
+        btcuser_blank = self.btcuserLineEdit.text().isEmpty()
+        btcpswd_blank = self.btcpswdLineEdit.text().isEmpty()
+        btchost_blank = self.btchostLineEdit.text().isEmpty()
         
-        if channame_blank or bmuser_blank or bmpswd_blank or bmhost_blank:
+        if channame_blank or \
+                bmuser_blank or bmpswd_blank or bmhost_blank or \
+                btcuser_blank or btcpswd_blank or btchost_blank:
             self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         else:
             self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
@@ -70,12 +81,20 @@ class ConfigDlg(QDialog,
         channame = str( self.channameLineEdit.text() )
         fee = truncate( Decimal(self.feeDoubleSpinBox.value()) )
         minconf = self.minconfSpinBox.value()
+        
         bmuser = str( self.bmuserLineEdit.text() )
         bmpswd = str( self.bmpswdLineEdit.text() )
         bmhost = str( self.bmhostLineEdit.text() )
         bmport = self.bmportSpinBox.value()
+        
+        btcuser = str( self.btcuserLineEdit.text() )
+        btcpswd = str( self.btcpswdLineEdit.text() )
+        btchost = str( self.btchostLineEdit.text() )
         btcport = self.btcportSpinBox.value()
-        return ( chain, channame, fee, minconf, bmuser, bmpswd, bmhost, bmport, btcport )
+        
+        return ( chain, channame, fee, minconf, \
+                    bmuser, bmpswd, bmhost, bmport, \
+                    btcuser, btcpswd, btchost, btcport )
     
 
 if __name__ == "__main__":
@@ -85,12 +104,20 @@ if __name__ == "__main__":
     channame = sys.argv[2]
     fee = Decimal( sys.argv[3] )
     minconf = int( sys.argv[4] )
+    
     bmuser = sys.argv[5]
     bmpswd = sys.argv[6]
     bmhost = sys.argv[7]
     bmport = int( sys.argv[8] )
-    btcport = int( sys.argv[9] )
-    configTuple = ( chain, channame, fee, minconf, bmuser, bmpswd, bmhost, bmport, btcport )
+    
+    btcuser = sys.argv[9]
+    btcpswd = sys.argv[10]
+    btchost = sys.argv[11]
+    btcport = int( sys.argv[12] )
+    
+    configTuple = ( chain, channame, fee, minconf, \
+                    bmuser, bmpswd, bmhost, bmport, \
+                    btcuser, btcpswd, btchost, btcport )
     
     form = ConfigDlg(configTuple)
     if form.exec_():
