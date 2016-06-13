@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>384</width>
+    <width>431</width>
     <height>393</height>
    </rect>
   </property>
@@ -15,21 +15,21 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <layout class="QVBoxLayout" name="verticalLayout_4">
+    <layout class="QVBoxLayout" name="verticalLayout_7">
      <item>
-      <widget class="QGroupBox" name="groupBox">
+      <widget class="QGroupBox" name="groupBox_3">
        <property name="title">
         <string>Configuration:</string>
        </property>
-       <layout class="QGridLayout" name="gridLayout_2">
+       <layout class="QGridLayout" name="gridLayout_4">
         <item row="0" column="0">
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout">
+           <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
-             <widget class="QLabel" name="chainLabel">
+             <widget class="QLabel" name="label_9">
               <property name="text">
-               <string>Bitcoin Chain:</string>
+               <string>Bitcoin Chain</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -40,9 +40,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="channameLabel">
+             <widget class="QLabel" name="label_10">
               <property name="text">
-               <string>Channel:</string>
+               <string>Channel</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -53,9 +53,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="feeLabel">
+             <widget class="QLabel" name="label_11">
               <property name="text">
-               <string>Default Fee:</string>
+               <string>Default Fee</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -66,9 +66,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="minconfLabel">
+             <widget class="QLabel" name="label_12">
               <property name="text">
-               <string>Minimum Confirms:</string>
+               <string>Minimum Confirms</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -78,85 +78,20 @@
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QLabel" name="bmuserLabel">
-              <property name="text">
-               <string>Bitmessage RPC User:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-              <property name="buddy">
-               <cstring>bmuserLineEdit</cstring>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="bmpswdLabel">
-              <property name="text">
-               <string>Bitmessage RPC Password:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-              <property name="buddy">
-               <cstring>bmpswdLineEdit</cstring>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="bmhostLabel">
-              <property name="text">
-               <string>Bitmessage RPC Host:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-              <property name="buddy">
-               <cstring>bmhostLineEdit</cstring>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="bmportLabel">
-              <property name="text">
-               <string>Bitmessage RPC Port:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-              <property name="buddy">
-               <cstring>bmportSpinBox</cstring>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="btcportLabel">
-              <property name="text">
-               <string>Bitcoin Core RPC Port:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-              <property name="buddy">
-               <cstring>btcportSpinBox</cstring>
-              </property>
-             </widget>
-            </item>
            </layout>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
+           <layout class="QVBoxLayout" name="verticalLayout_5">
             <item>
              <widget class="QComboBox" name="chainComboBox">
               <item>
                <property name="text">
-                <string>testnet</string>
+                <string>mainnet</string>
                </property>
               </item>
               <item>
                <property name="text">
-                <string>mainnet</string>
+                <string>testnet</string>
                </property>
               </item>
              </widget>
@@ -177,29 +112,6 @@
             <item>
              <widget class="QSpinBox" name="minconfSpinBox"/>
             </item>
-            <item>
-             <widget class="QLineEdit" name="bmuserLineEdit"/>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="bmpswdLineEdit"/>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="bmhostLineEdit"/>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="bmportSpinBox">
-              <property name="maximum">
-               <number>99999</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="btcportSpinBox">
-              <property name="maximum">
-               <number>99999</number>
-              </property>
-             </widget>
-            </item>
            </layout>
           </item>
          </layout>
@@ -208,16 +120,198 @@
       </widget>
      </item>
      <item>
-      <widget class="QDialogButtonBox" name="buttonBox">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="standardButtons">
-        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Bitcoin Core RPC:</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="0" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>User</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="buddy">
+                 <cstring>btcuserLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>Password</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="buddy">
+                 <cstring>btcpswdLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>Host</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="buddy">
+                 <cstring>btchostLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>Port</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="buddy">
+                 <cstring>btcportSpinBox</cstring>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+               <widget class="QLineEdit" name="btcuserLineEdit"/>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="btcpswdLineEdit"/>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="btchostLineEdit"/>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="btcportSpinBox">
+                <property name="maximum">
+                 <number>99999</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Bitmessage RPC:</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_3">
+              <item>
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>User</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="buddy">
+                 <cstring>bmuserLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>Password</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="buddy">
+                 <cstring>bmpswdLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>Host</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="buddy">
+                 <cstring>bmhostLineEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>Port</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="buddy">
+                 <cstring>bmportSpinBox</cstring>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_4">
+              <item>
+               <widget class="QLineEdit" name="bmuserLineEdit"/>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="bmpswdLineEdit"/>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="bmhostLineEdit"/>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="bmportSpinBox">
+                <property name="maximum">
+                 <number>99999</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
+   </item>
+   <item row="1" column="0">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
@@ -226,11 +320,14 @@
   <tabstop>channameLineEdit</tabstop>
   <tabstop>feeDoubleSpinBox</tabstop>
   <tabstop>minconfSpinBox</tabstop>
+  <tabstop>btcuserLineEdit</tabstop>
+  <tabstop>btcpswdLineEdit</tabstop>
+  <tabstop>btchostLineEdit</tabstop>
+  <tabstop>btcportSpinBox</tabstop>
   <tabstop>bmuserLineEdit</tabstop>
   <tabstop>bmpswdLineEdit</tabstop>
   <tabstop>bmhostLineEdit</tabstop>
   <tabstop>bmportSpinBox</tabstop>
-  <tabstop>btcportSpinBox</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
