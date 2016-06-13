@@ -12,7 +12,7 @@
 
 from MM_util import *
 import MM_util
-import bitcoin, bitcoin.rpc, pycoin.serialize, pycoin.key.Key
+import bitcoinrpc.authproxy, pycoin.serialize, pycoin.key.Key
 import scrypt
 import simplejson as json
 import argparse, ConfigParser
@@ -1029,8 +1029,9 @@ else:
 if entity not in ('buyer', 'vendor', 'mod'):
     raise Exception("Config: entity must be buyer, vendor or mod.")
 
-bitcoin.SelectParams(chain)
-MM_util.btcd = bitcoin.rpc.RawProxy(service_port=btc_port)
+#   TODO: Create configuration options for btcd_url
+btcd_url = "http://user:password@localhost:%d" % btc_port
+MM_util.btcd = bitcoinrpc.authproxy.AuthServiceProxy(btcd_url)
 MM_util.bm = xmlrpclib.ServerProxy(bm_url)
 MM_util.minconf = minconf
 

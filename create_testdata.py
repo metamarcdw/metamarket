@@ -11,20 +11,19 @@
 # LICENSE file.
 
 import MM_util
-import pycoin.key.Key
-import bitcoin, bitcoin.rpc, pycoin.serialize
+import pycoin.key.Key, pycoin.serialize
+import bitcoinrpc.authproxy
 import xmlrpclib, base64, hashlib, decimal, time
 import scrypt, simplecrypt
 
-CHAIN = "testnet"
 NETCODE = "XTN"
+BTCDURL = "http://user:password@localhost:18332"
 BMURL = "http://username:password@localhost:8442"
 HOUR = 60 * 60
 DAY = HOUR * 24
 
 decimal.getcontext().prec = 8
-bitcoin.SelectParams(CHAIN)
-MM_util.btcd = bitcoin.rpc.RawProxy()
+MM_util.btcd = bitcoinrpc.authproxy.AuthServiceProxy(BTCDURL)
 MM_util.btcd.walletpassphrase('test', 300)
 bm = xmlrpclib.ServerProxy(BMURL)
 

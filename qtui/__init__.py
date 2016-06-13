@@ -4,7 +4,7 @@ sys.path.append(    # Make sure we can access MM_util in the parent directory
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
 import MM_util
-import bitcoin, bitcoin.rpc, pycoin.serialize, pycoin.key.Key
+import bitcoinrpc.authproxy, pycoin.serialize, pycoin.key.Key
 import scrypt, simplecrypt
 import simplejson as json
 import ConfigParser
@@ -130,9 +130,10 @@ class MyForm(QtGui.QMainWindow,
             raise Exception("Config: chain must be either testnet or mainnet.")
         
         bm_url = "http://%s:%s@%s:%d" % ( self.bmuser, self.bmpswd, self.bmhost, self.bmport )
+        btcd_url = "http://user:password@localhost:%d" % self.btc_port
+        #   TODO: Create configuration options for btcd_url
         
-        bitcoin.SelectParams(self.chain)
-        MM_util.btcd = bitcoin.rpc.RawProxy(service_port=self.btc_port)
+        MM_util.btcd = bitcoinrpc.authproxy.AuthServiceProxy(btcd_url)
         MM_util.bm = xmlrpclib.ServerProxy(bm_url)
         MM_util.minconf = self.minconf
         MM_util.pob_address = pob_address
@@ -365,7 +366,7 @@ class MyForm(QtGui.QMainWindow,
             if not wp:
                 return
             MM_util.unlockwallet(wp)
-        except bitcoin.rpc.JSONRPCException as jre:
+        except bitcoinrpc.authproxy.JSONRPCException as jre:
             if jre.error['code'] == -14:
                 self.info("The passphrase was not correct. Please try logging in again.")
                 return

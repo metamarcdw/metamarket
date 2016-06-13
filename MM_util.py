@@ -9,7 +9,7 @@
 # propagated, or distributed except according to the terms contained in the
 # LICENSE file.
 
-import bitcoin
+from bitcoinrpc.authproxy import JSONRPCException
 import pycoin.serialize
 import simplejson as json
 import simplecrypt
@@ -292,7 +292,7 @@ def getrep( identhash, burn_mult, feedbacklist, burnlist ):
         if burn.obj['userid'] == identhash:
             try:
                 burntx_hex = btcd.getrawtransaction(burn.obj['txid'])
-            except bitcoin.rpc.JSONRPCException as jre:
+            except JSONRPCException as jre:
                 if jre.error['code'] == -5:
                     continue
             burntx = btcd.decoderawtransaction( burntx_hex )
@@ -318,7 +318,7 @@ def backupordermsgs(finalhash, finallist, reclist, paylist, conflist):
 def sendtx(tx):
     try:
         return btcd.sendrawtransaction(tx)
-    except bitcoin.rpc.JSONRPCException as jre:
+    except JSONRPCException as jre:
         raise Exception("TX NOT SENT.", jre)
         
 def gettx(txid, callback):
@@ -326,7 +326,7 @@ def gettx(txid, callback):
         tx = None
         try:
             tx = btcd.getrawtransaction(txid, 1)
-        except bitcoin.rpc.JSONRPCException as jre:
+        except JSONRPCException as jre:
             pass
         if tx:
             return tx
