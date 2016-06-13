@@ -26,7 +26,7 @@ class ConfigDlg(QDialog,
             bmuser, bmpswd, bmhost, bmport, \
             btcuser, btcpswd, btchost, btcport = configTuple
         
-        if chain == "testnet":
+        if chain == "mainnet":
             self.chainComboBox.setCurrentIndex(0)
         else:
             self.chainComboBox.setCurrentIndex(1)
