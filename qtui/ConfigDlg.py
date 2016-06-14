@@ -33,10 +33,12 @@ class ConfigDlg(QDialog,
         self.channameLineEdit.setText(channame)
         self.feeDoubleSpinBox.setValue(fee)
         self.minconfSpinBox.setValue(minconf)
+        
         self.bmuserLineEdit.setText(bmuser)
         self.bmpswdLineEdit.setText(bmpswd)
         self.bmhostLineEdit.setText(bmhost)
         self.bmportSpinBox.setValue(bmport)
+        
         self.btcuserLineEdit.setText(btcuser)
         self.btcpswdLineEdit.setText(btcpswd)
         self.btchostLineEdit.setText(btchost)
@@ -60,6 +62,7 @@ class ConfigDlg(QDialog,
         else:
             self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
     
+    
     @pyqtSignature("QString")
     def on_channameLineEdit_textEdited(self):
         self.updateUi()
@@ -76,6 +79,19 @@ class ConfigDlg(QDialog,
     def on_bmhostLineEdit_textEdited(self):
         self.updateUi()
     
+    @pyqtSignature("QString")
+    def on_btcuserLineEdit_textEdited(self):
+        self.updateUi()
+    
+    @pyqtSignature("QString")
+    def on_btcpswdLineEdit_textEdited(self):
+        self.updateUi()
+    
+    @pyqtSignature("QString")
+    def on_btchostLineEdit_textEdited(self):
+        self.updateUi()
+    
+    
     def result(self):
         chain = str( self.chainComboBox.currentText() )
         channame = str( self.channameLineEdit.text() )
