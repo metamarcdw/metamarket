@@ -127,7 +127,7 @@ class MyForm(QtGui.QMainWindow,
         self.config.set(self.section, 'btchost', self.btchost)
         self.config.set(self.section, 'btcport', self.btcport)
     
-    def setConfig(self, configTuple):
+    def setConfig(self, configTuple, retries=0):
         self.chain, self.channame, self.default_fee, self.minconf, \
             self.bmuser, self.bmpswd, self.bmhost, self.bmport, \
             self.btcuser, self.btcpswd, self.btchost, self.btcport = configTuple
@@ -152,6 +152,9 @@ class MyForm(QtGui.QMainWindow,
             feePerKB = decimal.Decimal( MM_util.btcd.estimatefee(6) )
         except socket.error:
             self.sockErr()
+        except httplib.BadStatusLine:
+            MM_util.reconnect_btcd(retries)
+            return self.setConfig(configTuple, retries+1)
         
         if feePerKB > 0:
             self.feePerKB = feePerKB
@@ -354,7 +357,7 @@ class MyForm(QtGui.QMainWindow,
         if loginDlg.exec_():
             return loginDlg.result()
         
-    def login(self):
+    def login(self, retries=0):
         credentials = self.showLoginDlg()
         if not credentials:
             return
@@ -376,15 +379,20 @@ class MyForm(QtGui.QMainWindow,
             if not wp:
                 return
             MM_util.unlockwallet(wp)
+            
+            addrismine = MM_util.btcd.validateaddress(self.btcaddr)['ismine']
         except bitcoinrpc.authproxy.JSONRPCException as jre:
             if jre.error['code'] == -14:
                 self.info("The passphrase was not correct. Please try logging in again.")
                 return
         except socket.error:
             self.sockErr()
+        except httplib.BadStatusLine:
+            MM_util.reconnect_btcd(retries)
+            return self.login(retries+1)
         
-        if MM_util.bm.createDeterministicAddresses(base64.b64encode(self.pkstr)) == [] or \
-            not MM_util.btcd.validateaddress(self.btcaddr)['ismine']:
+        if MM_util.bm.createDeterministicAddresses(base64.b64encode(self.pkstr)) == [] \
+            or not addrismine:
             if not self.importkeys():
                 return
         
@@ -400,13 +408,17 @@ class MyForm(QtGui.QMainWindow,
         self.loggedIn = True
         self.updateUi()
     
-    def importkeys(self):
+    def importkeys(self, retries=0):
         if self.yorn("Bitcoin private key not found in wallet or "+\
                 "Bitmessage identity does not exist. Import your "+\
                 "BTC private key and create your BM ID?"):
             pass2 = self.input("Please re-enter your passphrase:", password=True)
             if pass2 == self.passphrase:
-                MM_util.btcd.importprivkey(self.wif, self.username, False)
+                try:
+                    MM_util.btcd.importprivkey(self.wif, self.username, False)
+                except httplib.BadStatusLine:
+                    MM_util.reconnect_btcd(retries)
+                    return self.importkeys(retries+1)
                 
                 self.info("REMEMBER TO SECURELY BACKUP YOUR wallet.dat file!")
                 return True
