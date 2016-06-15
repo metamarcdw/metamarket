@@ -79,19 +79,19 @@ class ConfigDlg(QDialog,
     def on_bmhostLineEdit_textEdited(self):
         self.updateUi()
     
-    @pyqtSignature("QString")
-    def on_btcuserLineEdit_textEdited(self):
-        self.updateUi()
-    
-    @pyqtSignature("QString")
-    def on_btcpswdLineEdit_textEdited(self):
-        self.updateUi()
-    
-    @pyqtSignature("QString")
-    def on_btchostLineEdit_textEdited(self):
-        self.updateUi()
-    
-    
+    @pyqtSignature("QString")
+    def on_btcuserLineEdit_textEdited(self):
+        self.updateUi()
+    
+    @pyqtSignature("QString")
+    def on_btcpswdLineEdit_textEdited(self):
+        self.updateUi()
+    
+    @pyqtSignature("QString")
+    def on_btchostLineEdit_textEdited(self):
+        self.updateUi()
+    
+    
     def result(self):
         chain = str( self.chainComboBox.currentText() )
         channame = str( self.channameLineEdit.text() )

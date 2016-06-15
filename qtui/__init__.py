@@ -141,11 +141,8 @@ class MyForm(QtGui.QMainWindow,
         else:
             raise Exception("Config: chain must be either testnet or mainnet.")
         
-        bm_url = "http://%s:%s@%s:%d" % ( self.bmuser, self.bmpswd, self.bmhost, self.bmport )
-        btcd_url = "http://%s:%s@%s:%d" % ( self.btcuser, self.btcpswd, self.btchost, self.btcport )
-        
-        MM_util.btcd = bitcoinrpc.authproxy.AuthServiceProxy(btcd_url)
-        MM_util.bm = xmlrpclib.ServerProxy(bm_url)
+        MM_util.connect_btcd(self.btcuser, self.btcpswd, self.btchost, self.btcport)
+        MM_util.connect_bm(self.bmuser, self.bmpswd, self.bmhost, self.bmport)
         MM_util.minconf = self.minconf
         MM_util.pob_address = pob_address
         
@@ -172,10 +169,7 @@ class MyForm(QtGui.QMainWindow,
         
         if mtime > lastTime:
             self.listLastLoaded[index] = time.time()
-            try:
-                list = MM_util.loadlist(index)
-            except httplib.BadStatusLine:
-                self.btcdErr()
+            list = MM_util.loadlist(index)
             
             if index == "ident":
                 MM_util.idList = list
@@ -211,6 +205,13 @@ class MyForm(QtGui.QMainWindow,
             elif self.orderStatus == self.statusNames[4]:
                 index = 'final'
             return index
+    
+    def getFee(self):
+        if self.feePerKB:
+            return self.feePerKB
+        else:
+            return self.default_fee
+    
     
     def updateUi(self):
         #UPDATE MAINWINDOW UI WITH DATA FROM ALL DATA STRUCTURES
@@ -331,11 +332,8 @@ class MyForm(QtGui.QMainWindow,
             
             for i in range(numIdents):
                 id = identlist[i]
-                try:
-                    rep = MM_util.getrep(id.hash, self.currentMarket.obj['multiplier'], \
-                                            self.listDict['feedback'], self.listDict['burn'])
-                except httplib.BadStatusLine:
-                    self.btcdErr()
+                rep = MM_util.getrep(id.hash, self.currentMarket.obj['multiplier'], \
+                                        self.listDict['feedback'], self.listDict['burn'])
                 
                 self.identTableWidget.setItem( i, 0, QTableWidgetItem(id.obj['name']) )
                 self.identTableWidget.setItem( i, 1, QTableWidgetItem("%d" % rep) )
@@ -382,8 +380,6 @@ class MyForm(QtGui.QMainWindow,
             if jre.error['code'] == -14:
                 self.info("The passphrase was not correct. Please try logging in again.")
                 return
-        except httplib.BadStatusLine:
-            self.btcdErr()
         except socket.error:
             self.sockErr()
         
@@ -609,7 +605,7 @@ class MyForm(QtGui.QMainWindow,
         vendor = MM_util.searchlistbyhash(identlist, offer.obj['vendorid'])
         
         msgstr = MM_util.createorder( \
-                    self.myid.hash, self.btcaddr, offer, self.pkstr, self.default_fee)
+                    self.myid.hash, self.btcaddr, offer, self.pkstr, self.getFee() )
         hash = MM_util.MM_writefile(msgstr)
         MM_util.appendindex('order', hash)
         
@@ -824,7 +820,7 @@ class MyForm(QtGui.QMainWindow,
         amount = self.currentMarket.obj['fee']
         
         msgstr = MM_util.createreg( \
-                    self.myid.hash, self.btcaddr, amount, mod, self.default_fee)
+                    self.myid.hash, self.btcaddr, amount, mod, self.getFee() )
         hash = MM_util.MM_writefile(msgstr)
         MM_util.appendindex('reg', hash)
         
@@ -858,17 +854,15 @@ class MyForm(QtGui.QMainWindow,
         self.tabWidget.setEnabled(True)
     
     @pyqtSignature("")
-    def on_identBurnButton_clicked(self):
-        amount = self.value_input("How much BTC would you like to BURN?")
+    def on_identBurnButton_clicked(self, amount=None):
+        mod = MM_util.searchlistbyhash(self.listDict["ident"], self.currentMarket.obj['modid'])
         
+        amount = self.value_input("How much BTC would you like to BURN?")
         if not amount or not self.yorn("Are you sure?"):
             return
         
-        try:
-            msgstr = MM_util.createburn( self.myid.hash, self.btcaddr, \
-                                amount, self.default_fee, self.conf_wait, self.conf_end )
-        except httplib.BadStatusLine:
-            self.btcdErr()
+        msgstr = MM_util.createburn( self.myid.hash, self.btcaddr, \
+                            amount, self.getFee(), self.conf_wait, self.conf_end )
         
         hash = MM_util.MM_writefile(msgstr)
         MM_util.appendindex('burn', hash)
@@ -883,10 +877,7 @@ class MyForm(QtGui.QMainWindow,
                 return obj
     
     def processMsg(self, msg):
-        try:
-            ver = MM_util.readmsg(msg) # Verifies sig/hash
-        except httplib.BadStatusLine:
-            self.btcdErr()
+        ver = MM_util.readmsg(msg) # Verifies sig/hash
         
         if ver.msgname == MM_util.IDENT:
             MM_util.processident(msg, ver)
