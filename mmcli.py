@@ -393,7 +393,7 @@ def do_createpay():
     order = searchlistbyhash(orderlist, conf.obj['orderhash'])
     offer = do_offerfromordermsg(conf)
     
-    msgstr = createpay(myid.hash, btcaddr, conf, order, offer)
+    msgstr = createpay(myid.hash, btcaddr, conf, order, offer, default_fee)
     hash = MM_writefile(msgstr)
     appendindex('pay', hash)
     

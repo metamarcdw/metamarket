@@ -601,10 +601,6 @@ def createreg(myidhash, mybtc, amount, mod, tx_fee, retries=0):
             return create_regtx(fee, retries+1)
         
     regtx_hex_signed = create_regtx(tx_fee)
-    regtx_fee = calc_fee(regtx_hex_signed)
-    if regtx_fee != tx_fee:
-        regtx_hex_signed = create_regtx(regtx_fee)
-        
     reg_txid = sendtx(regtx_hex_signed)
     # print "REGISTER TXID:", reg_txid
     return createregmsgstr(mybtc, mod.hash, myidhash, reg_txid)
@@ -619,7 +615,7 @@ def createburn(myidhash, mybtc, amount, tx_fee, conf_wait, conf_end=None, retrie
     
     # Aggregate to main address. Includes 2 fees.
     def create_ag(fee, retries=0):
-        raw_agtx_hex = mktx(amount+tx_fee, mybtc, change_addr, fee, minconf)
+        raw_agtx_hex = mktx(amount+fee, mybtc, change_addr, fee, minconf)
         try:
             return btcd.signrawtransaction(raw_agtx_hex)['hex']
         except httplib.BadStatusLine:
@@ -627,9 +623,6 @@ def createburn(myidhash, mybtc, amount, tx_fee, conf_wait, conf_end=None, retrie
             return create_ag(fee)
     
     sig_agtx_hex = create_ag(tx_fee)
-    ag_fee = calc_fee(sig_agtx_hex)
-    if ag_fee != tx_fee:
-        sig_agtx_hex = create_ag(ag_fee)
     try:
         sig_agtx = btcd.decoderawtransaction(sig_agtx_hex)
     except httplib.BadStatusLine:
@@ -680,10 +673,6 @@ def createorder(myidhash, mybtc, offer, cryptkey, tx_fee, retries=0):
             return create_funding(fee, retries+1)
     
     signedtx_hex = create_funding(tx_fee)
-    funding_fee = calc_fee(signedtx_hex)
-    if funding_fee != tx_fee:
-        signedtx_hex = create_funding(funding_fee)
-    
     crypttx = base64.b64encode( simplecrypt.encrypt(cryptkey, signedtx_hex) )
     
     try:
@@ -726,9 +715,6 @@ def createconf( myidhash, mybtc, order, offer, buyer, tx_fee, retries=0 ):
             return create_refund(fee, retries+1)
         
     refund_tx_hex = create_refund(tx_fee)
-    refund_fee = calc_fee(refund_tx_hex)
-    if refund_fee != tx_fee:
-        refund_tx_hex = create_refund(refund_fee)
     
     #sets sequence to 0 (hacky as balls)
     refund_tx_hex = refund_tx_hex[:84] + "00000000" + refund_tx_hex[92:]
@@ -750,11 +736,10 @@ def createconf( myidhash, mybtc, order, offer, buyer, tx_fee, retries=0 ):
                                         sig_refund_hex, prev_tx )
 
     
-def createpay(myidhash, mybtc, conf, order, offer, retries=0):
+def createpay(myidhash, mybtc, conf, order, offer, tx_fee, retries=0):
     price = decimal.Decimal(offer.obj['price'])
     ratio = decimal.Decimal(offer.obj['ratio'])
     b_portion, v_portion = getamounts(ratio, price)
-    refund_fee = calc_fee( conf.obj['refundtx'] )
     
     try:
         refund_verify = btcd.decoderawtransaction(conf.obj['refundtx'])
@@ -762,7 +747,7 @@ def createpay(myidhash, mybtc, conf, order, offer, retries=0):
         reconnect_btcd(retries)
         return createpay(myidhash, mybtc, conf, order, offer, retries+1)
     
-    searchtxops(refund_verify, btcaddr, b_portion - refund_fee/2)
+    searchtxops(refund_verify, btcaddr, b_portion - tx_fee/2)
     
     try:
         complete_refund = btcd.signrawtransaction( conf.obj['refundtx'], conf.obj['prevtx'], [wif])['hex']
@@ -792,9 +777,6 @@ def createrec( myidhash, mybtc, pay, order, price, gettx_wait, conf_wait, retrie
             return create_final(fee, retries+1)
         
     final_tx_hex = create_final(tx_fee)
-    final_fee = calc_fee(final_tx_hex)
-    if final_fee != tx_fee:
-        final_tx_hex = create_final(final_fee)
 
     prev_tx[0]["scriptPubKey"] = order.obj['spk']
     prev_tx[0]["redeemScript"] = order.obj['multisig']['redeemScript']
@@ -1105,12 +1087,6 @@ def mktx(price, addr, chg_addr, fee, confs=1, retries=0):
         reconnect_btcd(retries)
         return mktx(price, addr, chg_addr, fee, confs, retries+1)
     
-    
-# Takes a tx hexstring and returns a more appropriate fee..
-def calc_fee( hex_str ):
-    size_bytes = len(hex_str) / 2
-    size_rounded = int(math.ceil(size_bytes / 1000.0)) * 1000
-    return size_rounded / decimal.Decimal('10000000.0')
     
 # Takes a number and truncates it to 8 decimal places.
 def truncate(num):

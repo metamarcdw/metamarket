@@ -707,8 +707,8 @@ class MyForm(QtGui.QMainWindow,
                     return
             
             order = MM_util.searchlistbyhash( self.listDict['order'], prevmsg.obj['orderhash'] )
-            msgstr = MM_util.createpay(self.myid.hash, self.btcaddr, prevmsg, order, offer)
-            
+            msgstr = MM_util.createpay(self.myid.hash, self.btcaddr, prevmsg, order, offer, self.getFee())
+        
         elif index == 'rec':
             # Send final based on this rec
             replyindex = 'final'
