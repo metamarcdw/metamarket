@@ -34,10 +34,6 @@ class MyForm(QtGui.QMainWindow,
         self.setupUi(self)
         
         #INIT ALL DATA STRUCTURES
-        self.section = 'metamarket'
-        self.config = self.loadConfig()
-        self.setConfig( self.importConfig() )
-        
         self.loggedIn = False
         self.username = None
         self.passphrase = None
@@ -50,6 +46,10 @@ class MyForm(QtGui.QMainWindow,
         self.inbox = None
         self.currentMarket = None
         self.currentTag = None
+        
+        self.section = 'metamarket'
+        self.config = self.loadConfig()
+        self.setConfig( self.importConfig() )
         
         self.statusNames = ('Ordered', 'Confirmed', 'Paid', 'Payment Received', 'Finalized')
         self.orderStatus = self.statusNames[0]
@@ -149,17 +149,14 @@ class MyForm(QtGui.QMainWindow,
         try:
             self.chan_v3 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 3,1 )
             self.chan_v4 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 4,1 )
-            feePerKB = MM_util.btcd.estimatefee(6)
+            self.feePerKB = MM_util.btcd.estimatefee(6)
         except socket.error:
             self.sockErr()
         except httplib.BadStatusLine:
             MM_util.reconnect_btcd(retries)
             return self.setConfig(configTuple, retries+1)
-        
-        if feePerKB:
-            self.feePerKB = feePerKB
-        
-
+    
+    
     def getConfig(self):
         return ( self.chain, self.channame, self.default_fee, self.minconf, \
                 self.bmuser, self.bmpswd, self.bmhost, self.bmport, \
