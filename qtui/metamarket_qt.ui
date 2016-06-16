@@ -204,6 +204,13 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
+                <widget class="QLabel" name="offerMarketLabel">
+                 <property name="text">
+                  <string>Market:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QComboBox" name="offerMktComboBox">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -318,8 +325,25 @@
            <string>My Orders:</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_4">
-           <item row="1" column="0">
+           <item row="0" column="0">
             <layout class="QVBoxLayout" name="verticalLayout_2">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_10">
+               <item>
+                <widget class="QLabel" name="orderStatusLabel">
+                 <property name="text">
+                  <string>Status:</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="orderStatusComboBox"/>
+               </item>
+              </layout>
+             </item>
              <item>
               <widget class="QTableWidget" name="orderTableWidget">
                <property name="editTriggers">
@@ -402,10 +426,10 @@
              </item>
             </layout>
            </item>
-           <item row="0" column="0">
-            <widget class="QComboBox" name="orderStatusComboBox"/>
-           </item>
           </layout>
+          <zorder>orderStatusComboBox</zorder>
+          <zorder>orderCancelButton</zorder>
+          <zorder>orderStatusLabel</zorder>
          </widget>
         </item>
        </layout>
@@ -461,6 +485,13 @@
               <layout class="QVBoxLayout" name="verticalLayout_4">
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_5">
+                 <item>
+                  <widget class="QLabel" name="identMarketLabel">
+                   <property name="text">
+                    <string>Market:</string>
+                   </property>
+                  </widget>
+                 </item>
                  <item>
                   <widget class="QComboBox" name="identMktComboBox">
                    <property name="sizePolicy">

@@ -335,7 +335,7 @@ class MyForm(QtGui.QMainWindow,
             
             for i in range(numIdents):
                 id = identlist[i]
-                rep = MM_util.getrep(id.hash, self.currentMarket.obj['multiplier'], \
+                rep = MM_util.getrep(id.hash, decimal.Decimal(self.currentMarket.obj['multiplier']), \
                                         self.listDict['feedback'], self.listDict['burn'])
                 
                 self.identTableWidget.setItem( i, 0, QTableWidgetItem(id.obj['name']) )

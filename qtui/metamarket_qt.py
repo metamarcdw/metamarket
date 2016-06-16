@@ -3,7 +3,7 @@
 
 # Form implementation generated from reading ui file 'metamarket_qt.ui'
 #
-# Created: Mon May 30 00:00:15 2016
+# Created: Wed Jun 15 23:26:52 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -129,6 +129,9 @@ class Ui_MainWindow(object):
         self.verticalLayout_7.setObjectName(_fromUtf8("verticalLayout_7"))
         self.horizontalLayout_6 = QtGui.QHBoxLayout()
         self.horizontalLayout_6.setObjectName(_fromUtf8("horizontalLayout_6"))
+        self.offerMarketLabel = QtGui.QLabel(self.offerGroupBox)
+        self.offerMarketLabel.setObjectName(_fromUtf8("offerMarketLabel"))
+        self.horizontalLayout_6.addWidget(self.offerMarketLabel)
         self.offerMktComboBox = QtGui.QComboBox(self.offerGroupBox)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -188,6 +191,16 @@ class Ui_MainWindow(object):
         self.gridLayout_4.setObjectName(_fromUtf8("gridLayout_4"))
         self.verticalLayout_2 = QtGui.QVBoxLayout()
         self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
+        self.horizontalLayout_10 = QtGui.QHBoxLayout()
+        self.horizontalLayout_10.setObjectName(_fromUtf8("horizontalLayout_10"))
+        self.orderStatusLabel = QtGui.QLabel(self.orderGroupBox)
+        self.orderStatusLabel.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.orderStatusLabel.setObjectName(_fromUtf8("orderStatusLabel"))
+        self.horizontalLayout_10.addWidget(self.orderStatusLabel)
+        self.orderStatusComboBox = QtGui.QComboBox(self.orderGroupBox)
+        self.orderStatusComboBox.setObjectName(_fromUtf8("orderStatusComboBox"))
+        self.horizontalLayout_10.addWidget(self.orderStatusComboBox)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_10)
         self.orderTableWidget = QtGui.QTableWidget(self.orderGroupBox)
         self.orderTableWidget.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
         self.orderTableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
@@ -223,10 +236,7 @@ class Ui_MainWindow(object):
         self.orderCancelButton.setObjectName(_fromUtf8("orderCancelButton"))
         self.horizontalLayout_2.addWidget(self.orderCancelButton)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
-        self.gridLayout_4.addLayout(self.verticalLayout_2, 1, 0, 1, 1)
-        self.orderStatusComboBox = QtGui.QComboBox(self.orderGroupBox)
-        self.orderStatusComboBox.setObjectName(_fromUtf8("orderStatusComboBox"))
-        self.gridLayout_4.addWidget(self.orderStatusComboBox, 0, 0, 1, 1)
+        self.gridLayout_4.addLayout(self.verticalLayout_2, 0, 0, 1, 1)
         self.gridLayout_5.addWidget(self.orderGroupBox, 0, 0, 1, 1)
         self.tabWidget.addTab(self.orderTab, _fromUtf8(""))
         self.identTab = QtGui.QWidget()
@@ -260,6 +270,9 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setObjectName(_fromUtf8("verticalLayout_4"))
         self.horizontalLayout_5 = QtGui.QHBoxLayout()
         self.horizontalLayout_5.setObjectName(_fromUtf8("horizontalLayout_5"))
+        self.identMarketLabel = QtGui.QLabel(self.identGroupBox)
+        self.identMarketLabel.setObjectName(_fromUtf8("identMarketLabel"))
+        self.horizontalLayout_5.addWidget(self.identMarketLabel)
         self.identMktComboBox = QtGui.QComboBox(self.identGroupBox)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -363,6 +376,7 @@ class Ui_MainWindow(object):
         self.marketDeleteButton.setText(_translate("MainWindow", "Delete Market", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.marketTab), _translate("MainWindow", "Markets", None))
         self.offerGroupBox.setTitle(_translate("MainWindow", "Available Offers:", None))
+        self.offerMarketLabel.setText(_translate("MainWindow", "Market:", None))
         self.offerSearchLineEdit.setPlaceholderText(_translate("MainWindow", "Search", None))
         self.offerTableWidget.setSortingEnabled(True)
         item = self.offerTableWidget.horizontalHeaderItem(0)
@@ -380,6 +394,7 @@ class Ui_MainWindow(object):
         self.offerFilterButton.setText(_translate("MainWindow", "Filter Offers", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.offerTab), _translate("MainWindow", "Offers", None))
         self.orderGroupBox.setTitle(_translate("MainWindow", "My Orders:", None))
+        self.orderStatusLabel.setText(_translate("MainWindow", "Status:", None))
         self.orderTableWidget.setSortingEnabled(True)
         item = self.orderTableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Name", None))
@@ -402,6 +417,7 @@ class Ui_MainWindow(object):
         self.identBtcaddrLabel.setText(_translate("MainWindow", "BTC Address: ", None))
         self.identBmaddrLabel.setText(_translate("MainWindow", "BM Address: ", None))
         self.identGroupBox.setTitle(_translate("MainWindow", "Known Identities:", None))
+        self.identMarketLabel.setText(_translate("MainWindow", "Market:", None))
         self.identSearchLineEdit.setPlaceholderText(_translate("MainWindow", "Search", None))
         self.identTableWidget.setSortingEnabled(True)
         item = self.identTableWidget.horizontalHeaderItem(0)
