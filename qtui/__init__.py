@@ -149,16 +149,17 @@ class MyForm(QtGui.QMainWindow,
         try:
             self.chan_v3 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 3,1 )
             self.chan_v4 = MM_util.bm.getDeterministicAddress( base64.b64encode(self.channame), 4,1 )
-            feePerKB = decimal.Decimal( MM_util.btcd.estimatefee(6) )
+            feePerKB = MM_util.btcd.estimatefee(6)
         except socket.error:
             self.sockErr()
         except httplib.BadStatusLine:
             MM_util.reconnect_btcd(retries)
             return self.setConfig(configTuple, retries+1)
         
-        if feePerKB > 0:
+        if feePerKB:
             self.feePerKB = feePerKB
-    
+        
+
     def getConfig(self):
         return ( self.chain, self.channame, self.default_fee, self.minconf, \
                 self.bmuser, self.bmpswd, self.bmhost, self.bmport, \

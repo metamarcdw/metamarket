@@ -583,14 +583,14 @@ def importMarket(self, msgstr):
     bm.addSubscription(mod['obj']['bmaddr'])
 
 
-def createreg(myidhash, mybtc, amount, mod, default_fee, retries=0):
+def createreg(myidhash, mybtc, amount, mod, tx_fee, retries=0):
     modbtc = mod.obj['btcaddr']
     
     try:
         change_addr = btcd.getrawchangeaddress()
     except httplib.BadStatusLine:
         reconnect_btcd(retries)
-        return createreg(myidhash, mybtc, amount, mod, default_fee, retries+1)
+        return createreg(myidhash, mybtc, amount, mod, tx_fee, retries+1)
     
     def create_regtx(fee, retries=0):
         regtx_hex = mktx(amount, modbtc, change_addr, fee, minconf)
@@ -600,9 +600,9 @@ def createreg(myidhash, mybtc, amount, mod, default_fee, retries=0):
             reconnect_btcd(retries)
             return create_regtx(fee, retries+1)
         
-    regtx_hex_signed = create_regtx(default_fee)
+    regtx_hex_signed = create_regtx(tx_fee)
     regtx_fee = calc_fee(regtx_hex_signed)
-    if regtx_fee != default_fee:
+    if regtx_fee != tx_fee:
         regtx_hex_signed = create_regtx(regtx_fee)
         
     reg_txid = sendtx(regtx_hex_signed)
@@ -610,31 +610,31 @@ def createreg(myidhash, mybtc, amount, mod, default_fee, retries=0):
     return createregmsgstr(mybtc, mod.hash, myidhash, reg_txid)
 
 
-def createburn(myidhash, mybtc, amount, default_fee, conf_wait, conf_end=None, retries=0):
+def createburn(myidhash, mybtc, amount, tx_fee, conf_wait, conf_end=None, retries=0):
     try:
         change_addr = btcd.getrawchangeaddress()
     except httplib.BadStatusLine:
         reconnect_btcd(retries)
-        return createburn(myidhash, mybtc, amount, default_fee, conf_wait, conf_end)
+        return createburn(myidhash, mybtc, amount, tx_fee, conf_wait, conf_end)
     
     # Aggregate to main address. Includes 2 fees.
     def create_ag(fee, retries=0):
-        raw_agtx_hex = mktx(amount+default_fee, mybtc, change_addr, fee, minconf)
+        raw_agtx_hex = mktx(amount+tx_fee, mybtc, change_addr, fee, minconf)
         try:
             return btcd.signrawtransaction(raw_agtx_hex)['hex']
         except httplib.BadStatusLine:
             reconnect_btcd(retries)
             return create_ag(fee)
     
-    sig_agtx_hex = create_ag(default_fee)
+    sig_agtx_hex = create_ag(tx_fee)
     ag_fee = calc_fee(sig_agtx_hex)
-    if ag_fee != default_fee:
+    if ag_fee != tx_fee:
         sig_agtx_hex = create_ag(ag_fee)
     try:
         sig_agtx = btcd.decoderawtransaction(sig_agtx_hex)
     except httplib.BadStatusLine:
         reconnect_btcd(retries)
-        return createburn(myidhash, mybtc, amount, default_fee, conf_wait, conf_end)
+        return createburn(myidhash, mybtc, amount, tx_fee, conf_wait, conf_end)
     
     if retries < 1:
         ag_txid = sendtx(sig_agtx_hex)
@@ -642,7 +642,7 @@ def createburn(myidhash, mybtc, amount, default_fee, conf_wait, conf_end=None, r
         waitforconf(ag_txid, conf_wait, conf_end)
     
     # Create raw burn TX.
-    vout = searchtxops(sig_agtx, mybtc, amount+default_fee)
+    vout = searchtxops(sig_agtx, mybtc, amount+tx_fee)
     
     txs = [{    "txid": ag_txid,
                 "vout": vout }]
@@ -653,7 +653,7 @@ def createburn(myidhash, mybtc, amount, default_fee, conf_wait, conf_end=None, r
         burntx_hex_signed = btcd.signrawtransaction(burntx_hex)['hex']
     except httplib.BadStatusLine:
         reconnect_btcd(retries)
-        return createburn(myidhash, mybtc, amount, default_fee, conf_wait, conf_end, retries+1)
+        return createburn(myidhash, mybtc, amount, tx_fee, conf_wait, conf_end, retries+1)
 
     burn_txid = sendtx(burntx_hex_signed)
     
@@ -661,7 +661,7 @@ def createburn(myidhash, mybtc, amount, default_fee, conf_wait, conf_end=None, r
     return createburnmsgstr(mybtc, myidhash, burn_txid)
     
     
-def createorder(myidhash, mybtc, offer, cryptkey, default_fee, retries=0):
+def createorder(myidhash, mybtc, offer, cryptkey, tx_fee, retries=0):
     price = decimal.Decimal(offer.obj['price'])
     try:
         pubkey = btcd.validateaddress(mybtc)['pubkey']
@@ -669,7 +669,7 @@ def createorder(myidhash, mybtc, offer, cryptkey, default_fee, retries=0):
         change_addr = btcd.getrawchangeaddress()
     except httplib.BadStatusLine:
         reconnect_btcd(retries)
-        return createorder(myidhash, mybtc, offer, cryptkey, default_fee, retries+1)
+        return createorder(myidhash, mybtc, offer, cryptkey, tx_fee, retries+1)
     
     def create_funding(fee, retries=0):
         rawtx_hex = mktx(price, multisig['address'], change_addr, fee)
@@ -679,9 +679,9 @@ def createorder(myidhash, mybtc, offer, cryptkey, default_fee, retries=0):
             reconnect_btcd(retries)
             return create_funding(fee, retries+1)
     
-    signedtx_hex = create_funding(default_fee)
+    signedtx_hex = create_funding(tx_fee)
     funding_fee = calc_fee(signedtx_hex)
-    if funding_fee != default_fee:
+    if funding_fee != tx_fee:
         signedtx_hex = create_funding(funding_fee)
     
     crypttx = base64.b64encode( simplecrypt.encrypt(cryptkey, signedtx_hex) )
@@ -690,7 +690,7 @@ def createorder(myidhash, mybtc, offer, cryptkey, default_fee, retries=0):
         signedtx = btcd.decoderawtransaction(signedtx_hex)
     except httplib.BadStatusLine:
         reconnect_btcd(retries)
-        return createorder(myidhash, mybtc, offer, cryptkey, default_fee, retries+1)
+        return createorder(myidhash, mybtc, offer, cryptkey, tx_fee, retries+1)
     
     vout = searchtxops(signedtx, multisig['address'], price)
     
@@ -699,7 +699,7 @@ def createorder(myidhash, mybtc, offer, cryptkey, default_fee, retries=0):
                                         vout, signedtx['vout'][vout]['scriptPubKey']['hex'] )
 
     
-def createconf( myidhash, mybtc, order, offer, buyer, default_fee, retries=0 ):
+def createconf( myidhash, mybtc, order, offer, buyer, tx_fee, retries=0 ):
     price = decimal.Decimal(offer.obj['price'])
     ratio = decimal.Decimal(offer.obj['ratio'])
     pubkey = offer.obj['pubkey']
@@ -708,7 +708,7 @@ def createconf( myidhash, mybtc, order, offer, buyer, default_fee, retries=0 ):
         ms_verify = btcd.createmultisig( 2, sorted([order.obj['pubkey'], pubkey]) )
     except httplib.BadStatusLine:
         reconnect_btcd(retries)
-        return createconf( myidhash, mybtc, order, offer, buyer, default_fee, retries+1)
+        return createconf( myidhash, mybtc, order, offer, buyer, tx_fee, retries+1)
     
     if ms_verify['address'] != order.obj['multisig']['address']:
         raise Exception("Multisig did not verify!")
@@ -725,9 +725,9 @@ def createconf( myidhash, mybtc, order, offer, buyer, default_fee, retries=0 ):
             reconnect_btcd(retries)
             return create_refund(fee, retries+1)
         
-    refund_tx_hex = create_refund(default_fee)
+    refund_tx_hex = create_refund(tx_fee)
     refund_fee = calc_fee(refund_tx_hex)
-    if refund_fee != default_fee:
+    if refund_fee != tx_fee:
         refund_tx_hex = create_refund(refund_fee)
     
     #sets sequence to 0 (hacky as balls)
@@ -744,7 +744,7 @@ def createconf( myidhash, mybtc, order, offer, buyer, default_fee, retries=0 ):
         sig_refund_hex = btcd.signrawtransaction(refund_tx_hex, prev_tx, [wif])['hex']
     except httplib.BadStatusLine:
         reconnect_btcd(retries)
-        return createconf( myidhash, mybtc, order, offer, buyer, default_fee, retries+1)
+        return createconf( myidhash, mybtc, order, offer, buyer, tx_fee, retries+1)
     
     return createconfmsgstr(mybtc, order.hash, myidhash, order.obj['buyerid'], \
                                         sig_refund_hex, prev_tx )
@@ -791,9 +791,9 @@ def createrec( myidhash, mybtc, pay, order, price, gettx_wait, conf_wait, retrie
             reconnect_btcd(retries)
             return create_final(fee, retries+1)
         
-    final_tx_hex = create_final(default_fee)
+    final_tx_hex = create_final(tx_fee)
     final_fee = calc_fee(final_tx_hex)
-    if final_fee != default_fee:
+    if final_fee != tx_fee:
         final_tx_hex = create_final(final_fee)
 
     prev_tx[0]["scriptPubKey"] = order.obj['spk']
@@ -816,7 +816,7 @@ def createfinal(myidhash, mybtc, finalflag, rec, vendor, offer, price, retries=0
         reconnect_btcd(retries)
         return createfinal(myidhash, mybtc, finalflag, rec, vendor, offer, price, retries+1)
         
-    searchtxops(final_verify, vendor.obj['btcaddr'], price - default_fee)
+    searchtxops(final_verify, vendor.obj['btcaddr'], price - tx_fee)
     
     try:
         complete_final = btcd.signrawtransaction(rec.obj['finaltx'], rec.obj['prevtx'], [wif])['hex']
