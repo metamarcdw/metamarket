@@ -1097,6 +1097,25 @@ def truncate(num):
             return decimal.Decimal( strnum[:i+9] )
     return num
     
+# Takes a signed hex TX and returns an appropriate total fee.
+# Returns None if btcd cannot estimate.
+def calculatefee(signedtx, retries=0):
+    try:
+        feeperkb = btcd.estimatefee(6)
+    except httplib.BadStatusLine:
+        reconnect_btcd(retries)
+        return calculatefee(signedtx, retries+1)
+    
+    if feeperkb < 0:
+        return None
+    
+    kb = (len(signedtx) /2) /1024
+    if kb < 1:
+        kb = 1
+    
+    return decimal.Decimal( feeperkb*kb )
+
+
 # Takes a ratio and amount, returns a tuple containing
 # two portions of the amounts based on the given ratio.
 def getamounts(ratio, amount):
