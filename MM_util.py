@@ -736,7 +736,7 @@ def createconf( myidhash, mybtc, order, offer, buyer, tx_fee, retries=0 ):
                                         sig_refund_hex, prev_tx )
 
     
-def createpay(myidhash, mybtc, conf, order, offer, tx_fee, retries=0):
+def createpay(myidhash, mybtc, conf, order, offer, tx_fee, pkstr, retries=0):
     price = decimal.Decimal(offer.obj['price'])
     ratio = decimal.Decimal(offer.obj['ratio'])
     b_portion, v_portion = getamounts(ratio, price)
@@ -745,7 +745,7 @@ def createpay(myidhash, mybtc, conf, order, offer, tx_fee, retries=0):
         refund_verify = btcd.decoderawtransaction(conf.obj['refundtx'])
     except httplib.BadStatusLine:
         reconnect_btcd(retries)
-        return createpay(myidhash, mybtc, conf, order, offer, retries+1)
+        return createpay(myidhash, mybtc, conf, order, offer, tx_fee, pkstr, retries+1)
     
     searchtxops(refund_verify, btcaddr, b_portion - tx_fee/2)
     
@@ -753,7 +753,7 @@ def createpay(myidhash, mybtc, conf, order, offer, tx_fee, retries=0):
         complete_refund = btcd.signrawtransaction( conf.obj['refundtx'], conf.obj['prevtx'], [wif])['hex']
     except httplib.BadStatusLine:
         reconnect_btcd(retries)
-        return createpay(myidhash, mybtc, conf, order, offer, retries+1)
+        return createpay(myidhash, mybtc, conf, order, offer, tx_fee, pkstr, retries+1)
     
     fund_tx = simplecrypt.decrypt( pkstr, base64.b64decode(order.obj['crypt_fundingtx']) )
     sendtx(fund_tx)
