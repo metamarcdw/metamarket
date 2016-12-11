@@ -48,14 +48,13 @@ sudo pip install scrypt
 sudo pip install pycrypto
 sudo pip install simple-crypt
 sudo pip install pycoin
-export install_dir=~
-cd $install_dir
-git clone https://github.com/petertodd/python-bitcoinlib.git
-python python-bitcoinlib/setup.py install
+sudo pip install python-bitcoinrpc
 ```
 
 **INSTALL METAmarket:**
 ```
+export install_dir=~
+cd $install_dir
 wget https://github.com/metamarcdw/metamarket/archive/v0.1.0-alpha.tar.gz
 tar -x -f v0.1.0-alpha.tar.gz
 cd metamarket-0.1.0-alpha
