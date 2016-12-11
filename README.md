@@ -7,6 +7,7 @@ http://metamarket.trade
 
 *Install Bitcoin Core* - http://bitcoin.org
 ```
+# Debian/Ubuntu Install
 sudo apt-add-repository ppa:bitcoin/bitcoin
 sudo apt-get update
 sudo apt-get install bitcoin-qt
@@ -14,6 +15,7 @@ bitcoin-qt
 ```
 *Install Bitmessage* - http://bitmessage.org
 ```
+# Debian/Ubuntu install (from source)
 sudo apt-get install python openssl git python-qt4
 git clone https://github.com/Bitmessage/PyBitmessage ~/PyBitmessage 
 ~/PyBitmessage/src/bitmessagemain.py
@@ -38,7 +40,7 @@ rpcuser=user
 rpcpassword=password
 ```
 
-*INSTALL ON UBUNTU GNU/LINUX:*
+*INSTALL ON DEBIAN AND UBUNTU GNU/LINUX:*
 
 **DEPENDENCIES:**
 ```
@@ -56,7 +58,7 @@ sudo pip install python-bitcoinrpc
 export install_dir=~
 cd $install_dir
 wget https://github.com/metamarcdw/metamarket/archive/v0.1.0-alpha.tar.gz
-tar -x -f v0.1.0-alpha.tar.gz
+tar -xf v0.1.0-alpha.tar.gz
 cd metamarket-0.1.0-alpha
 ./mmcli.py --help
 ```
@@ -65,11 +67,11 @@ cd metamarket-0.1.0-alpha
 ```
 cd ~/.bitcoin
 wget http://metamarket.trade/test_suite/regtest_conf.tar.gz
-tar -x -f regtest_conf.tar.gz
+tar -xf regtest_conf.tar.gz
 
 cd $install_dir
 wget http://metamarket.trade/test_suite/test_suite_scripts.tar.gz
-tar -x -f test_suite_scripts.tar.gz
+tar -xf test_suite_scripts.tar.gz
 ./copyscripts
 ```
 
